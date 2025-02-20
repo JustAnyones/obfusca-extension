@@ -1,0 +1,11 @@
+{
+    "name": "extension demo",
+    "description": "demo",
+    "version": "1.0.0",
+    "action": {
+        "default_popup": "index.html",
+        "default_icon": "icons/Icon-192.png"
+    },
+    "permissions": ["scripting", "activeTab"],
+    "manifest_version": 3
+}
