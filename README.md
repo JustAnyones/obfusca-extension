@@ -1,16 +1,14 @@
 # browser_extension
 
-A new Flutter project.
+## Firefox setup
 
-## Getting Started
+1. In search bar type `about:debugging`
+2. Press `Load Temporary Add-on`
+3. Go to select `<extendion_dir>/build/web/manifest.json`
 
-This project is a starting point for a Flutter application.
+## Chrome setup
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. In search bar type `chrome:extensions`
+2. Enable *Developer mode*
+3. Press `Load unpacked`
+4. Select the web directory `<extension_dirt>/build/web`
