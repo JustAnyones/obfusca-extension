@@ -3,10 +3,8 @@ function print(){
 	console.log(item);
 	item.setAttribute("labas","Pasauli");
 	console.log("hello");
-	alert("good");
 }
 function good(tab){
-	alert(tab[0].id);
 	chrome.scripting.executeScript({
 		target: {
 			tabId: tab[0].id
