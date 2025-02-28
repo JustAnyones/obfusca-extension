@@ -35,6 +35,8 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
 
   String _generatedName = "";
 
+  // Language selection state
+  String _selectedLanguage = 'Lithuanian';
   @override
   void initState() {
     super.initState();
@@ -42,8 +44,19 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
   }
 
   Future<void> _loadCSVData() async {
-    var result = await readCSV('assets/EngNames.csv');
-    var result2 = await readCSV('assets/EngSur.csv');
+    String namesFilePath;
+    String surnamesFilePath;
+
+    if (_selectedLanguage == 'English') {
+      namesFilePath = 'assets/EngNames.csv';
+      surnamesFilePath = 'assets/EngSur.csv';
+    } else {
+      namesFilePath = 'assets/LTNames.csv';
+      surnamesFilePath = 'assets/LTSur.csv';
+    }
+
+    var result = await readCSV(namesFilePath);
+    var result2 = await readCSV(surnamesFilePath);
 
     setState(() {
       names = result.$1;
@@ -54,11 +67,35 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
   }
 
   void _generateName() {
+    if (names.isEmpty || nameFreq.isEmpty || surNames.isEmpty || surNamesFreq.isEmpty) {
+      setState(() {
+        _generatedName = 'Error: Could not load name data.';
+      });
+      return;
+    }
+
     String fullName = NameGenerator.generateName(names, nameFreq, surNames, surNamesFreq);
 
     List<String> nameParts = fullName.split(" ");
     String name = nameParts[0];
     String surname = nameParts[1];
+    surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
+
+    while (true) {
+      if (name[name.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0) && surname[surname.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0)) {
+        break;
+      }
+      else if (name[name.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0) && surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)){
+        break;
+      }
+      fullName = NameGenerator.generateName(names, nameFreq, surNames, surNamesFreq);
+      nameParts = fullName.split(" ");
+      name = nameParts[0];
+      surname = nameParts[1];
+      surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
+    }
+
+    fullName = '$name $surname';
 
     setState(() {
       _nameController.text = name;
