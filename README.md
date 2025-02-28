@@ -1,5 +1,16 @@
 # browser_extension
 
+## Building
+
+To build the extension, run the following command:
+
+```
+flutter build web --no-web-resources-cdn
+```
+
+`--no-web-resources-cdn` is used to load libraries (specifically canvaskit) locally instead of from CDN.
+
+
 ## Firefox setup
 
 1. In search bar type `about:debugging`
