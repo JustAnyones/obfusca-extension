@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'utils/name_generator.dart';
+import 'utils/read_csv.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,13 +25,36 @@ class NameGeneratorScreen extends StatefulWidget {
 }
 
 class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
+  late List<String> names;
+  late List<double> nameFreq;
+  late List<String> surNames;
+  late List<double> surNamesFreq;
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
 
   String _generatedName = "";
 
+  @override
+  void initState() {
+    super.initState();
+    _loadCSVData();
+  }
+
+  Future<void> _loadCSVData() async {
+    var result = await readCSV('assets/EngNames.csv');
+    var result2 = await readCSV('assets/EngSur.csv');
+
+    setState(() {
+      names = result.$1;
+      nameFreq = result.$2;
+      surNames = result2.$1;
+      surNamesFreq = result2.$2;
+    });
+  }
+
   void _generateName() {
-    String fullName = NameGenerator.generateName();
+    String fullName = NameGenerator.generateName(names, nameFreq, surNames, surNamesFreq);
 
     List<String> nameParts = fullName.split(" ");
     String name = nameParts[0];
