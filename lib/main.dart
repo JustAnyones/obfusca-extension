@@ -1,122 +1,151 @@
 import 'package:flutter/material.dart';
+import 'utils/name_generator.dart';
+import 'utils/read_csv.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Name Generator Extension',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: NameGeneratorScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class NameGeneratorScreen extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _NameGeneratorScreenState createState() => _NameGeneratorScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
+  late List<String> names;
+  late List<double> nameFreq;
+  late List<String> surNames;
+  late List<double> surNamesFreq;
 
-  void _incrementCounter() {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController();
+
+  String _generatedName = "";
+
+  // Language selection state
+  String _selectedLanguage = 'Lithuanian';
+  @override
+  void initState() {
+    super.initState();
+    _loadCSVData();
+  }
+
+  Future<void> _loadCSVData() async {
+    String namesFilePath;
+    String surnamesFilePath;
+
+    if (_selectedLanguage == 'English') {
+      namesFilePath = 'assets/EngNames.csv';
+      surnamesFilePath = 'assets/EngSur.csv';
+    } else {
+      namesFilePath = 'assets/LTNames.csv';
+      surnamesFilePath = 'assets/LTSur.csv';
+    }
+
+    var result = await readCSV(namesFilePath);
+    var result2 = await readCSV(surnamesFilePath);
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      names = result.$1;
+      nameFreq = result.$2;
+      surNames = result2.$1;
+      surNamesFreq = result2.$2;
+    });
+  }
+
+  void _generateName() {
+    if (names.isEmpty || nameFreq.isEmpty || surNames.isEmpty || surNamesFreq.isEmpty) {
+      setState(() {
+        _generatedName = 'Error: Could not load name data.';
+      });
+      return;
+    }
+
+    String fullName = NameGenerator.generateName(names, nameFreq, surNames, surNamesFreq);
+
+    List<String> nameParts = fullName.split(" ");
+    String name = nameParts[0];
+    String surname = nameParts[1];
+    surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
+
+    while (true) {
+      if (name[name.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0) && surname[surname.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0)) {
+        break;
+      }
+      else if (name[name.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0) && surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)){
+        break;
+      }
+      fullName = NameGenerator.generateName(names, nameFreq, surNames, surNamesFreq);
+      nameParts = fullName.split(" ");
+      name = nameParts[0];
+      surname = nameParts[1];
+      surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
+    }
+
+    fullName = '$name $surname';
+
+    setState(() {
+      _nameController.text = name;
+      _surnameController.text = surname;
+      _generatedName = fullName;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text("Name Generator Extension"),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: "Name",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Surname TextField
+            TextField(
+              controller: _surnameController,
+              decoration: InputDecoration(
+                labelText: "Surname",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: _generateName,
+              child: Text("Generate Name"),
+            ),
+            SizedBox(height: 16),
+
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              _generatedName,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
