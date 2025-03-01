@@ -5,6 +5,29 @@ enum Language { English, Lithuanian }
 
 enum Region { America, Lithuania }
 
+List<String> languages = ['English', 'Lithuanian'];
+List<String> regions = ['America', 'Lithuania'];
+
+class SettingsState {
+  static const String KEY_LANG = 'lang';
+  static const String KEY_REGION = 'region';
+
+  static Future<void> setString(String key, String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value);
+  }
+
+  static Future<String?> getString(String key, String defaultValue) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key) ?? defaultValue;
+  }
+
+  static Future<String?> getRegion() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(KEY_REGION) ?? regions[0];
+  }
+}
+
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -14,12 +37,6 @@ class _SettingsPageState extends State<SettingsPage> {
   String? _selectedLanguage;
   String? _selectedRegion;
 
-  static const String KEY_LANG = 'lang';
-  static const String KEY_REGION = 'region';
-
-  List<String> languages = ['English', 'Lithuanian'];
-  List<String> regions = ['America', 'Lithuania'];
-
   @override
   void initState() {
     super.initState();
@@ -27,17 +44,29 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadSettings() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var lang = await SettingsState.getString(
+      SettingsState.KEY_LANG,
+      languages[0],
+    );
+    var region = await SettingsState.getString(
+      SettingsState.KEY_REGION,
+      regions[0],
+    );
     setState(() {
-      _selectedLanguage = prefs.getString(KEY_LANG) ?? languages[0];
-      _selectedRegion = prefs.getString(KEY_REGION) ?? regions[0];
+      _selectedLanguage = lang;
+      _selectedRegion = region;
     });
   }
 
   Future<void> _saveSettings() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(KEY_LANG, _selectedLanguage ?? languages[0]);
-    prefs.setString(KEY_REGION, _selectedRegion ?? regions[0]);
+    await SettingsState.setString(
+      SettingsState.KEY_LANG,
+      _selectedLanguage ?? languages[0],
+    );
+    await SettingsState.setString(
+      SettingsState.KEY_REGION,
+      _selectedRegion ?? regions[0],
+    );
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('Settings saved!')));

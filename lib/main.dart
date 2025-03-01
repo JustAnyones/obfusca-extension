@@ -34,8 +34,6 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
 
   String _generatedName = "";
 
-  // Language selection state
-  String _selectedLanguage = 'Lithuanian';
   @override
   void initState() {
     super.initState();
@@ -46,7 +44,9 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
     String namesFilePath;
     String surnamesFilePath;
 
-    if (_selectedLanguage == 'English') {
+    // TODO: force reload if settings change
+    var region = await SettingsState.getRegion();
+    if (region == 'America') {
       namesFilePath = 'assets/EngNames.csv';
       surnamesFilePath = 'assets/EngSur.csv';
     } else {

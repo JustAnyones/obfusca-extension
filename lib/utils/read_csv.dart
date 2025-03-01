@@ -5,7 +5,6 @@ Future<(List<String>, List<double>)> readCSV(String filePath) async {
   List<String> data = [];
   List<double> freq = [];
   try {
-
     final csvString = await rootBundle.loadString(filePath);
 
     final csvTable = const CsvToListConverter().convert(csvString);
