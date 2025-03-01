@@ -1,3 +1,4 @@
+import 'package:browser_extension/settings.dart';
 import 'package:flutter/material.dart';
 import 'utils/name_generator.dart';
 import 'utils/read_csv.dart';
@@ -11,9 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Name Generator Extension',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: NameGeneratorScreen(),
     );
   }
@@ -67,14 +66,22 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
   }
 
   void _generateName() {
-    if (names.isEmpty || nameFreq.isEmpty || surNames.isEmpty || surNamesFreq.isEmpty) {
+    if (names.isEmpty ||
+        nameFreq.isEmpty ||
+        surNames.isEmpty ||
+        surNamesFreq.isEmpty) {
       setState(() {
         _generatedName = 'Error: Could not load name data.';
       });
       return;
     }
 
-    String fullName = NameGenerator.generateName(names, nameFreq, surNames, surNamesFreq);
+    String fullName = NameGenerator.generateName(
+      names,
+      nameFreq,
+      surNames,
+      surNamesFreq,
+    );
 
     List<String> nameParts = fullName.split(" ");
     String name = nameParts[0];
@@ -82,13 +89,19 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
     surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
 
     while (true) {
-      if (name[name.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0) && surname[surname.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0)) {
+      if (name[name.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0) &&
+          surname[surname.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0)) {
+        break;
+      } else if (name[name.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0) &&
+          surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)) {
         break;
       }
-      else if (name[name.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0) && surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)){
-        break;
-      }
-      fullName = NameGenerator.generateName(names, nameFreq, surNames, surNamesFreq);
+      fullName = NameGenerator.generateName(
+        names,
+        nameFreq,
+        surNames,
+        surNamesFreq,
+      );
       nameParts = fullName.split(" ");
       name = nameParts[0];
       surname = nameParts[1];
@@ -107,9 +120,7 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Name Generator Extension"),
-      ),
+      appBar: AppBar(title: Text("Name Generator Extension")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -142,6 +153,16 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
             Text(
               _generatedName,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                );
+              },
+              child: Text('Settings'),
             ),
           ],
         ),

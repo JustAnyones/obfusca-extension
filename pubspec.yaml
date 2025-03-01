@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   csv: ^6.0.0
+  shared_preferences: ^2.5.2
   flutter:
     sdk: flutter
 
