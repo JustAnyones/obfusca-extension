@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum Language { English, Lithuanian }
 
@@ -67,26 +68,28 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsState.KEY_REGION,
       _selectedRegion ?? regions[0],
     );
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Settings saved!')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.settings_saved_popup),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Settings')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.settings_title)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Language
-            Text('Interface Language'),
+            Text(AppLocalizations.of(context)!.setting_locale_title),
             DropdownButton<String>(
               isExpanded: true,
               value: _selectedLanguage,
-              hint: Text('Choose Interface Language'),
+              hint: Text(AppLocalizations.of(context)!.setting_locale_hint),
               onChanged: (String? newValue) {
                 setState(() {
                   _selectedLanguage = newValue;
@@ -103,11 +106,11 @@ class _SettingsPageState extends State<SettingsPage> {
             SizedBox(height: 20),
 
             // Region
-            Text('Region'),
+            Text(AppLocalizations.of(context)!.setting_region_title),
             DropdownButton<String>(
               isExpanded: true,
               value: _selectedRegion,
-              hint: Text('Choose Region'),
+              hint: Text(AppLocalizations.of(context)!.setting_region_hint),
               onChanged: (String? newValue) {
                 setState(() {
                   _selectedRegion = newValue;
@@ -126,7 +129,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 _saveSettings();
               },
-              child: Text('Save Settings'),
+              child: Text(AppLocalizations.of(context)!.settings_save_button),
             ),
           ],
         ),

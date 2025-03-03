@@ -2,13 +2,20 @@
 
 ## Building
 
+First of all, run:
+```bash
+flutter pub get
+```
+
+This will also regenerate translations.
+
 To build the extension, run the following command:
 
-```
+```bash
 flutter build web --no-web-resources-cdn
 ```
 
-`--no-web-resources-cdn` is used to load libraries (specifically canvaskit) locally instead of from CDN.
+- `--no-web-resources-cdn` is used to load libraries (specifically canvaskit) locally rather than through a CDN.
 
 
 ## Firefox setup

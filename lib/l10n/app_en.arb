@@ -1,0 +1,26 @@
+{
+  "helloWorld": "Hello World!",
+  "ext_title": "Name Generator Extension",
+
+
+  "settings_title": "Settings",
+  "@settings_title": {
+    "description": "Settings page name"
+  },
+  "setting_locale_title": "Interface Language",
+  "@setting_locale_title": {
+    "description": "Title for the language option"
+  },
+  "setting_locale_hint": "Choose Interface Language",
+  "setting_region_title": "Region",
+  "setting_region_hint": "Choose Region",
+  "settings_save_button": "Save Settings",
+  "settings_saved_popup": "Settings Saved!",
+
+  "@ext_title": {
+    "description": "Name and title of the extension"
+  },
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  }
+}

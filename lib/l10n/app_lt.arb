@@ -1,0 +1,13 @@
+{
+    "helloWorld": "Sveikas pasauli!",
+
+    "ext_title": "Vardų generavimo įskiepis",
+
+    "settings_title": "Nustatymai",
+    "setting_locale_title": "Kalba",
+    "setting_locale_hint": "Pasirinkite kalbą",
+    "setting_region_title": "Regionas",
+    "setting_region_hint": "Pasirinkite regioną",
+    "settings_save_button": "Išsaugoti nustatymus",
+    "settings_saved_popup": "Nustatymai išsaugoti!"
+}

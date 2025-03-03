@@ -2,6 +2,8 @@ import 'package:browser_extension/settings.dart';
 import 'package:flutter/material.dart';
 import 'utils/name_generator.dart';
 import 'utils/read_csv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,6 +15,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Name Generator Extension',
       theme: ThemeData(primarySwatch: Colors.blue),
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      locale: Locale('lt'),
+      supportedLocales: [Locale('en'), Locale('lt')],
       home: NameGeneratorScreen(),
     );
   }
@@ -120,7 +130,7 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Name Generator Extension")),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.ext_title)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -162,7 +172,7 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
                   MaterialPageRoute(builder: (context) => SettingsPage()),
                 );
               },
-              child: Text('Settings'),
+              child: Text(AppLocalizations.of(context)!.settings_title),
             ),
           ],
         ),
