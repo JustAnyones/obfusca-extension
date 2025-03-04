@@ -5,6 +5,7 @@ import 'utils/name_generator.dart';
 import 'utils/read_csv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:js_interop';
 
 void main() async {
   await SettingProvider().initialize();
@@ -15,6 +16,8 @@ void main() async {
     ),
   );
 }
+@JS('hello')
+external void _editHTML();
 
 class MyExtension extends StatefulWidget {
   @override
@@ -173,6 +176,12 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
             ElevatedButton(
               onPressed: _generateName,
               child: Text("Generate Name"),
+            ),
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: (){_editHTML();},
+              child: Text("Edit HTML"),
             ),
             SizedBox(height: 16),
 

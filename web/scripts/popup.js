@@ -19,5 +19,3 @@ function onError(error){
 function hello(){
 	chrome.tabs.query({ currentWindow: true, active: true }).then(good, onError);
 }
-
-document.getElementById("clickMe").addEventListener('click', hello);
