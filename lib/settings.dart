@@ -7,23 +7,48 @@ enum Language { English, Lithuanian }
 enum Region { America, Lithuania }
 
 List<String> languages = ['English', 'Lithuanian'];
+List<String> locales = ['en', 'lt'];
 List<String> regions = ['America', 'Lithuania'];
 
-class SettingsState {
-  static const String KEY_LANG = 'lang';
+class SettingProvider extends ChangeNotifier {
+  static const String KEY_LOCALE = 'locale';
   static const String KEY_REGION = 'region';
 
-  static Future<void> setString(String key, String value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+  static final SettingProvider _instance = SettingProvider._internal();
+
+  // Private constructor
+  SettingProvider._internal() {
+    print("Singleton Instance Created");
   }
 
-  static Future<String?> getString(String key, String defaultValue) async {
+  factory SettingProvider() {
+    return _instance;
+  }
+
+  Locale _locale = Locale(locales[0]);
+
+  Locale get locale => _locale;
+
+  static SettingProvider getInstance() {
+    return _instance;
+  }
+
+  Future<void> setString(String key, String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value);
+
+    if (key == KEY_LOCALE) {
+      _locale = Locale(value);
+    }
+    notifyListeners();
+  }
+
+  Future<String?> getString(String key, String defaultValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key) ?? defaultValue;
   }
 
-  static Future<String?> getRegion() async {
+  Future<String?> getRegion() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(KEY_REGION) ?? regions[0];
   }
@@ -45,12 +70,12 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadSettings() async {
-    var lang = await SettingsState.getString(
-      SettingsState.KEY_LANG,
-      languages[0],
+    var lang = await SettingProvider.getInstance().getString(
+      SettingProvider.KEY_LOCALE,
+      locales[0],
     );
-    var region = await SettingsState.getString(
-      SettingsState.KEY_REGION,
+    var region = await SettingProvider.getInstance().getString(
+      SettingProvider.KEY_REGION,
       regions[0],
     );
     setState(() {
@@ -60,12 +85,12 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _saveSettings() async {
-    await SettingsState.setString(
-      SettingsState.KEY_LANG,
-      _selectedLanguage ?? languages[0],
+    await SettingProvider.getInstance().setString(
+      SettingProvider.KEY_LOCALE,
+      _selectedLanguage ?? locales[0],
     );
-    await SettingsState.setString(
-      SettingsState.KEY_REGION,
+    await SettingProvider.getInstance().setString(
+      SettingProvider.KEY_REGION,
       _selectedRegion ?? regions[0],
     );
     ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +121,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
               },
               items:
-                  languages.map<DropdownMenuItem<String>>((String value) {
+                  locales.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),

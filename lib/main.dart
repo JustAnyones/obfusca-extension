@@ -1,29 +1,44 @@
 import 'package:browser_extension/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'utils/name_generator.dart';
 import 'utils/read_csv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => SettingProvider(),
+      child: MyExtension(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyExtension extends StatefulWidget {
+  @override
+  State<MyExtension> createState() => _MyExtensionState();
+}
+
+class _MyExtensionState extends State<MyExtension> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Name Generator Extension',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      localizationsDelegates: [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      locale: Locale('lt'),
-      supportedLocales: [Locale('en'), Locale('lt')],
-      home: NameGeneratorScreen(),
+    return Consumer<SettingProvider>(
+      builder: (context, localeProvider, child) {
+        return MaterialApp(
+          title: 'Name Generator Extension',
+          theme: ThemeData(primarySwatch: Colors.blue),
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          locale: localeProvider.locale,
+          supportedLocales: [Locale('en'), Locale('lt')],
+          home: NameGeneratorScreen(),
+        );
+      },
     );
   }
 }
@@ -55,7 +70,7 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
     String surnamesFilePath;
 
     // TODO: force reload if settings change
-    var region = await SettingsState.getRegion();
+    var region = await SettingProvider.getInstance().getRegion();
     if (region == 'America') {
       namesFilePath = 'assets/EngNames.csv';
       surnamesFilePath = 'assets/EngSur.csv';
