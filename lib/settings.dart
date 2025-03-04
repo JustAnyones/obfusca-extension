@@ -33,6 +33,14 @@ class SettingProvider extends ChangeNotifier {
     return _instance;
   }
 
+  Future<void> initialize() async {
+    _locale = Locale(await _getLocale());
+  }
+
+  Future<String> _getLocale() async {
+    return await getString(KEY_LOCALE, locales[0]);
+  }
+
   Future<void> setString(String key, String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value);
@@ -43,12 +51,12 @@ class SettingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String?> getString(String key, String defaultValue) async {
+  Future<String> getString(String key, String defaultValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key) ?? defaultValue;
   }
 
-  Future<String?> getRegion() async {
+  Future<String> getRegion() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(KEY_REGION) ?? regions[0];
   }
