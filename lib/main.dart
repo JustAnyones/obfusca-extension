@@ -74,8 +74,7 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
     String surnamesFilePath;
 
     // TODO: force reload if settings change
-    var region = await SettingProvider.getInstance().getRegion();
-    if (region == 'America') {
+    if (SettingProvider.getInstance().region == 'America') {
       namesFilePath = 'assets/EngNames.csv';
       surnamesFilePath = 'assets/EngSur.csv';
     } else {
@@ -180,7 +179,9 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
             SizedBox(height: 16),
 
             ElevatedButton(
-              onPressed: (){_editHTML();},
+              onPressed: () {
+                _editHTML();
+              },
               child: Text("Edit HTML"),
             ),
             SizedBox(height: 16),
