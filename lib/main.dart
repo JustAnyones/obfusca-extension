@@ -66,7 +66,14 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
   @override
   void initState() {
     super.initState();
+    SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
+  }
+
+  @override
+  void dispose() {
+    SettingProvider.getInstance().removeListener(_loadCSVData);
+    super.dispose();
   }
 
   Future<void> _loadCSVData() async {
