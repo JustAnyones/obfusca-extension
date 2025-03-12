@@ -152,9 +152,14 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+@override
+Widget build(BuildContext context) {
+  return GestureDetector(
+    behavior: HitTestBehavior.translucent,
+    onTap: () {
+      FocusManager.instance.primaryFocus?.unfocus();
+    },
+    child: Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.ext_title)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -169,7 +174,6 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
             ),
             SizedBox(height: 16),
 
-            // Surname TextField
             TextField(
               controller: _surnameController,
               decoration: InputDecoration(
@@ -198,6 +202,7 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -210,6 +215,7 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
