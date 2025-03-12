@@ -16,6 +16,7 @@ void main() async {
     ),
   );
 }
+
 @JS('hello')
 external void _editHTML();
 
@@ -152,70 +153,69 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
     });
   }
 
-@override
-Widget build(BuildContext context) {
-  return GestureDetector(
-    behavior: HitTestBehavior.translucent,
-    onTap: () {
-      FocusManager.instance.primaryFocus?.unfocus();
-    },
-    child: Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.ext_title)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: "Name",
-                border: OutlineInputBorder(),
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.ext_title)),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: "Name",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
+              SizedBox(height: 16),
 
-            TextField(
-              controller: _surnameController,
-              decoration: InputDecoration(
-                labelText: "Surname",
-                border: OutlineInputBorder(),
+              TextField(
+                controller: _surnameController,
+                decoration: InputDecoration(
+                  labelText: "Surname",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
+              SizedBox(height: 16),
 
-            ElevatedButton(
-              onPressed: _generateName,
-              child: Text("Generate Name"),
-            ),
-            SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _generateName,
+                child: Text("Generate Name"),
+              ),
+              SizedBox(height: 16),
 
-            ElevatedButton(
-              onPressed: () {
-                _editHTML();
-              },
-              child: Text("Edit HTML"),
-            ),
-            SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  _editHTML();
+                },
+                child: Text("Edit HTML"),
+              ),
+              SizedBox(height: 16),
 
-            Text(
-              _generatedName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
-                );
-              },
-              child: Text(AppLocalizations.of(context)!.settings_title),
-            ),
-          ],
+              Text(
+                _generatedName,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()),
+                  );
+                },
+                child: Text(AppLocalizations.of(context)!.settings_title),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
