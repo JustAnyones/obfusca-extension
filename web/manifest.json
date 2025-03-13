@@ -9,6 +9,25 @@
         "default_popup": "popup.html",
         "default_icon": "icons/Icon-192.png"
     },
-    "permissions": ["scripting", "activeTab"],
-    "manifest_version": 3
+    "permissions": ["scripting", "activeTab", "webNavigation"],
+    "manifest_version": 3,
+    "web_accessible_resources": [{
+        "resources": [ "d.json" ],
+        "extension_ids": ["*"],
+        "matches": [ "*://*/*" ]
+    }],
+    "content_scripts": [{
+        "matches": [
+            "<all_urls>"
+        ],
+        "exclude_matches": [
+            "*://*/*.xml*",
+            "file:///*.xml*"
+        ],
+        "js": [
+            "scripts/content-script.js"
+        ],
+        "run_at": "document_idle",
+        "all_frames": true
+    }]
 }

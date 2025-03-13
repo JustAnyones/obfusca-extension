@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'utils/name_generator.dart';
 import 'utils/read_csv.dart';
+import 'web/interop.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'dart:js_interop';
 
 void main() async {
   await SettingProvider().initialize();
@@ -16,8 +16,6 @@ void main() async {
     ),
   );
 }
-@JS('hello')
-external void _editHTML();
 
 class MyExtension extends StatefulWidget {
   @override
@@ -63,6 +61,9 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
 
   String _generatedName = "";
 
+  int _frameId = -1;
+  List<Map> _detectedFields = [];
+
   @override
   void initState() {
     super.initState();
@@ -80,7 +81,6 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
     String namesFilePath;
     String surnamesFilePath;
 
-    // TODO: force reload if settings change
     if (SettingProvider.getInstance().region == 'America') {
       namesFilePath = 'assets/EngNames.csv';
       surnamesFilePath = 'assets/EngSur.csv';
@@ -186,10 +186,49 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
             SizedBox(height: 16),
 
             ElevatedButton(
-              onPressed: () {
-                _editHTML();
+              onPressed: () async {
+                var result = await queryFields();
+                if (result["status"] != "FOUND") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context)!.detect_fail),
+                    ),
+                  );
+                  return;
+                }
+
+                _frameId = result["frameId"];
+                _detectedFields = result["data"];
+
+                print("Received fields:");
+                print(_detectedFields);
               },
-              child: Text("Edit HTML"),
+              child: Text("Detect fields from current website"),
+            ),
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () {
+                if (_detectedFields.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context)!.detect_fail),
+                    ),
+                  );
+                  return;
+                }
+
+                List<Map<String, dynamic>> fieldsToFill = [];
+                for (var i = 0; i < _detectedFields.length; i++) {
+                  fieldsToFill.add({
+                    "ref": _detectedFields[i]["ref"],
+                    "value":
+                        _detectedFields[i]["generator"], // TODO: perform actual generation
+                  });
+                }
+                fillFields(_frameId, fieldsToFill);
+              },
+              child: Text("Fill detected fields"),
             ),
             SizedBox(height: 16),
 
