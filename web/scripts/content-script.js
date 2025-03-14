@@ -8,11 +8,11 @@ function initRefKeeper() {
 
 /**
  * 
- * @param {number} field 
- * @param {string} generator 
+ * @param {any} field Represents a HTML field.
+ * @param {string} generator Namespaced generator name.
  * @returns 
  */
-function wrapGen(field, generator) {
+function registerField(field, generator) {
     cnt++
     ref_keeper[cnt] = field
     return {ref: cnt, generator: generator}
@@ -82,7 +82,7 @@ function locateFromDataEntry(entry) {
             const eleme = document.querySelector(field["selector"])
             console.log("Query", field["selector"], eleme)
             if (eleme !== null) {
-                fields.push(wrapGen(eleme, field["generator"]))
+                fields.push(registerField(eleme, field["generator"]))
             }
         }
     }
@@ -120,7 +120,7 @@ function locateFields(data) {
 
 // Called when site finishes loading, not all iframes
 (async () => {
-    const dataUrl = chrome.runtime.getURL("d.json");
+    const dataUrl = chrome.runtime.getURL("predefined.json");
     const response = await fetch(dataUrl)
     const data = await response.json()
 
