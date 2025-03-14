@@ -2,6 +2,7 @@
   "helloWorld": "Hello World!",
   "ext_title": "Name Generator Extension",
 
+  "detect_fail": "Failed to detect fields",
 
   "settings_title": "Settings",
   "@settings_title": {
