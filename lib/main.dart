@@ -6,6 +6,7 @@ import 'utils/read_csv.dart';
 import 'web/interop.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'utils/Saver/saver.dart';
 
 void main() async {
   await SettingProvider().initialize();
@@ -186,6 +187,18 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
               ElevatedButton(
                 onPressed: _generateName,
                 child: Text("Generate Name"),
+              ),
+              SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed: () => writeToFile(_nameController.text, _surnameController.text),
+                child: Text("Save"),
+              ),
+              SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed: readFromFile,
+                child: Text("REad"),
               ),
               SizedBox(height: 16),
 
