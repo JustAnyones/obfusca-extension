@@ -11,13 +11,28 @@
   "@settings_title": {
     "description": "Settings page name"
   },
+
   "setting_locale_title": "Interface Language",
   "@setting_locale_title": {
     "description": "Title for the language option"
   },
   "setting_locale_hint": "Choose Interface Language",
+  "setting_locale_option": "{code, select, en{English} lt{Lithuanian} other{{code}}}",
+  "@setting_locale_option": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+
   "setting_region_title": "Region",
   "setting_region_hint": "Choose Region",
+  "setting_region_option": "{code, select, us{United States} lt{Lithuania} other{{code}}}",
+  "@setting_region_option": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+
   "settings_save_button": "Save Settings",
   "settings_saved_popup": "Settings Saved!",
 

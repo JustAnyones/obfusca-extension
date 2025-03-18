@@ -1,12 +1,14 @@
-import 'package:browser_extension/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'utils/name_generator.dart';
-import 'utils/read_csv.dart';
-import 'web/interop.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'utils/Saver/saver.dart';
+
+import 'package:browser_extension/providers/settings.dart';
+import 'package:browser_extension/utils/name_generator.dart';
+import 'package:browser_extension/utils/read_csv.dart';
+import 'package:browser_extension/web/interop.dart';
+import 'package:browser_extension/widgets/settings.dart';
 
 void main() async {
   await SettingProvider().initialize();
@@ -83,7 +85,7 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
     String namesFilePath;
     String surnamesFilePath;
 
-    if (SettingProvider.getInstance().region == 'America') {
+    if (SettingProvider.getInstance().region == 'us') {
       namesFilePath = 'assets/EngNames.csv';
       surnamesFilePath = 'assets/EngSur.csv';
     } else {
