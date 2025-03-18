@@ -1,38 +1,32 @@
 import "dart:convert";
-import "package:web/web.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
-class Data{
-  final String _name;
-  final String _surname;
+class Saver{
+  static SharedPreferences? _prefs;
 
-  Data(this._name, this._surname);
-
-}
-
-void writeToFile(String name, String surname) async{
-  int count = 0;
-  String? countS = window.localStorage.getItem("count");
-  if(countS != null){
-    count = int.parse(countS);
-    count++;
+  static Future<void> initialize() async{
+    _prefs = await SharedPreferences.getInstance();
+    print("Instance");
   }
 
-  var save = {'name' : '$name', 'surname' : '$surname'};
-  final String json = jsonEncode(save);
-  print(json);
-  window.localStorage.setItem("$count", json);
-  window.localStorage.setItem("count", count.toString());
-  print("Saved");
-}
-
-void readFromFile() {
-  String? item = window.localStorage.getItem("count");
-  if(item == null){
-    return;
+  static Future<void> saveInfo(String name, String surname) async{
+    var newSave = {'name' : name, 'surname' : surname};
+    final String json = jsonEncode(newSave);
+    print('Before');
+    String? entries =  _prefs!.getString('entries') ?? "";
+    print('After');
+    if(entries == ""){
+      entries = json;
+    }
+    else{
+      entries = entries! + ';' + json;
+    }
+    _prefs!.setString('entries', entries);
+    print('Saved!');
   }
-  int count = int.parse(item);
-  for(int i = 0; i <= count; i++){
-    String? entry = window.localStorage.getItem("$i");
-    print(entry);
+
+  static Future<void> readInfo() async{
+    String? entries = _prefs!.getString('entries');
+    print(entries);
   }
 }

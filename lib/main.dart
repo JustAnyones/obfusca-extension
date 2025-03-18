@@ -10,6 +10,7 @@ import 'utils/Saver/saver.dart';
 
 void main() async {
   await SettingProvider().initialize();
+  await Saver.initialize();
   runApp(
     ChangeNotifierProvider(
       create: (_) => SettingProvider(),
@@ -191,13 +192,28 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: () => writeToFile(_nameController.text, _surnameController.text),
+                onPressed: (){
+                  if(_nameController.text == '' && _surnameController.text == ''){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Įveskite vardą ir pavardę"),
+                        ),
+                    );
+                    return;
+                  }
+                  Saver.saveInfo(_nameController.text, _surnameController.text);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Duomenys išsaugoti"),
+                      ),
+                  );
+                  },
                 child: Text("Save"),
               ),
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: readFromFile,
+                onPressed: (){Saver.readInfo();},
                 child: Text("REad"),
               ),
               SizedBox(height: 16),
