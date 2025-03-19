@@ -26,8 +26,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
 
-  String _generatedName = "";
-
   int _frameId = -1;
   List<Map> _detectedFields = [];
 
@@ -72,9 +70,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
         nameFreq.isEmpty ||
         surNames.isEmpty ||
         surNamesFreq.isEmpty) {
-      setState(() {
-        _generatedName = 'Error: Could not load name data.';
-      });
       return;
     }
 
@@ -115,7 +110,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     setState(() {
       _nameController.text = name;
       _surnameController.text = surname;
-      _generatedName = fullName;
     });
   }
 
@@ -240,11 +234,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               ),
               SizedBox(height: 16),
 
-              Text(
-                _generatedName,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(

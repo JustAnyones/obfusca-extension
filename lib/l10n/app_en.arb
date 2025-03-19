@@ -1,17 +1,15 @@
 {
-  "helloWorld": "Hello World!",
-  "ext_title": "Name Generator Extension",
+  "ext_title": "Data Generation Extension",
 
   "detect_fail": "Failed to detect fields",
 
   "generator_name_name": "Name",
   "generator_surname_name": "Surname",
-  "button_generate": "Generate Name",
+  "button_generate": "Generate",
 
   "button_save_entry": "Save",
-
-  "missing_name_surname": "Enter name and surname",
   "entry_saved": "Entry saved!",
+  "missing_name_surname": "Enter name and surname",
 
   "settings_title": "Settings",
   "@settings_title": {
@@ -44,8 +42,5 @@
 
   "@ext_title": {
     "description": "Name and title of the extension"
-  },
-  "@helloWorld": {
-    "description": "The conventional newborn programmer greeting"
   }
 }
