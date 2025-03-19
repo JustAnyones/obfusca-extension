@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'package:browser_extension/providers/settings.dart';
+import 'package:browser_extension/widgets/generator.dart';
 
 class Extension extends StatefulWidget {
   const Extension({super.key});
@@ -18,7 +19,7 @@ class _ExtensionState extends State<Extension> {
     return Consumer<SettingProvider>(
       builder: (context, localeProvider, child) {
         return MaterialApp(
-          title: AppLocalizations.of(context)!.ext_title,
+          title: 'Name Generator Extension',
           theme: ThemeData(primarySwatch: Colors.blue),
           localizationsDelegates: [
             AppLocalizations.delegate,
@@ -28,7 +29,7 @@ class _ExtensionState extends State<Extension> {
           ],
           locale: localeProvider.locale,
           supportedLocales: [Locale('en'), Locale('lt')],
-          //home: NameGeneratorScreen(),
+          home: NameGeneratorPage(),
         );
       },
     );

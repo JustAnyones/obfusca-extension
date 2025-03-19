@@ -4,6 +4,12 @@
 
   "detect_fail": "Failed to detect fields",
 
+  "generator_name_name": "Name",
+  "generator_surname_name": "Surname",
+  "button_generate": "Generate Name",
+
+  "button_save_entry": "Save",
+
   "missing_name_surname": "Enter name and surname",
   "entry_saved": "Entry saved!",
 

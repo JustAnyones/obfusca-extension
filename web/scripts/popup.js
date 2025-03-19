@@ -7,7 +7,7 @@ async function queryFields() {
 	if (tabs.length === 0) return;
 	const frames = await chrome.webNavigation.getAllFrames({tabId : tabs[0].id})
 
-	let foundEntry;
+	let foundEntry = {status: "NOT_FOUND"}; // initialize so its not null
 	for (let frame of frames) {
 		let response;
 		try {
