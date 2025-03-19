@@ -1,7 +1,15 @@
 {
-    "ext_title": "Vardų generavimo įskiepis",
+    "ext_title": "Duomenų generavimo įskiepis",
 
     "detect_fail": "Nepavyko aptikti laukų",
+
+    "generator_name_name": "Vardas",
+    "generator_surname_name": "Pavardė",
+    "button_generate": "Generuoti",
+
+    "button_save_entry": "Išsaugoti",
+    "entry_saved": "Įrašas išsaugotas!",
+    "missing_name_surname": "Įveskite vardą ir pavardę",
 
     "settings_title": "Nustatymai",
     "setting_locale_title": "Kalba",
