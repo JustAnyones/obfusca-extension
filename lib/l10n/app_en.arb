@@ -4,6 +4,9 @@
 
   "detect_fail": "Failed to detect fields",
 
+  "missing_name_surname": "Enter name and surname",
+  "entry_saved": "Entry saved!",
+
   "settings_title": "Settings",
   "@settings_title": {
     "description": "Settings page name"

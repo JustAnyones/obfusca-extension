@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'utils/Saver/saver.dart';
 
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/name_generator.dart';
@@ -11,6 +12,7 @@ import 'package:browser_extension/widgets/settings.dart';
 
 void main() async {
   await SettingProvider().initialize();
+  await Saver.initialize();
   runApp(
     ChangeNotifierProvider(
       create: (_) => SettingProvider(),
@@ -156,99 +158,140 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.ext_title)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: "Name",
-                border: OutlineInputBorder(),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.ext_title)),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: "Name",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
+              SizedBox(height: 16),
 
-            // Surname TextField
-            TextField(
-              controller: _surnameController,
-              decoration: InputDecoration(
-                labelText: "Surname",
-                border: OutlineInputBorder(),
+              TextField(
+                controller: _surnameController,
+                decoration: InputDecoration(
+                  labelText: "Surname",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
+              SizedBox(height: 16),
 
-            ElevatedButton(
-              onPressed: _generateName,
-              child: Text("Generate Name"),
-            ),
-            SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _generateName,
+                child: Text("Generate Name"),
+              ),
+              SizedBox(height: 16),
 
-            ElevatedButton(
-              onPressed: () async {
-                var result = await queryFields();
-                if (result["status"] != "FOUND") {
+              ElevatedButton(
+                onPressed: () {
+                  if (_nameController.text == '' &&
+                      _surnameController.text == '') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.missing_name_surname,
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  Saver.saveInfo(_nameController.text, _surnameController.text);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(AppLocalizations.of(context)!.detect_fail),
+                      content: Text(AppLocalizations.of(context)!.entry_saved),
                     ),
                   );
-                  return;
-                }
+                },
+                child: Text("Save"),
+              ),
+              SizedBox(height: 16),
 
-                _frameId = result["frameId"];
-                _detectedFields = result["data"];
+              ElevatedButton(
+                onPressed: () {
+                  Saver.readInfo();
+                },
+                child: Text("REad"),
+              ),
+              SizedBox(height: 16),
 
-                print("Received fields:");
-                print(_detectedFields);
-              },
-              child: Text("Detect fields from current website"),
-            ),
-            SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  var result = await queryFields();
+                  if (result["status"] != "FOUND") {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.detect_fail,
+                        ),
+                      ),
+                    );
+                    return;
+                  }
 
-            ElevatedButton(
-              onPressed: () {
-                if (_detectedFields.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(AppLocalizations.of(context)!.detect_fail),
-                    ),
+                  _frameId = result["frameId"];
+                  _detectedFields = result["data"];
+
+                  print("Received fields:");
+                  print(_detectedFields);
+                },
+                child: Text("Detect fields from current website"),
+              ),
+              SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed: () {
+                  if (_detectedFields.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.detect_fail,
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  List<Map<String, dynamic>> fieldsToFill = [];
+                  for (var i = 0; i < _detectedFields.length; i++) {
+                    fieldsToFill.add({
+                      "ref": _detectedFields[i]["ref"],
+                      "value":
+                          _detectedFields[i]["generator"], // TODO: perform actual generation
+                    });
+                  }
+                  fillFields(_frameId, fieldsToFill);
+                },
+                child: Text("Fill detected fields"),
+              ),
+              SizedBox(height: 16),
+
+              Text(
+                _generatedName,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()),
                   );
-                  return;
-                }
-
-                List<Map<String, dynamic>> fieldsToFill = [];
-                for (var i = 0; i < _detectedFields.length; i++) {
-                  fieldsToFill.add({
-                    "ref": _detectedFields[i]["ref"],
-                    "value":
-                        _detectedFields[i]["generator"], // TODO: perform actual generation
-                  });
-                }
-                fillFields(_frameId, fieldsToFill);
-              },
-              child: Text("Fill detected fields"),
-            ),
-            SizedBox(height: 16),
-
-            Text(
-              _generatedName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
-                );
-              },
-              child: Text(AppLocalizations.of(context)!.settings_title),
-            ),
-          ],
+                },
+                child: Text(AppLocalizations.of(context)!.settings_title),
+              ),
+            ],
+          ),
         ),
       ),
     );
