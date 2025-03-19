@@ -12,7 +12,7 @@
     "permissions": ["scripting", "activeTab", "webNavigation"],
     "manifest_version": 3,
     "web_accessible_resources": [{
-        "resources": [ "d.json" ],
+        "resources": [ "predefined.json" ],
         "extension_ids": ["*"],
         "matches": [ "*://*/*" ]
     }],

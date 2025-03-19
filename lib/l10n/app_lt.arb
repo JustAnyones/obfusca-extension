@@ -1,13 +1,35 @@
 {
-    "helloWorld": "Sveikas pasauli!",
+    "ext_title": "Duomenų generavimo įskiepis",
 
-    "ext_title": "Vardų generavimo įskiepis",
+    "detect_fail": "Nepavyko aptikti laukų",
+
+    "generator_name_name": "Vardas",
+    "generator_surname_name": "Pavardė",
+    "button_generate": "Generuoti",
+
+    "button_save_entry": "Išsaugoti",
+    "entry_saved": "Įrašas išsaugotas!",
+    "missing_name_surname": "Įveskite vardą ir pavardę",
 
     "settings_title": "Nustatymai",
     "setting_locale_title": "Kalba",
     "setting_locale_hint": "Pasirinkite kalbą",
+    "setting_locale_option": "{code, select, en{Anglų} lt{Lietuvių} other{{code}}}",
+    "@setting_locale_option": {
+        "placeholders": {
+            "code": {"type": "String"}
+        }
+    },
+
     "setting_region_title": "Regionas",
     "setting_region_hint": "Pasirinkite regioną",
+    "setting_region_option": "{code, select, us{Jungtinės Valstijos} lt{Lietuva} other{{code}}}",
+    "@setting_region_option": {
+        "placeholders": {
+            "code": {"type": "String"}
+        }
+    },
+
     "settings_save_button": "Išsaugoti nustatymus",
     "settings_saved_popup": "Nustatymai išsaugoti!"
 }

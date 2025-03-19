@@ -1,30 +1,46 @@
 {
-  "helloWorld": "Hello World!",
-  "ext_title": "Name Generator Extension",
+  "ext_title": "Data Generation Extension",
 
   "detect_fail": "Failed to detect fields",
 
-  "missing_name_surname": "Enter name and surname",
+  "generator_name_name": "Name",
+  "generator_surname_name": "Surname",
+  "button_generate": "Generate",
+
+  "button_save_entry": "Save",
   "entry_saved": "Entry saved!",
+  "missing_name_surname": "Enter name and surname",
 
   "settings_title": "Settings",
   "@settings_title": {
     "description": "Settings page name"
   },
+
   "setting_locale_title": "Interface Language",
   "@setting_locale_title": {
     "description": "Title for the language option"
   },
   "setting_locale_hint": "Choose Interface Language",
+  "setting_locale_option": "{code, select, en{English} lt{Lithuanian} other{{code}}}",
+  "@setting_locale_option": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+
   "setting_region_title": "Region",
   "setting_region_hint": "Choose Region",
+  "setting_region_option": "{code, select, us{United States} lt{Lithuania} other{{code}}}",
+  "@setting_region_option": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+
   "settings_save_button": "Save Settings",
   "settings_saved_popup": "Settings Saved!",
 
   "@ext_title": {
     "description": "Name and title of the extension"
-  },
-  "@helloWorld": {
-    "description": "The conventional newborn programmer greeting"
   }
 }

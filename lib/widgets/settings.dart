@@ -1,72 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-enum Language { English, Lithuanian }
-
-enum Region { America, Lithuania }
-
-List<String> languages = ['English', 'Lithuanian'];
-List<String> locales = ['en', 'lt'];
-List<String> regions = ['America', 'Lithuania'];
-
-class SettingProvider extends ChangeNotifier {
-  static const String _KEY_LOCALE = 'locale';
-  static const String _KEY_REGION = 'region';
-
-  static final SettingProvider _instance = SettingProvider._internal();
-  static SharedPreferences? _prefs;
-
-  // Private constructor
-  SettingProvider._internal() {
-    print("Singleton Instance Created");
-  }
-
-  factory SettingProvider() {
-    return _instance;
-  }
-
-  // Locale
-  String _locale = locales[0];
-  Locale get locale => Locale(_locale);
-  String get localeAsString => _locale;
-
-  // Region
-  String _region = regions[0];
-  String get region => _region;
-
-  static SettingProvider getInstance() {
-    return _instance;
-  }
-
-  Future<void> initialize() async {
-    _prefs = await SharedPreferences.getInstance();
-
-    _locale = await getString(_KEY_LOCALE, locales[0]);
-    _region = await getString(_KEY_REGION, regions[0]);
-  }
-
-  Future<void> setLocale(String value) async {
-    await _prefs!.setString(_KEY_LOCALE, value);
-    _locale = value;
-    notifyListeners();
-  }
-
-  Future<void> setRegion(String value) async {
-    await _prefs!.setString(_KEY_REGION, value);
-    _region = value;
-    notifyListeners();
-  }
-
-  Future<String> getString(String key, String defaultValue) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(key) ?? defaultValue;
-  }
-}
+import 'package:browser_extension/providers/settings.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -79,6 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _loadSettings();
   }
 
+  // Loads current settings from the settings provider.
   Future<void> _loadSettings() async {
     setState(() {
       _selectedLanguage = SettingProvider.getInstance().localeAsString;
@@ -86,18 +28,10 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
+  // Saves the settings to the settings provider.
   Future<void> _saveSettings() async {
-    await SettingProvider.getInstance().setLocale(
-      _selectedLanguage ?? locales[0],
-    );
-    await SettingProvider.getInstance().setRegion(
-      _selectedRegion ?? regions[0],
-    );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.settings_saved_popup),
-      ),
-    );
+    await SettingProvider.getInstance().setLocale(_selectedLanguage!);
+    await SettingProvider.getInstance().setRegion(_selectedRegion!);
   }
 
   @override
@@ -124,7 +58,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   locales.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.setting_locale_option(value),
+                      ),
                     );
                   }).toList(),
             ),
@@ -145,7 +83,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   regions.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.setting_region_option(value),
+                      ),
                     );
                   }).toList(),
             ),
@@ -153,6 +95,13 @@ class _SettingsPageState extends State<SettingsPage> {
             ElevatedButton(
               onPressed: () {
                 _saveSettings();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.settings_saved_popup,
+                    ),
+                  ),
+                );
               },
               child: Text(AppLocalizations.of(context)!.settings_save_button),
             ),
