@@ -192,28 +192,33 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: (){
-                  if(_nameController.text == '' && _surnameController.text == ''){
+                onPressed: () {
+                  if (_nameController.text == '' &&
+                      _surnameController.text == '') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("Įveskite vardą ir pavardę"),
+                        content: Text(
+                          AppLocalizations.of(context)!.missing_name_surname,
                         ),
+                      ),
                     );
                     return;
                   }
                   Saver.saveInfo(_nameController.text, _surnameController.text);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("Duomenys išsaugoti"),
-                      ),
+                      content: Text(AppLocalizations.of(context)!.entry_saved),
+                    ),
                   );
-                  },
+                },
                 child: Text("Save"),
               ),
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: (){Saver.readInfo();},
+                onPressed: () {
+                  Saver.readInfo();
+                },
                 child: Text("REad"),
               ),
               SizedBox(height: 16),
