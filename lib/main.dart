@@ -6,9 +6,11 @@ import 'utils/read_csv.dart';
 import 'web/interop.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'utils/Saver/saver.dart';
 
 void main() async {
   await SettingProvider().initialize();
+  await Saver.initialize();
   runApp(
     ChangeNotifierProvider(
       create: (_) => SettingProvider(),
@@ -186,6 +188,38 @@ class _NameGeneratorScreenState extends State<NameGeneratorScreen> {
               ElevatedButton(
                 onPressed: _generateName,
                 child: Text("Generate Name"),
+              ),
+              SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed: () {
+                  if (_nameController.text == '' &&
+                      _surnameController.text == '') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.missing_name_surname,
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  Saver.saveInfo(_nameController.text, _surnameController.text);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context)!.entry_saved),
+                    ),
+                  );
+                },
+                child: Text("Save"),
+              ),
+              SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed: () {
+                  Saver.readInfo();
+                },
+                child: Text("REad"),
               ),
               SizedBox(height: 16),
 
