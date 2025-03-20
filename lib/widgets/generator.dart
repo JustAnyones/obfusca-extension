@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:math';
 
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/name_generator.dart';
+import 'package:browser_extension/utils/date_generator.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
@@ -25,6 +27,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _datecontroller = TextEditingController();
+  final random = new Random();
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -73,6 +78,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       return;
     }
 
+    DateTime date = DateGenerator.getRandomDateTime();
     String fullName = NameGenerator.generateName(
       names,
       nameFreq,
@@ -105,11 +111,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
     }
 
-    fullName = '$name $surname';
+    int next = 100 + random.nextInt(1000 - 100);
+    fullName = '$name$surname$next';
 
     setState(() {
       _nameController.text = name;
       _surnameController.text = surname;
+      _usernameController.text = fullName;
+      _datecontroller.text = date.toIso8601String().split('T')[0];
     });
   }
 
@@ -140,6 +149,58 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 decoration: InputDecoration(
                   labelText:
                       AppLocalizations.of(context)!.generator_surname_name,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.generator_username,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              TextField(
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.generator_city,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              TextField(
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.generator_country,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              TextField(
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.generator_street,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              TextField(
+                decoration: InputDecoration(
+                  labelText:
+                      AppLocalizations.of(context)!.generator_postal_code,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              TextField(
+                controller: _datecontroller,
+                decoration: InputDecoration(
+                  labelText:
+                      AppLocalizations.of(context)!.generator_date_of_birth,
                   border: OutlineInputBorder(),
                 ),
               ),
