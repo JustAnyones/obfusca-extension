@@ -168,6 +168,17 @@ function detectPassword(field) {
     }
 }
 
+const ignoredDetectors = [
+    // These should be explicitly ignored
+    (field) => {
+        const aria = field.getAttribute("aria-label")
+        if (aria && RegExp(/otp/, "i").test(aria)) {
+            return true
+        }
+        return false
+    }
+]
+
 const heuristicDetectors = [
     detectFirstName,
     detectLastName,
@@ -191,7 +202,7 @@ const heuristicDetectors = [
         if (RegExp(/birthday_year/).test(field.name)) {
             return fieldDetails(Generators.BIRTH_YEAR)
         }
-    }
+    },
 ]
 
 function determineFieldData(field) {
@@ -202,10 +213,23 @@ function determineFieldData(field) {
         if (val === undefined) {
             console.warn("No autocomplete binding for", autocomplete)
         } else {
+            // Override for email type usernames
+            if (autocomplete == "username" && field.type === "email") {
+                return fieldDetails(Generators.EMAIL)
+            }
+
             return fieldDetails(val)
         }
     }
 
+    // Explicitly ignore some fields
+    for (const detector of ignoredDetectors) {
+        if (detector(field)) {
+            return
+        }
+    }
+
+    // Try to determine field data using heuristics
     for (const detector of heuristicDetectors) {
         const result = detector(field)
         if (result !== undefined) {
