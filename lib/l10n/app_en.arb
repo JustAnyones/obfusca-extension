@@ -11,6 +11,7 @@
   "generator_street": "Street",
   "generator_postal_code": "Postal code",
   "generator_date_of_birth": "Date of birth",
+  "button_wait": "Please wait...",
   "button_generate": "Generate",
 
   "button_save_entry": "Save",

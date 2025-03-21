@@ -11,6 +11,7 @@
     "generator_street": "Gatvė",
     "generator_postal_code": "Pašto kodas",
     "generator_date_of_birth": "Gimimo metai",
+    "button_wait": "Prašau palaukit...",
     "button_generate": "Generuoti",
 
     "button_save_entry": "Išsaugoti",

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:browser_extension/providers/settings.dart';
@@ -18,6 +19,8 @@ class NameGeneratorPage extends StatefulWidget {
 }
 
 class _NameGeneratorPageState extends State<NameGeneratorPage> {
+  bool _isButtonDisabled = false;
+
   late List<String> names;
   late List<double> nameFreq;
   late List<String> surNames;
@@ -27,6 +30,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _datecontroller = TextEditingController();
+  final TextEditingController _countrycontroller = TextEditingController();
+  final TextEditingController _citycontroller = TextEditingController();
+  final TextEditingController _addresscontroller = TextEditingController();
+  final TextEditingController _postalcontroller = TextEditingController();
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -67,7 +74,13 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     });
   }
 
-  void _generateName() {
+  void _generateName() async {
+    setState(() {
+      _isButtonDisabled = true;
+    });
+
+    final locationInfo = await Generation.getRandomLocation();
+
     if (names.isEmpty ||
         nameFreq.isEmpty ||
         surNames.isEmpty ||
@@ -113,6 +126,19 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       _usernameController.text = Generation.generateUsername(name, surname);
       _datecontroller.text =
           Generation.getRandomDateTime().toIso8601String().split('T')[0];
+      _countrycontroller.text = Generation.getCountry(
+        SettingProvider.getInstance().region,
+        false,
+      );
+      _citycontroller.text = locationInfo['city'];
+      _addresscontroller.text = locationInfo['street'];
+      _postalcontroller.text = locationInfo['postcode'];
+    });
+
+    Timer(Duration(seconds: 2), () {
+      setState(() {
+        _isButtonDisabled = false;
+      });
     });
   }
 
@@ -158,6 +184,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               TextField(
+                controller: _citycontroller,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.generator_city,
                   border: OutlineInputBorder(),
@@ -166,6 +193,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               TextField(
+                controller: _countrycontroller,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.generator_country,
                   border: OutlineInputBorder(),
@@ -174,6 +202,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               TextField(
+                controller: _addresscontroller,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.generator_street,
                   border: OutlineInputBorder(),
@@ -182,6 +211,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               TextField(
+                controller: _postalcontroller,
                 decoration: InputDecoration(
                   labelText:
                       AppLocalizations.of(context)!.generator_postal_code,
@@ -201,8 +231,12 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: _generateName,
-                child: Text(AppLocalizations.of(context)!.button_generate),
+                onPressed: _isButtonDisabled ? null : _generateName,
+                child: Text(
+                  _isButtonDisabled
+                      ? AppLocalizations.of(context)!.button_wait
+                      : AppLocalizations.of(context)!.button_generate,
+                ),
               ),
               SizedBox(height: 16),
 
