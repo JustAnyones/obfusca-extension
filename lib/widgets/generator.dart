@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'dart:math';
 
 import 'package:browser_extension/providers/settings.dart';
-import 'package:browser_extension/utils/name_generator.dart';
-import 'package:browser_extension/utils/date_generator.dart';
+import 'package:browser_extension/utils/generation.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
@@ -29,7 +27,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _datecontroller = TextEditingController();
-  final random = new Random();
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -78,8 +75,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       return;
     }
 
-    DateTime date = DateGenerator.getRandomDateTime();
-    String fullName = NameGenerator.generateName(
+    String fullName = Generation.generateName(
       names,
       nameFreq,
       surNames,
@@ -99,7 +95,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
           surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)) {
         break;
       }
-      fullName = NameGenerator.generateName(
+      fullName = Generation.generateName(
         names,
         nameFreq,
         surNames,
@@ -111,14 +107,12 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
     }
 
-    int next = 100 + random.nextInt(1000 - 100);
-    fullName = '$name$surname$next';
-
     setState(() {
       _nameController.text = name;
       _surnameController.text = surname;
-      _usernameController.text = fullName;
-      _datecontroller.text = date.toIso8601String().split('T')[0];
+      _usernameController.text = Generation.generateUsername(name, surname);
+      _datecontroller.text =
+          Generation.getRandomDateTime().toIso8601String().split('T')[0];
     });
   }
 
