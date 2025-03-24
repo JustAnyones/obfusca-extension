@@ -15,9 +15,9 @@ Each frame contains an array with the following data:
         }],
         // An array of options, returned for SELECT elements
         "options": [{
-            "value": "any",
-            "text": "any",
-            "selected": "any"
+            "value": "string",
+            "text": "string",
+            "selected": true
         }],
         // An array of contextual information for field backing elements
         // In cases of RADIO elements, there's more than one context object

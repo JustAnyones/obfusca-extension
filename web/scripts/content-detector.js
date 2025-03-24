@@ -28,13 +28,20 @@ class Generator {
  */
 
 /**
+ * @typedef {Object} Option
+ * @property {string} value
+ * @property {string} text
+ * @property {boolean} selected
+ */
+
+/**
  * 
  * This data is passed to Flutter.
  * @typedef {Object} Field
  * @property {number} ref The reference number to the field.
  * @property {Generator[]} generators A list of generators that can be used to fill the field.
  * @property {string} generator Backwards compatibility with the old format.
- * @property {any[]} options A list of possible options for the field.
+ * @property {Option[]} options A list of possible options for the field.
  * @property {FieldContext[]} context A list of context data for each HTML field of this field.
  */
 
@@ -55,6 +62,11 @@ function resetStore() {
     reference_count = 0
 }
 
+/**
+ * Serializes the options of a select field for transmission to Flutter.
+ * @param {HTMLOptionsCollection} options 
+ * @returns {Option[]}
+ */
 function serializeOptions(options) {
     let serialized = []
     for (const option of options) {
