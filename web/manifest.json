@@ -12,9 +12,11 @@
     "permissions": ["scripting", "activeTab", "webNavigation"],
     "manifest_version": 3,
     "web_accessible_resources": [{
-        "resources": [ "predefined.json" ],
+        "resources": [
+            "predefined.json"
+        ],
         "extension_ids": ["*"],
-        "matches": [ "*://*/*" ]
+        "matches": [ "<all_urls>" ]
     }],
     "content_scripts": [{
         "matches": [
@@ -25,7 +27,8 @@
             "file:///*.xml*"
         ],
         "js": [
-            "scripts/content-script.js"
+            "scripts/content-script.js",
+            "scripts/content-detector.js"
         ],
         "run_at": "document_idle",
         "all_frames": true
