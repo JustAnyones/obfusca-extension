@@ -67,6 +67,9 @@ function fillFields(fields) {
     const response = await fetch(dataUrl)
     const data = await response.json()
 
+    // Load site specific overrides
+    const overrideResponse = await fetch(chrome.runtime.getURL("data/overrides.json"))
+    const overrides = await overrideResponse.json()["overrides"]
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Called when the popup requests fields
@@ -82,8 +85,6 @@ function fillFields(fields) {
                     return acc
                 }, {})
             )
-
-
             console.log("Detected fields", fieldData)
 
             if (fieldData.length === 0) {

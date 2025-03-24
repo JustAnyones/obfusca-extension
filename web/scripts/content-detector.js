@@ -1,6 +1,8 @@
 //@ts-check
 "use strict";
 
+// TODO: research https://gist.github.com/ErosLever/51c794dc1f2bab888f571e47275c85cd
+
 class Generator {
     /**
      * @param {string} name 
@@ -25,6 +27,7 @@ class Generator {
  * @property {number} minLength
  * @property {string | null} placeholder
  * @property {string | null} ariaLabel
+ * @property {string} url
  */
 
 /**
@@ -119,7 +122,7 @@ function registerField(field, generators) {
     }
 
     // If the field is a select field, we need to serialize the options
-    if (field.tagName === "SELECT") {
+    if (field.tagName === "SELECT" && field instanceof HTMLSelectElement) {
         options = serializeOptions(field.options)
     }
 
@@ -139,6 +142,7 @@ function registerField(field, generators) {
             minLength: field instanceof HTMLInputElement ? field.minLength: -1,
             placeholder: field instanceof HTMLInputElement ? field.placeholder : null,
             ariaLabel: field.getAttribute("aria-label"),
+            url: window.location.href,
         })
     }
 
@@ -165,79 +169,82 @@ const Generators = {
 
     SEX: new Generator("namespace::sex_generator"),
 
+    TEL: new Generator("namespace::tel_generator"),
+
     COUNTRY: new Generator("namespace::country_generator"),
+
+    UNKNOWN: new Generator("namespace::unknown_generator"),
 }
 
 
 const autocomplete_bindings = {
-    "name": "First Name or Username or Email?",
-
+    "name": [Generators.FIRSTNAME, Generators.USERNAME, Generators.EMAIL],
     "given-name": Generators.FIRSTNAME,
     "family-name": Generators.LASTNAME,
-    "additional-name": "",
+    "additional-name": Generators.UNKNOWN,
 
-    "honorific-prefix": "HONORIFIC PREFIX",
-    "honorific-suffix": "HONORIFIC SUFFIX",
+    "honorific-prefix": Generators.UNKNOWN,
+    "honorific-suffix": Generators.UNKNOWN,
 
     "email": Generators.EMAIL,
-    "nickname": "",
-    "organization-title": "",
+    "nickname": Generators.USERNAME,
+    "organization-title": Generators.UNKNOWN,
     "username": Generators.USERNAME,
     "new-password": Generators.PASSWORD,
     "current-password": Generators.PASSWORD,
-    "organization": "",
+    "organization": Generators.UNKNOWN,
 
     // Address
-    "postal-code": "",
-    "street-address": "",
-    "address-line1": "",
-    "address-line2": "",
-    "address-line3": "",
-    "address-level1": "",
-    "address-level2": "",
-    "address-level4": "",
-    "address-level3": "",
-    "country": "",
-    "country-name": "",
+    "postal-code": Generators.UNKNOWN,
+    "street-address": Generators.UNKNOWN,
+    "address-line1": Generators.UNKNOWN,
+    "address-line2": Generators.UNKNOWN,
+    "address-line3": Generators.UNKNOWN,
+    "address-level1": Generators.UNKNOWN,
+    "address-level2": Generators.UNKNOWN,
+    "address-level4": Generators.UNKNOWN,
+    "address-level3": Generators.UNKNOWN,
+    "country": Generators.UNKNOWN,
+    "country-name": Generators.UNKNOWN,
 
     // Credit card
-    "cc-name": "",
-    "cc-given-name": "",
-    "cc-additional-name": "",
-    "cc-family-name": "",
-    "cc-number": "",
-    "cc-exp": "",
-    "cc-exp-month": "",
-    "cc-exp-year": "",
-    "cc-csc": "",
-    "cc-type": "",
+    "cc-name": Generators.UNKNOWN,
+    "cc-given-name": Generators.UNKNOWN,
+    "cc-additional-name": Generators.UNKNOWN,
+    "cc-family-name": Generators.UNKNOWN,
+    "cc-number": Generators.UNKNOWN,
+    "cc-exp": Generators.UNKNOWN,
+    "cc-exp-month": Generators.UNKNOWN,
+    "cc-exp-year": Generators.UNKNOWN,
+    "cc-csc": Generators.UNKNOWN,
+    "cc-type": Generators.UNKNOWN,
 
-    "transaction-currency": "",
-    "transaction-amount": "",
+    "transaction-currency": Generators.UNKNOWN,
+    "transaction-amount": Generators.UNKNOWN,
 
-    "language": "",
+    "language": Generators.UNKNOWN,
 
     // Birth date
-    "bday": "",
+    "bday": Generators.UNKNOWN,
     "bday-day": Generators.BIRTH_DAY,
     "bday-month": Generators.BIRTH_MONTH,
     "bday-year": Generators.BIRTH_YEAR,
 
     "sex": Generators.SEX,
-    "url": "",
-    "photo": "",
+    "url": Generators.UNKNOWN,
+    "photo": Generators.UNKNOWN,
 
     // Phone related
-    "tel": "",
-    "tel-country-code": "",
-    "tel-national": "",
-    "tel-area-code": "",
-    "tel-local": "",
-    "tel-local-prefix": "",
-    "tel-local-suffix": "",
-    "tel-extension": "",
+    "tel": Generators.TEL,
+    "tel-country-code": Generators.UNKNOWN,
+    "tel-national": Generators.UNKNOWN,
+    "tel-area-code": Generators.UNKNOWN,
+    "tel-local": Generators.UNKNOWN,
+    "tel-local-prefix": Generators.UNKNOWN,
+    "tel-local-suffix": Generators.UNKNOWN,
+    "tel-extension": Generators.UNKNOWN,
 
-    "impp": "",
+    "impp": Generators.UNKNOWN,
 }
 
 /**
@@ -248,6 +255,11 @@ const ignoredDetectors = [
     (field) => {
         const aria = field.getAttribute("aria-label")
         const type = field.getAttribute("type")
+        const id = field.id
+
+        if (id && RegExp(/recaptcha|code/, "i").test(id)) {
+            return true
+        }
 
         if (type && RegExp(/search|submit/, "i").test(type)) {
             return true
@@ -261,7 +273,7 @@ const ignoredDetectors = [
 ]
 
 /**
- * @type {((field: ParseableElement) => Generator | undefined)[]}
+ * @type {((field: ParseableElement) => Generator[] | Generator | undefined)[]}
  */
 const heuristicDetectors = [
     // First name
@@ -278,6 +290,11 @@ const heuristicDetectors = [
     },
     // Username
     (field) => {
+        // Specific to Google
+        if (field.id == "identifierId") {
+            return [Generators.USERNAME, Generators.EMAIL, Generators.TEL]
+        }
+
         if (field.name === "username" || RegExp(/username|user_name/, "i").test(field.name)) {
             return Generators.USERNAME
         }
@@ -296,19 +313,19 @@ const heuristicDetectors = [
     },
     // Birth month
     (field) => {
-        if (RegExp(/birthday_month|birthmonth/, "i").test(field.name)) {
+        if (RegExp(/birthday_month|birthmonth|month/, "i").test(field.id) || RegExp(/birthday_month|birthmonth|month/, "i").test(field.name)) {
             return Generators.BIRTH_MONTH
         }
     },
     // Birth year
     (field) => {
-        if (RegExp(/birthday_year|birthyear/, "i").test(field.name)) {
+        if (RegExp(/birthday_year|birthyear|year/, "i").test(field.name)) {
             return Generators.BIRTH_YEAR
         }
     },
     // Birth day
     (field) => {
-        if (RegExp(/birthday_day|birthday/, "i").test(field.name)) {
+        if (RegExp(/birthday_day|birthday|day/, "i").test(field.name)) {
             return Generators.BIRTH_DAY
         }
     },
@@ -322,7 +339,7 @@ const heuristicDetectors = [
 
     // Sex
     (field) => {
-        if (RegExp(/sex|gender/, "i").test(field.name)) {
+        if (RegExp(/sex|gender/, "i").test(field.id) || RegExp(/sex|gender/, "i").test(field.name)) {
             return Generators.SEX
         }
     },
@@ -341,10 +358,6 @@ function determineFieldData(field) {
         if (val === undefined) {
             console.warn("No autocomplete binding for", autocomplete)
         } else {
-            // Override for email type usernames
-            if (autocomplete == "username" && field.type === "email") {
-                return Generators.EMAIL
-            }
             return val
         }
     }
@@ -372,14 +385,17 @@ function determineFieldData(field) {
  * @returns {Field[]} A list of fields that can be filled.
  */
 function detectAutomatically() {
-    /** @type {NodeListOf<ParseableElement>} */
-    const inputs = document.querySelectorAll('input, select')
+    /** @type {Array<ParseableElement>} */
+    //const inputs = document.querySelectorAll('input, select')
+    const inputs = deepQuerySelectorAll(document, 'input, select')
+
     let fields = []
     for (const field of inputs) {
 
         // Skip hidden fields
         // https://stackoverflow.com/a/21696585
         if (field.type === "hidden" || field.offsetParent === null) {
+            console.log("Skipping hidden field", field)
             continue
         }
 
@@ -431,6 +447,13 @@ function detectFromPredefined(entry) {
  */
 function detectFields(data) {
     // TODO: replace with overrides
+
+    // The plan would be such:
+    // First, check if there is an override for the current domain
+    // If there is, check if it's a system override or a user override, prioritize user overrides
+    // If there's a user override and a system override for different fields, merge them
+    // Otherwise, if there is no override, detect automatically
+
     const entry = data[window.location.hostname]
     if (entry === undefined) return detectAutomatically()
     return detectFromPredefined(entry)
