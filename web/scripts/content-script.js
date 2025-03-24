@@ -1,10 +1,3 @@
-// Composite ref
-
-composite = {
-    type: "RADIO",
-    fields: [], 
-}
-
 function isForm(form, url) {
     if (form.match.type === "static") {
         const pattern = new RegExp(form["match"]["pattern"] ?? ".+", "g")
