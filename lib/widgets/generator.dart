@@ -69,7 +69,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
     var result = await readCSV(namesFilePath);
     var result2 = await readCSV(surnamesFilePath);
-    var result3 = await readCities('output.csv', country);
+    var result3 = await readCities('CityList.csv', country);
 
     setState(() {
       names = result.$1;
