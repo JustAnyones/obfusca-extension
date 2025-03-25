@@ -13,6 +13,7 @@
   "generator_date_of_birth": "Date of birth",
   "button_wait": "Please wait...",
   "button_generate": "Generate",
+  "expansion_tile": "Generators",
 
   "button_save_entry": "Save",
   "entry_saved": "Entry saved!",

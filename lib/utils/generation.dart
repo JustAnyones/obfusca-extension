@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:browser_extension/providers/settings.dart';
 
 class Generation {
-  static const String geoNamesUsername = 'buhmaster69';
   static final _random = Random();
 
   static String generateName(
@@ -68,25 +67,8 @@ class Generation {
     return await http.get(url).timeout(Duration(seconds: 5));
   }
 
-  static Future<String> getRandomCity(String countryCode) async {
-    final response = await fetchWithTimeout(
-      Uri.parse(
-        'http://api.geonames.org/searchJSON?country=$countryCode&featureClass=P&maxRows=10&username=$geoNamesUsername',
-      ),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data == null ||
-          !data.containsKey('geonames') ||
-          data['geonames'].isEmpty) {
-        throw Exception('No cities found');
-      }
-      final cities = data['geonames'];
-      final randomCity = cities[_random.nextInt(cities.length)];
-      return randomCity['name'].toString();
-    }
-    throw Exception('Failed to fetch city');
+  static String getRandomCity(List<String> cities) {
+    return cities[_random.nextInt(19)];
   }
 
   static Future<Map<String, dynamic>> getRandomCoords(String city) async {
@@ -141,9 +123,10 @@ class Generation {
     throw Exception('Failed to fetch address info');
   }
 
-  static Future<Map<String, dynamic>> getRandomLocation() async {
-    final region = await Future.value(SettingProvider.getInstance().region);
-    final city = await getRandomCity(region);
+  static Future<Map<String, dynamic>> getRandomLocation(
+    List<String> Cities,
+  ) async {
+    String city = getRandomCity(Cities);
     final coords = await getRandomCoords(city);
     final info = await getInfo(coords);
 

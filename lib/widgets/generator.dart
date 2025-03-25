@@ -25,6 +25,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<double> nameFreq;
   late List<String> surNames;
   late List<double> surNamesFreq;
+  late List<String> cities;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
@@ -54,23 +55,28 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   Future<void> _loadCSVData() async {
     String namesFilePath;
     String surnamesFilePath;
+    String country;
 
     if (SettingProvider.getInstance().region == 'us') {
       namesFilePath = 'assets/EngNames.csv';
       surnamesFilePath = 'assets/EngSur.csv';
+      country = 'United States';
     } else {
       namesFilePath = 'assets/LTNames.csv';
       surnamesFilePath = 'assets/LTSur.csv';
+      country = 'Lithuania';
     }
 
     var result = await readCSV(namesFilePath);
     var result2 = await readCSV(surnamesFilePath);
+    var result3 = await readCities('output.csv', country);
 
     setState(() {
       names = result.$1;
       nameFreq = result.$2;
       surNames = result2.$1;
       surNamesFreq = result2.$2;
+      cities = result3;
     });
   }
 
@@ -79,7 +85,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       _isButtonDisabled = true;
     });
 
-    final locationInfo = await Generation.getRandomLocation();
+    final locationInfo = await Generation.getRandomLocation(cities);
 
     if (names.isEmpty ||
         nameFreq.isEmpty ||
@@ -155,80 +161,84 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.generator_name_name,
-                  border: OutlineInputBorder(),
-                ),
+              ExpansionTile(
+                title: Text(
+                  AppLocalizations.of(context)!.expansion_tile,
+                ), // Add appropriate localization
+                initiallyExpanded:
+                    true, // Set to false if you want it collapsed initially
+                children: [
+                  TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_name_name,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _surnameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_surname_name,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_username,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _citycontroller,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.generator_city,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _countrycontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_country,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _addresscontroller,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.generator_street,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _postalcontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_postal_code,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _datecontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_date_of_birth,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 16),
-
-              TextField(
-                controller: _surnameController,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.of(context)!.generator_surname_name,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.generator_username,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              TextField(
-                controller: _citycontroller,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.generator_city,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              TextField(
-                controller: _countrycontroller,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.generator_country,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              TextField(
-                controller: _addresscontroller,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.generator_street,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              TextField(
-                controller: _postalcontroller,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.of(context)!.generator_postal_code,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              TextField(
-                controller: _datecontroller,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.of(context)!.generator_date_of_birth,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16),
 
               ElevatedButton(
                 onPressed: _isButtonDisabled ? null : _generateName,
