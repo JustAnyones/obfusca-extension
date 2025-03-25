@@ -1,3 +1,4 @@
+import 'package:browser_extension/widgets/read_entries.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -152,7 +153,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_nameController.text == '' &&
                       _surnameController.text == '') {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -164,7 +165,12 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     );
                     return;
                   }
-                  Saver.saveInfo(_nameController.text, _surnameController.text);
+                  var favIcon = await getFavIconUrl();
+                  Saver.saveInfo(
+                    _nameController.text,
+                    _surnameController.text,
+                    favIcon.toString(),
+                  );
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(AppLocalizations.of(context)!.entry_saved),
@@ -177,9 +183,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
               ElevatedButton(
                 onPressed: () {
-                  Saver.readInfo();
+                  Saver.clear();
                 },
-                child: Text("Read"),
+                child: Text("Clear"),
               ),
               SizedBox(height: 16),
 
@@ -242,6 +248,17 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                   );
                 },
                 child: Text(AppLocalizations.of(context)!.settings_title),
+              ),
+              SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => EntriesPage()),
+                  );
+                },
+                child: Text("Entries"),
               ),
             ],
           ),
