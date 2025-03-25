@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:browser_extension/providers/settings.dart';
 
 class Generation {
   static final _random = Random();
