@@ -5,7 +5,15 @@
 
   "generator_name_name": "Name",
   "generator_surname_name": "Surname",
+  "generator_username": "Username",
+  "generator_city": "City",
+  "generator_country": "Country",
+  "generator_street": "Street",
+  "generator_postal_code": "Postal code",
+  "generator_date_of_birth": "Date of birth",
+  "button_wait": "Please wait...",
   "button_generate": "Generate",
+  "expansion_tile": "Generators",
 
   "button_save_entry": "Save",
   "entry_saved": "Entry saved!",

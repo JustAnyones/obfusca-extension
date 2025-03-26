@@ -1,14 +1,14 @@
-import 'package:browser_extension/widgets/read_entries.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:browser_extension/providers/settings.dart';
-import 'package:browser_extension/utils/name_generator.dart';
+import 'package:browser_extension/utils/generation.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:browser_extension/widgets/settings.dart';
-import 'package:http/http.dart' as http;
+import 'package:browser_extension/widgets/read_entries.dart';
 
 //import '' if (dart.library.html) 'package:browser_extension/web/interop.dart';
 
@@ -20,13 +20,22 @@ class NameGeneratorPage extends StatefulWidget {
 }
 
 class _NameGeneratorPageState extends State<NameGeneratorPage> {
+  bool _isButtonDisabled = false;
+
   late List<String> names;
   late List<double> nameFreq;
   late List<String> surNames;
   late List<double> surNamesFreq;
+  late List<String> cities;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _datecontroller = TextEditingController();
+  final TextEditingController _countrycontroller = TextEditingController();
+  final TextEditingController _citycontroller = TextEditingController();
+  final TextEditingController _addresscontroller = TextEditingController();
+  final TextEditingController _postalcontroller = TextEditingController();
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -47,27 +56,37 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   Future<void> _loadCSVData() async {
     String namesFilePath;
     String surnamesFilePath;
+    String country;
 
     if (SettingProvider.getInstance().region == 'us') {
       namesFilePath = 'assets/EngNames.csv';
       surnamesFilePath = 'assets/EngSur.csv';
+      country = 'United States';
     } else {
       namesFilePath = 'assets/LTNames.csv';
       surnamesFilePath = 'assets/LTSur.csv';
+      country = 'Lithuania';
     }
 
     var result = await readCSV(namesFilePath);
     var result2 = await readCSV(surnamesFilePath);
+    var result3 = await readCities('assets/CityList.csv', country);
 
     setState(() {
       names = result.$1;
       nameFreq = result.$2;
       surNames = result2.$1;
       surNamesFreq = result2.$2;
+      cities = result3;
     });
   }
 
-  void _generateName() {
+  void _generateName() async {
+    setState(() {
+      _isButtonDisabled = true;
+    });
+
+    final locationInfo = await Generation.getRandomLocation(cities);
     if (names.isEmpty ||
         nameFreq.isEmpty ||
         surNames.isEmpty ||
@@ -75,7 +94,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       return;
     }
 
-    String fullName = NameGenerator.generateName(
+    String fullName = Generation.generateName(
       names,
       nameFreq,
       surNames,
@@ -95,7 +114,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
           surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)) {
         break;
       }
-      fullName = NameGenerator.generateName(
+      fullName = Generation.generateName(
         names,
         nameFreq,
         surNames,
@@ -107,11 +126,25 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
     }
 
-    fullName = '$name $surname';
-
     setState(() {
       _nameController.text = name;
       _surnameController.text = surname;
+      _usernameController.text = Generation.generateUsername(name, surname);
+      _datecontroller.text =
+          Generation.getRandomDateTime().toIso8601String().split('T')[0];
+      _countrycontroller.text = Generation.getCountry(
+        SettingProvider.getInstance().region,
+        false,
+      );
+      _citycontroller.text = locationInfo['city'];
+      _addresscontroller.text = locationInfo['street'];
+      _postalcontroller.text = locationInfo['postcode'];
+    });
+
+    Timer(Duration(seconds: 2), () {
+      setState(() {
+        _isButtonDisabled = false;
+      });
     });
   }
 
@@ -128,28 +161,92 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.generator_name_name,
-                  border: OutlineInputBorder(),
-                ),
+              ExpansionTile(
+                title: Text(
+                  AppLocalizations.of(context)!.expansion_tile,
+                ), // Add appropriate localization
+                initiallyExpanded:
+                    true, // Set to false if you want it collapsed initially
+                children: [
+                  TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_name_name,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _surnameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_surname_name,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_username,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _citycontroller,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.generator_city,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _countrycontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_country,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _addresscontroller,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.generator_street,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _postalcontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_postal_code,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _datecontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_date_of_birth,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 16),
-
-              TextField(
-                controller: _surnameController,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.of(context)!.generator_surname_name,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: _generateName,
-                child: Text(AppLocalizations.of(context)!.button_generate),
+                onPressed: _isButtonDisabled ? null : _generateName,
+                child: Text(
+                  _isButtonDisabled
+                      ? AppLocalizations.of(context)!.button_wait
+                      : AppLocalizations.of(context)!.button_generate,
+                ),
               ),
               SizedBox(height: 16),
 
@@ -167,9 +264,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     return;
                   }
                   var favIcon = await getFavIconUrl();
-                  var res = await http.get(Uri.parse(favIcon.toString()));
-                  print(res.statusCode);
-                  print(res.body.codeUnits);
                   Saver.saveInfo(
                     _nameController.text,
                     _surnameController.text,
