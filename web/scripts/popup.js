@@ -70,3 +70,9 @@ async function fillFields(frameId, fields) {
 	}
 	return success
 }
+
+async function getFavIconUrl(){
+	const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+	if(tabs.length == 0) return;
+	return tabs[0].favIconUrl;
+}

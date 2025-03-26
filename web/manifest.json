@@ -9,7 +9,7 @@
         "default_popup": "popup.html",
         "default_icon": "icons/Icon-192.png"
     },
-    "permissions": ["scripting", "activeTab", "webNavigation"],
+    "permissions": ["scripting", "activeTab", "webNavigation", "tabs"],
     "manifest_version": 3,
     "web_accessible_resources": [{
         "resources": [ "predefined.json" ],
