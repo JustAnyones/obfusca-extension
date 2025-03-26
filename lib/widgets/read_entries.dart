@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as img;
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({super.key});
@@ -23,7 +26,7 @@ class _EntriesPageState extends State<EntriesPage> {
     _entries = Saver.readInfo();
   }
 
-  List<TableRow> _getRows() {
+  Future<List<TableRow>> _getRows() async {
     List<TableRow> rows = [];
     rows.add(
       TableRow(
@@ -39,10 +42,11 @@ class _EntriesPageState extends State<EntriesPage> {
       ),
     );
     if (_entries == null) {
-      return rows;
+      return Future.value(rows);
     }
     for (int i = 0; i < _entries!.length; i++) {
       final _entry = jsonDecode(_entries![i]);
+      var res = await http.get(Uri.parse(_entry['favicon']));
       rows.add(
         TableRow(
           children: <Widget>[
@@ -53,8 +57,12 @@ class _EntriesPageState extends State<EntriesPage> {
                   if (_entry['favicon'] == null || _entry['favicon'] == "") {
                     return Text("??");
                   }
-                  var image = Image.network(
-                    _entry['favicon'],
+                  var bytes = Uint8List.fromList(res.body.codeUnits);
+                  var test = img.IcoDecoder().decode(bytes);
+                  var image2 = img.JpegEncoder().encode(test!);
+
+                  var image = Image.memory(
+                    image2,
                     width: 16,
                     height: 16,
                     errorBuilder: (ctx, ex, trace) {
@@ -73,7 +81,7 @@ class _EntriesPageState extends State<EntriesPage> {
         ),
       );
     }
-    return rows;
+    return Future.value(rows);
   }
 
   @override
@@ -82,15 +90,24 @@ class _EntriesPageState extends State<EntriesPage> {
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.entries_title)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Table(
-          border: TableBorder.all(),
-          columnWidths: const <int, TableColumnWidth>{
-            0: FlexColumnWidth(),
-            1: FlexColumnWidth(),
-            2: FlexColumnWidth(),
+        child: FutureBuilder<List<TableRow>>(
+          future: _getRows(),
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<List<TableRow>> snapshot,
+          ) {
+            var child = Table(
+              border: TableBorder.all(),
+              columnWidths: const <int, TableColumnWidth>{
+                0: FlexColumnWidth(),
+                1: FlexColumnWidth(),
+                2: FlexColumnWidth(),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: snapshot.data!,
+            );
+            return child;
           },
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          children: _getRows(),
         ),
       ),
     );

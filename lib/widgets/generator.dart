@@ -8,6 +8,7 @@ import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:browser_extension/widgets/settings.dart';
+import 'package:http/http.dart' as http;
 
 //import '' if (dart.library.html) 'package:browser_extension/web/interop.dart';
 
@@ -166,6 +167,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     return;
                   }
                   var favIcon = await getFavIconUrl();
+                  var res = await http.get(Uri.parse(favIcon.toString()));
+                  print(res.statusCode);
+                  print(res.body.codeUnits);
                   Saver.saveInfo(
                     _nameController.text,
                     _surnameController.text,
