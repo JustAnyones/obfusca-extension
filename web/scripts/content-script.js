@@ -1,23 +1,3 @@
-let ref_keeper = {}
-let cnt = 0;
-
-function initRefKeeper() {
-    ref_keeper = {}
-    cnt = 0
-}
-
-/**
- * 
- * @param {any} field Represents a HTML field.
- * @param {string} generator Namespaced generator name.
- * @returns 
- */
-function registerField(field, generator) {
-    cnt++
-    ref_keeper[cnt] = field
-    return {ref: cnt, generator: generator}
-}
-
 function isForm(form, url) {
     if (form.match.type === "static") {
         const pattern = new RegExp(form["match"]["pattern"] ?? ".+", "g")
@@ -30,92 +10,55 @@ function isForm(form, url) {
     return false
 }
 
-
-
-
-/*
-chrome.runtime.onConnect.addListener(function(port) {
-    console.assert(port.name === "knockknock");
-    port.onMessage.addListener(function(msg) {
-      if (msg.joke === "Knock knock")
-        port.postMessage({question: "Who's there?"});
-      else if (msg.answer === "Madame")
-        port.postMessage({question: "Madame who?"});
-      else if (msg.answer === "Madame... Bovary")
-        port.postMessage({question: "I don't get it."});
-    });
-  });
-  */
-
-window.addEventListener("message", (event) => {
-    if (event.source !== window) return; // Avoid messages from other sources
-    if (event.data.type === "FROM_A") {
-        console.log("Message received in B:", event.data.data);
-    }
-});
-
-function locateAutomatically() {
-
-    const fields = ["input", "select", "textarea"]
-
-    console.log(document.getElementsByTagName("input"))
-}
-
-/**
- * 
- * @param {*} entry 
- * @returns 
- */
-function locateFromDataEntry(entry) {
-    console.log("Running on", document, window.location.href)
-
-    let fields = []
-    for (const form of entry["forms"]) {
-        console.log(form);
-
-        if (!isForm(form, window.location.href)) {
-            continue;   
-        }
-        console.log("Matched via", form["match"])
-
-        for (const field of form["fields"]) {
-            const eleme = document.querySelector(field["selector"])
-            console.log("Query", field["selector"], eleme)
-            if (eleme !== null) {
-                fields.push(registerField(eleme, field["generator"]))
-            }
-        }
-    }
-    return fields;
-}
-
 function fillFields(fields) {
     for (const field of fields) {
-        const element = ref_keeper[field.ref]
-        element.value = field.value
+
+        const elements = reference_store[field.ref]
+        let element;
+        if (elements.length === 1) {
+            element = elements[0]
+        } else {
+            console.warn("Unsupported: multiple elements found for field", field)
+            continue
+        }
+
+        if (element.tagName === "SELECT") {
+            let selected = false
+            for (const option of element.options) {
+                if (option.value === field.value) {
+                    option.selected = true
+                    selected = true
+                } else {
+                    option.selected = false
+                }
+            }
+            if (!selected) {
+                console.warn("Could not find option", field.value, "for", element)
+            }
+        } else {
+            console.log("Setting value", field.value, "for", element)
+        
+            // https://stackoverflow.com/a/62111884
+            // https://stackoverflow.com/a/75880020
+            const valueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+            const prototype = Object.getPrototypeOf(element);
+            const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+            if (valueSetter && valueSetter !== prototypeValueSetter) {
+                prototypeValueSetter.call(element, field.value);
+            } else {
+                valueSetter.call(element, field.value);
+            }
+
+            //element.value = field.value
+        
+        }
+
         // Notify about fields being changed
-        element.dispatchEvent(new Event("change"));
+        element.dispatchEvent(new Event("input", { bubbles: true }));
+        element.dispatchEvent(new Event("change", { bubbles: true }));
+        //element.dispatchEvent(new Event("click", { bubbles: true }));
+        element.dispatchEvent(new Event("keyup"));
     } 
-}
-
-
-
-function locateFields(data) {
-    const entry = data[window.location.hostname]
-    if (entry === undefined) return []
-
-    return locateFromDataEntry(entry)
-
-    window.postMessage({ type: "FROM_A", data: "Hello from A" }, "*");
-
-    /*var port = chrome.runtime.connect({name: "knockknock"});
-    port.postMessage({joke: "Knock knock"});
-    port.onMessage.addListener(function(msg) {
-        if (msg.question === "Who's there?")
-            port.postMessage({answer: "Madame"});
-        else if (msg.question === "Madame who?")
-            port.postMessage({answer: "Madame... Bovary"});
-    });*/
 }
 
 // Called when site finishes loading, not all iframes
@@ -124,14 +67,25 @@ function locateFields(data) {
     const response = await fetch(dataUrl)
     const data = await response.json()
 
+    // Load site specific overrides
+    const overrideResponse = await fetch(chrome.runtime.getURL("data/overrides.json"))
+    const overrides = await overrideResponse.json()["overrides"]
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Called when the popup requests fields
         if (request.action === "requestFields") {
             console.log("Received request for fields from popup");
-            initRefKeeper()
-            let fieldData = locateFields(data)
-            console.log(fieldData)
+
+            resetStore()
+            let fieldData = detectFields(data)
+            // Remove fields with duplicate ref number, leaving only the last one
+            fieldData = Object.values(
+                fieldData.reduce((acc, obj) => {
+                    acc[obj.ref] = obj
+                    return acc
+                }, {})
+            )
+            console.log("Detected fields", fieldData)
 
             if (fieldData.length === 0) {
                 sendResponse({status: "NOT_FOUND", data: fieldData})
