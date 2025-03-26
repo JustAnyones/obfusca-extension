@@ -57,18 +57,26 @@ class _EntriesPageState extends State<EntriesPage> {
                   if (_entry['favicon'] == null || _entry['favicon'] == "") {
                     return Text("??");
                   }
-                  var bytes = Uint8List.fromList(res.body.codeUnits);
+                  /*var bytes = Uint8List.fromList(res.body.codeUnits);
+                  var vaizdas = img.Image.fromBytes(
+                    width: 16,
+                    height: 16,
+                    bytes: bytes,
+                  );
                   var test = img.IcoDecoder().decode(bytes);
-                  var image2 = img.JpegEncoder().encode(test!);
+                  var image2 = img.JpegEncoder().encode(test!);*/
 
-                  var image = Image.memory(
-                    image2,
+                  var image = Image.network(
+                    _entry['favicon'],
                     width: 16,
                     height: 16,
                     errorBuilder: (ctx, ex, trace) {
                       print(ex);
                       print(trace);
-                      return Text("??");
+                      var bytes = Uint8List.fromList(res.body.codeUnits);
+                      var test = img.IcoDecoder().decode(bytes);
+                      var image2 = img.JpegEncoder().encode(test!);
+                      return Image.memory(image2);
                     },
                   );
                   return image;
