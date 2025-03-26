@@ -5,7 +5,15 @@
 
     "generator_name_name": "Vardas",
     "generator_surname_name": "Pavardė",
+    "generator_username": "Slapyvardis",
+    "generator_city": "Miestas",
+    "generator_country": "Šalis",
+    "generator_street": "Gatvė",
+    "generator_postal_code": "Pašto kodas",
+    "generator_date_of_birth": "Gimimo metai",
+    "button_wait": "Prašau palaukit...",
     "button_generate": "Generuoti",
+    "expansion_tile": "Generatoriai",
 
     "button_save_entry": "Išsaugoti",
     "entry_saved": "Įrašas išsaugotas!",
