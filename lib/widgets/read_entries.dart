@@ -45,12 +45,19 @@ class _EntriesPageState extends State<EntriesPage> {
               height: 32,
               child: Builder(
                 builder: (context) {
-                  print(_entry['favicon']);
                   if (_entry['favicon'] == null || _entry['favicon'] == "") {
                     return Text("??");
                   }
-                  var image = Image.network(_entry['favicon']);
-                  print(image.image);
+                  var image = Image.network(
+                    _entry['favicon'],
+                    width: 16,
+                    height: 16,
+                    errorBuilder: (ctx, ex, trace) {
+                      print(ex);
+                      print(trace);
+                      return Text("??");
+                    },
+                  );
                   return image;
                 },
               ),
