@@ -10,6 +10,8 @@
   "button_save_entry": "Save",
   "entry_saved": "Entry saved!",
   "missing_name_surname": "Enter name and surname",
+  "button_view_entries": "Entries",
+  "entries_title": "Saved entries",
 
   "settings_title": "Settings",
   "@settings_title": {

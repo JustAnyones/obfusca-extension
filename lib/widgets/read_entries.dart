@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({super.key});
@@ -28,8 +29,12 @@ class _EntriesPageState extends State<EntriesPage> {
       TableRow(
         children: <Widget>[
           Container(child: Text("")),
-          Container(child: Text("Vardas")),
-          Container(child: Text("Pavarde")),
+          Container(
+            child: Text(AppLocalizations.of(context)!.generator_name_name),
+          ),
+          Container(
+            child: Text(AppLocalizations.of(context)!.generator_surname_name),
+          ),
         ],
       ),
     );
@@ -74,7 +79,7 @@ class _EntriesPageState extends State<EntriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Issaugoti")),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.entries_title)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Table(

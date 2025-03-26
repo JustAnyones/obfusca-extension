@@ -258,7 +258,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     MaterialPageRoute(builder: (context) => EntriesPage()),
                   );
                 },
-                child: Text("Entries"),
+                child: Text(AppLocalizations.of(context)!.button_view_entries),
               ),
             ],
           ),
