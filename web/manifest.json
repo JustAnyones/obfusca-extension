@@ -2,10 +2,37 @@
     "name": "extension demo",
     "description": "demo",
     "version": "1.0.0",
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+    },
     "action": {
-        "default_popup": "index.html",
+        "default_popup": "popup.html",
         "default_icon": "icons/Icon-192.png"
     },
-    "permissions": ["scripting", "activeTab"],
-    "manifest_version": 3
+    "permissions": ["scripting", "activeTab", "webNavigation", "tabs"],
+    "manifest_version": 3,
+    "web_accessible_resources": [{
+        "resources": [
+            "predefined.json",
+            "data/overrides.json"
+        ],
+        "extension_ids": ["*"],
+        "matches": [ "<all_urls>" ]
+    }],
+    "content_scripts": [{
+        "matches": [
+            "<all_urls>"
+        ],
+        "exclude_matches": [
+            "*://*/*.xml*",
+            "file:///*.xml*"
+        ],
+        "js": [
+            "scripts/content-detector.js",
+            "scripts/content-script.js",
+            "scripts/content-utils.js"
+        ],
+        "run_at": "document_idle",
+        "all_frames": true
+    }]
 }

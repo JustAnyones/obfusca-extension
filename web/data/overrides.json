@@ -1,0 +1,14 @@
+{
+    "overrides": {
+        "https://x.com/i/flow/signup": {
+            "fields": [
+                {
+                    "selector": "select[id='SELECTOR_1']",
+                    "generator": {
+                        "name": "namespace::birth_month_generator"
+                    }
+                }
+            ]
+        }
+    }
+}
