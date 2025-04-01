@@ -35,6 +35,27 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<String> surNames;
   late List<double> surNamesFreq;
   late List<String> cities;
+  final List<String> generatorsEN = [
+    'Name',
+    'Surname',
+    'Username',
+    'City',
+    'Country',
+    'Address',
+    'Postal code',
+    'Date of birth',
+  ];
+  final List<String> generatorsLT = [
+    'Vardas',
+    'Pavardė',
+    'Slapyvardis',
+    'Miestas',
+    'Šalis',
+    'Adresas',
+    'Pašto kodas',
+    'Gimimo data',
+  ];
+  final List<bool> selectedItems = List.filled(8, false);
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
@@ -177,157 +198,180 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
             children: [
               ExpansionTile(
                 title: Text(AppLocalizations.of(context)!.expansion_tile),
-                initiallyExpanded: true,
+                initiallyExpanded: false,
                 children: [
-                  CheckboxListTile(
-                    title: TextField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(context)!.generator_name_name,
-                        border: OutlineInputBorder(),
-                      ),
+                  SizedBox(
+                    height: 250,
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount:
+                          SettingProvider.getInstance().region == 'us'
+                              ? generatorsEN.length
+                              : generatorsLT.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(
+                            SettingProvider.getInstance().region == 'us'
+                                ? generatorsEN[index]
+                                : generatorsLT[index],
+                          ),
+                          selected: selectedItems[index],
+                          selectedTileColor: Colors.green,
+                          onTap: () {
+                            setState(() {
+                              selectedItems[index] = !selectedItems[index];
+                            });
+                          },
+                        );
+                      },
                     ),
-                    value: isChecked_name,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked_name = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: TextField(
-                      controller: _surnameController,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(
-                              context,
-                            )!.generator_surname_name,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    value: isChecked_surname,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked_surname = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: TextField(
-                      controller: _usernameController,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(context)!.generator_username,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    value: isChecked_username,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked_username = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: TextField(
-                      controller: _citycontroller,
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.generator_city,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    value: isChecked_city,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked_city = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: TextField(
-                      controller: _countrycontroller,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(context)!.generator_country,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    value: isChecked_country,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked_country = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: TextField(
-                      controller: _addresscontroller,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(context)!.generator_street,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    value: isChecked_address,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked_address = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: TextField(
-                      controller: _postalcontroller,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(context)!.generator_postal_code,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    value: isChecked_postal,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked_postal = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: TextField(
-                      controller: _datecontroller,
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(
-                              context,
-                            )!.generator_date_of_birth,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    value: isChecked_date,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked_date = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
                   ),
                 ],
               ),
-
+              SizedBox(height: 16),
+              if (selectedItems[0])
+                CheckboxListTile(
+                  title: TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_name_name,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  value: isChecked_name,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked_name = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              if (selectedItems[1])
+                CheckboxListTile(
+                  title: TextField(
+                    controller: _surnameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_surname_name,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  value: isChecked_surname,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked_surname = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              if (selectedItems[2])
+                CheckboxListTile(
+                  title: TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_username,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  value: isChecked_username,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked_username = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              if (selectedItems[3])
+                CheckboxListTile(
+                  title: TextField(
+                    controller: _citycontroller,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.generator_city,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  value: isChecked_city,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked_city = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              if (selectedItems[4])
+                CheckboxListTile(
+                  title: TextField(
+                    controller: _countrycontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_country,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  value: isChecked_country,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked_country = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              if (selectedItems[5])
+                CheckboxListTile(
+                  title: TextField(
+                    controller: _addresscontroller,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.generator_street,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  value: isChecked_address,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked_address = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              if (selectedItems[6])
+                CheckboxListTile(
+                  title: TextField(
+                    controller: _postalcontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_postal_code,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  value: isChecked_postal,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked_postal = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              if (selectedItems[7])
+                CheckboxListTile(
+                  title: TextField(
+                    controller: _datecontroller,
+                    decoration: InputDecoration(
+                      labelText:
+                          AppLocalizations.of(context)!.generator_date_of_birth,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  value: isChecked_date,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked_date = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
               ElevatedButton(
                 onPressed: _isButtonDisabled ? null : _generateName,
                 child: Text(
