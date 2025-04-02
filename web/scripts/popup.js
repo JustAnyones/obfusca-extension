@@ -71,8 +71,28 @@ async function fillFields(frameId, fields) {
 	return success
 }
 
-async function getFavIconUrl(){
-	const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+async function getURL() {
+	const tabs = await chrome.tabs.query({ active: true, currentWindow: true});
 	if(tabs.length == 0) return;
-	return tabs[0].favIconUrl;
+	var matches = tabs[0].url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+	var domain = matches && matches[1];
+	console.log(tabs[0].favIconUrl);
+	return domain;
+}
+
+async function getFavIconUrl(){
+	const domain = await getURL();
+	return "https://www.google.com/s2/favicons?domain=" + domain;
+}
+
+async function exportEntries(entries) {
+	console.log(entries);
+	const fileAsBlob = new Blob(['[' + entries.toString() + ']'], {type: 'application/json'});
+	var result = JSON.stringify(entries);
+	var url = URL.createObjectURL(fileAsBlob);
+	console.log(url)
+	chrome.downloads.download({
+		url: url,
+		filename: 'entrie_export.json'
+	});
 }
