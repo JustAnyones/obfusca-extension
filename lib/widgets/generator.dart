@@ -35,26 +35,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<String> surNames;
   late List<double> surNamesFreq;
   late List<String> cities;
-  final List<String> generatorsEN = [
-    'Name',
-    'Surname',
-    'Username',
-    'City',
-    'Country',
-    'Address',
-    'Postal code',
-    'Date of birth',
-  ];
-  final List<String> generatorsLT = [
-    'Vardas',
-    'Pavardė',
-    'Slapyvardis',
-    'Miestas',
-    'Šalis',
-    'Adresas',
-    'Pašto kodas',
-    'Gimimo data',
-  ];
   final List<bool> selectedItems = List.filled(8, false);
 
   final TextEditingController _nameController = TextEditingController();
@@ -183,8 +163,24 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     });
   }
 
+  List<String> getLocalizedGenerators(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    return [
+      localizations.generator_name_name,
+      localizations.generator_surname_name,
+      localizations.generator_username,
+      localizations.generator_city,
+      localizations.generator_country,
+      localizations.generator_street,
+      localizations.generator_postal_code,
+      localizations.generator_date_of_birth,
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final generators = getLocalizedGenerators(context);
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -205,17 +201,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      itemCount:
-                          SettingProvider.getInstance().region == 'us'
-                              ? generatorsEN.length
-                              : generatorsLT.length,
+                      itemCount: generators.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(
-                            SettingProvider.getInstance().region == 'us'
-                                ? generatorsEN[index]
-                                : generatorsLT[index],
-                          ),
+                          title: Text(generators[index]),
                           selected: selectedItems[index],
                           selectedTileColor: Colors.green,
                           onTap: () {
