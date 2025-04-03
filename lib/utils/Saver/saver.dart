@@ -1,4 +1,9 @@
 import "dart:convert";
+import "dart:js_interop";
+import "package:file_picker/_internal/file_picker_web.dart";
+import "package:flutter/foundation.dart";
+import 'package:web/web.dart' as html;
+import 'package:file_picker/file_picker.dart';
 import "package:shared_preferences/shared_preferences.dart";
 
 class Saver {
@@ -27,5 +32,24 @@ class Saver {
   static List<String>? readInfo() {
     List<String>? entries = _prefs!.getStringList('entries');
     return entries;
+  }
+
+  static Future<void> writeEntries() async {
+    List<String> entries = _prefs!.getStringList('entries')!;
+    String save = '[';
+    for (int i = 0; i < entries.length; i++) {
+      save += entries[i];
+      if (i != entries.length - 1) save += ',';
+    }
+    save += ']';
+    Uint8List bytes = new Uint8List.fromList(save.codeUnits);
+    FilePicker? platform;
+    platform = FilePicker.platform;
+    String? outputFile = await platform.saveFile(
+      dialogTitle: 'SaveFile',
+      fileName: 'entries.json',
+      bytes: bytes,
+    );
+    print(outputFile);
   }
 }

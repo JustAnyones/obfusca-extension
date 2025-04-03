@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:browser_extension/web/interop.dart';
 import 'package:flutter/material.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -67,7 +66,6 @@ class _EntriesPageState extends State<EntriesPage> {
                       return Image.memory(
                         image2,
                         errorBuilder: (ctx, ex, trace) {
-                          print("??");
                           return Text("??");
                         },
                       );
@@ -116,9 +114,7 @@ class _EntriesPageState extends State<EntriesPage> {
 
             ElevatedButton(
               onPressed: () async {
-                print("Bef");
-                await exportEntries(_entries!);
-                print("Aft");
+                await Saver.writeEntries();
               },
               child: Text("Export"),
             ),
