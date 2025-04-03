@@ -181,6 +181,66 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   Widget build(BuildContext context) {
     final generators = getLocalizedGenerators(context);
 
+    final fields = [
+      {
+        'controller': _nameController,
+        'label': AppLocalizations.of(context)!.generator_name_name,
+        'isChecked': isChecked_name,
+        'onChanged':
+            (bool? value) => setState(() => isChecked_name = value ?? false),
+      },
+      {
+        'controller': _surnameController,
+        'label': AppLocalizations.of(context)!.generator_surname_name,
+        'isChecked': isChecked_surname,
+        'onChanged':
+            (bool? value) => setState(() => isChecked_surname = value ?? false),
+      },
+      {
+        'controller': _usernameController,
+        'label': AppLocalizations.of(context)!.generator_username,
+        'isChecked': isChecked_username,
+        'onChanged':
+            (bool? value) =>
+                setState(() => isChecked_username = value ?? false),
+      },
+      {
+        'controller': _citycontroller,
+        'label': AppLocalizations.of(context)!.generator_city,
+        'isChecked': isChecked_city,
+        'onChanged':
+            (bool? value) => setState(() => isChecked_city = value ?? false),
+      },
+      {
+        'controller': _countrycontroller,
+        'label': AppLocalizations.of(context)!.generator_country,
+        'isChecked': isChecked_country,
+        'onChanged':
+            (bool? value) => setState(() => isChecked_country = value ?? false),
+      },
+      {
+        'controller': _addresscontroller,
+        'label': AppLocalizations.of(context)!.generator_street,
+        'isChecked': isChecked_address,
+        'onChanged':
+            (bool? value) => setState(() => isChecked_address = value ?? false),
+      },
+      {
+        'controller': _postalcontroller,
+        'label': AppLocalizations.of(context)!.generator_postal_code,
+        'isChecked': isChecked_postal,
+        'onChanged':
+            (bool? value) => setState(() => isChecked_postal = value ?? false),
+      },
+      {
+        'controller': _datecontroller,
+        'label': AppLocalizations.of(context)!.generator_date_of_birth,
+        'isChecked': isChecked_date,
+        'onChanged':
+            (bool? value) => setState(() => isChecked_date = value ?? false),
+      },
+    ];
+
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -219,148 +279,23 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 ],
               ),
               SizedBox(height: 16),
-              if (selectedItems[0])
-                CheckboxListTile(
+              ...fields.asMap().entries.map((entry) {
+                final index = entry.key;
+                final field = entry.value;
+                if (!selectedItems[index]) return SizedBox.shrink();
+                return CheckboxListTile(
                   title: TextField(
-                    controller: _nameController,
+                    controller: field['controller'] as TextEditingController?,
                     decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.of(context)!.generator_name_name,
+                      labelText: field['label'] as String?,
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  value: isChecked_name,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked_name = value ?? false;
-                    });
-                  },
+                  value: field['isChecked'] as bool?,
+                  onChanged: field['onChanged'] as ValueChanged<bool?>?,
                   controlAffinity: ListTileControlAffinity.leading,
-                ),
-              if (selectedItems[1])
-                CheckboxListTile(
-                  title: TextField(
-                    controller: _surnameController,
-                    decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.of(context)!.generator_surname_name,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  value: isChecked_surname,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked_surname = value ?? false;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              if (selectedItems[2])
-                CheckboxListTile(
-                  title: TextField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.of(context)!.generator_username,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  value: isChecked_username,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked_username = value ?? false;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              if (selectedItems[3])
-                CheckboxListTile(
-                  title: TextField(
-                    controller: _citycontroller,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.generator_city,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  value: isChecked_city,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked_city = value ?? false;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              if (selectedItems[4])
-                CheckboxListTile(
-                  title: TextField(
-                    controller: _countrycontroller,
-                    decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.of(context)!.generator_country,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  value: isChecked_country,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked_country = value ?? false;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              if (selectedItems[5])
-                CheckboxListTile(
-                  title: TextField(
-                    controller: _addresscontroller,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.generator_street,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  value: isChecked_address,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked_address = value ?? false;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              if (selectedItems[6])
-                CheckboxListTile(
-                  title: TextField(
-                    controller: _postalcontroller,
-                    decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.of(context)!.generator_postal_code,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  value: isChecked_postal,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked_postal = value ?? false;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              if (selectedItems[7])
-                CheckboxListTile(
-                  title: TextField(
-                    controller: _datecontroller,
-                    decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.of(context)!.generator_date_of_birth,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  value: isChecked_date,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isChecked_date = value ?? false;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
+                );
+              }).toList(),
               ElevatedButton(
                 onPressed: _isButtonDisabled ? null : _generateName,
                 child: Text(
