@@ -118,6 +118,12 @@ class _EntriesPageState extends State<EntriesPage> {
               },
               child: Text("Export"),
             ),
+            ElevatedButton(
+              onPressed: () async {
+                await Saver.importEntries();
+              },
+              child: Text("Import"),
+            ),
           ],
         ),
       ),

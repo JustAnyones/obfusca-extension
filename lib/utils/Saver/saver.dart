@@ -49,4 +49,37 @@ class Saver {
     );
     print(outputFile);
   }
+
+  static Future<void> importEntries() async {
+    FilePicker? platform;
+    platform = FilePicker.platform;
+    FilePickerResult? result = await platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      String dataString = String.fromCharCodes(file.bytes!);
+      var data = jsonDecode(dataString);
+      if (data[0]['name'] == null ||
+          data[0]['surname'] == null ||
+          data[0]['favicon'] == null) {
+        print('bad');
+        return;
+      }
+      List<String> entries = [];
+      for (int i = 0; i < data.length; i++) {
+        var entry = {
+          'name': data[i]['name'],
+          'surname': data[i]['surname'],
+          'favicon': data[i]['favicon'],
+        };
+        final String json = jsonEncode(entry);
+        entries.add(json);
+      }
+      await _prefs!.setStringList('entries', entries);
+    } else {
+      return;
+    }
+  }
 }
