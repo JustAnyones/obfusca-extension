@@ -71,8 +71,15 @@ async function fillFields(frameId, fields) {
 	return success
 }
 
-async function getFavIconUrl(){
-	const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+async function getURL() {
+	const tabs = await chrome.tabs.query({ active: true, currentWindow: true});
 	if(tabs.length == 0) return;
-	return tabs[0].favIconUrl;
+	var matches = tabs[0].url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+	var domain = matches && matches[1];
+	return domain;
+}
+
+async function getFavIconUrl(){
+	const domain = await getURL();
+	return "https://www.google.com/s2/favicons?domain=" + domain;
 }

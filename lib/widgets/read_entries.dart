@@ -45,8 +45,8 @@ class _EntriesPageState extends State<EntriesPage> {
       return Future.value(rows);
     }
     for (int i = 0; i < _entries!.length; i++) {
-      final _entry = jsonDecode(_entries![i]);
-      var res = await http.get(Uri.parse(_entry['favicon']));
+      final entry = jsonDecode(_entries![i]);
+      var res = await http.get(Uri.parse(entry['favicon']));
       rows.add(
         TableRow(
           children: <Widget>[
@@ -54,37 +54,29 @@ class _EntriesPageState extends State<EntriesPage> {
               height: 32,
               child: Builder(
                 builder: (context) {
-                  if (_entry['favicon'] == null || _entry['favicon'] == "") {
+                  if (entry['favicon'] == null || entry['favicon'] == "") {
                     return Text("??");
                   }
-                  /*var bytes = Uint8List.fromList(res.body.codeUnits);
-                  var vaizdas = img.Image.fromBytes(
-                    width: 16,
-                    height: 16,
-                    bytes: bytes,
-                  );
-                  var test = img.IcoDecoder().decode(bytes);
-                  var image2 = img.JpegEncoder().encode(test!);*/
-
                   var image = Image.network(
-                    _entry['favicon'],
-                    width: 16,
-                    height: 16,
+                    entry['favicon'],
                     errorBuilder: (ctx, ex, trace) {
-                      print(ex);
-                      print(trace);
                       var bytes = Uint8List.fromList(res.body.codeUnits);
                       var test = img.IcoDecoder().decode(bytes);
                       var image2 = img.JpegEncoder().encode(test!);
-                      return Image.memory(image2);
+                      return Image.memory(
+                        image2,
+                        errorBuilder: (ctx, ex, trace) {
+                          return Text("??");
+                        },
+                      );
                     },
                   );
                   return image;
                 },
               ),
             ),
-            Container(child: Text(_entry['name'])),
-            Container(child: Text(_entry['surname'])),
+            Container(child: Text(entry['name'])),
+            Container(child: Text(entry['surname'])),
           ],
         ),
       );
@@ -98,24 +90,71 @@ class _EntriesPageState extends State<EntriesPage> {
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.entries_title)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<TableRow>>(
-          future: _getRows(),
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<List<TableRow>> snapshot,
-          ) {
-            var child = Table(
-              border: TableBorder.all(),
-              columnWidths: const <int, TableColumnWidth>{
-                0: FlexColumnWidth(),
-                1: FlexColumnWidth(),
-                2: FlexColumnWidth(),
+        child: Column(
+          children: [
+            FutureBuilder<List<TableRow>>(
+              future: _getRows(),
+              builder: (
+                BuildContext context,
+                AsyncSnapshot<List<TableRow>> snapshot,
+              ) {
+                var child = Table(
+                  border: TableBorder.all(),
+                  columnWidths: const <int, TableColumnWidth>{
+                    0: FlexColumnWidth(),
+                    1: FlexColumnWidth(),
+                    2: FlexColumnWidth(),
+                  },
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: snapshot.data!,
+                );
+                return child;
               },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: snapshot.data!,
-            );
-            return child;
-          },
+            ),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () async {
+                await Saver.writeEntries();
+              },
+              child: Text(AppLocalizations.of(context)!.button_export_entries),
+            ),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () async {
+                String res = await Saver.importEntries();
+                if (res == "BadFile") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_bad_file,
+                      ),
+                    ),
+                  );
+                } else if (res == "NoFile") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_no_file,
+                      ),
+                    ),
+                  );
+                } else if (res == "Saved") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_success,
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.button_import_entries),
+            ),
+          ],
         ),
       ),
     );

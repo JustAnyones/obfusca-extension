@@ -20,6 +20,11 @@
   "missing_name_surname": "Enter name and surname",
   "button_view_entries": "Entries",
   "entries_title": "Saved entries",
+  "button_export_entries": "Export",
+  "button_import_entries": "Import",
+  "import_no_file": "Choose a file",
+  "import_bad_file": "Cannot import from this file",
+  "import_success": "Entries imported",
 
   "settings_title": "Settings",
   "@settings_title": {

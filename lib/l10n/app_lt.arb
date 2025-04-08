@@ -18,6 +18,13 @@
     "button_save_entry": "Išsaugoti",
     "entry_saved": "Įrašas išsaugotas!",
     "missing_name_surname": "Įveskite vardą ir pavardę",
+    "button_view_entries": "Įrašais",
+    "entries_title": "Išsaugoti įrašai",
+    "button_export_entries": "Eksportuoti",
+    "button_import_entries": "Importuoti",
+    "import_no_file": "Pasirinkite failą",
+    "import_bad_file": "Negalima importuoti iš šio failo",
+    "import_success": "Įrašai importuoti",
 
     "settings_title": "Nustatymai",
     "setting_locale_title": "Kalba",
