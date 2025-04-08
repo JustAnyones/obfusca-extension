@@ -224,6 +224,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       if (isChecked_postal) _postalcontroller.text = locationInfo['postcode'];
     });
 
+    _saveCurrentValues();
     Timer(Duration(seconds: 2), () {
       setState(() {
         _isButtonDisabled = false;
