@@ -112,17 +112,47 @@ class _EntriesPageState extends State<EntriesPage> {
               },
             ),
 
+            SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () async {
                 await Saver.writeEntries();
               },
-              child: Text("Export"),
+              child: Text(AppLocalizations.of(context)!.button_export_entries),
             ),
+
+            SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () async {
-                await Saver.importEntries();
+                String res = await Saver.importEntries();
+                if (res == "BadFile") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_bad_file,
+                      ),
+                    ),
+                  );
+                } else if (res == "NoFile") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_no_file,
+                      ),
+                    ),
+                  );
+                } else if (res == "Saved") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_success,
+                      ),
+                    ),
+                  );
+                }
               },
-              child: Text("Import"),
+              child: Text(AppLocalizations.of(context)!.button_import_entries),
             ),
           ],
         ),

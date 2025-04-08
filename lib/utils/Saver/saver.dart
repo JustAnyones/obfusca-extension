@@ -50,7 +50,7 @@ class Saver {
     print(outputFile);
   }
 
-  static Future<void> importEntries() async {
+  static Future<String> importEntries() async {
     FilePicker? platform;
     platform = FilePicker.platform;
     FilePickerResult? result = await platform.pickFiles(
@@ -65,7 +65,7 @@ class Saver {
           data[0]['surname'] == null ||
           data[0]['favicon'] == null) {
         print('bad');
-        return;
+        return "BadFile";
       }
       List<String> entries = [];
       for (int i = 0; i < data.length; i++) {
@@ -78,8 +78,9 @@ class Saver {
         entries.add(json);
       }
       await _prefs!.setStringList('entries', entries);
+      return "Saved";
     } else {
-      return;
+      return "NoFile";
     }
   }
 }
