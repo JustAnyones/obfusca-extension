@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as img;
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({super.key});
@@ -22,7 +19,7 @@ class _EntriesPageState extends State<EntriesPage> {
     _loadEntries();
   }
 
-  Future<void> _loadEntries() async {
+  void _loadEntries() {
     _entries = Saver.readInfo();
   }
 
@@ -46,7 +43,6 @@ class _EntriesPageState extends State<EntriesPage> {
     }
     for (int i = 0; i < _entries!.length; i++) {
       final entry = jsonDecode(_entries![i]);
-      var res = await http.get(Uri.parse(entry['favicon']));
       rows.add(
         TableRow(
           children: <Widget>[
@@ -60,15 +56,7 @@ class _EntriesPageState extends State<EntriesPage> {
                   var image = Image.network(
                     entry['favicon'],
                     errorBuilder: (ctx, ex, trace) {
-                      var bytes = Uint8List.fromList(res.body.codeUnits);
-                      var test = img.IcoDecoder().decode(bytes);
-                      var image2 = img.JpegEncoder().encode(test!);
-                      return Image.memory(
-                        image2,
-                        errorBuilder: (ctx, ex, trace) {
-                          return Text("??");
-                        },
-                      );
+                      return Text("??");
                     },
                   );
                   return image;
