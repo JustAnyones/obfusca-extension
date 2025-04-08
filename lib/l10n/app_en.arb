@@ -17,6 +17,8 @@
 
   "button_save_entry": "Save",
   "entry_saved": "Entry saved!",
+  "entry_no_fields": "Please select fields to generate and save",
+  "entry_empty_fields": "Fill all selected fields",
   "missing_name_surname": "Enter name and surname",
   "button_view_entries": "Entries",
   "entries_title": "Saved entries",
