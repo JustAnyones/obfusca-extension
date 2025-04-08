@@ -177,6 +177,29 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     ];
   }
 
+  String getGeneratorName(String generator) {
+    switch (generator) {
+      case "namespace::username_generator":
+        return _usernameController.text;
+      case "namespace::firstname_generator":
+        return _nameController.text;
+      case "namespace::lastname_generator":
+        return _surnameController.text;
+      case "namespace::birthdate_generator":
+        return _datecontroller.text;
+      case "namespace::birth_day_generator":
+        return _datecontroller.text.split('-')[2];
+      case "namespace::birth_month_generator":
+        return _datecontroller.text.split('-')[1];
+      case "namespace::birth_year_generator":
+        return _datecontroller.text.split('-')[0];
+      case "namespace::country_generator":
+        return _countrycontroller.text;
+      default:
+        return "nera autofill";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final generators = getLocalizedGenerators(context);
@@ -384,8 +407,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                   for (var i = 0; i < _detectedFields.length; i++) {
                     fieldsToFill.add({
                       "ref": _detectedFields[i]["ref"],
-                      "value":
-                          _detectedFields[i]["generator"], // TODO: perform actual generation
+                      "value": getGeneratorName(
+                        _detectedFields[i]["generator"],
+                      ),
                     });
                   }
                   fillFields(_frameId, fieldsToFill);
