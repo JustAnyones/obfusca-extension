@@ -340,6 +340,80 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
               ElevatedButton(
                 onPressed: () async {
+                  int total = 0;
+                  int sum = 0;
+                  if (isChecked_address) {
+                    total++;
+                    if (_addresscontroller.text != '') sum++;
+                  }
+                  if (isChecked_city) {
+                    total++;
+                    if (_citycontroller.text != '') sum++;
+                  }
+                  if (isChecked_country) {
+                    total++;
+                    if (_countrycontroller.text != '') sum++;
+                  }
+                  if (isChecked_date) {
+                    total++;
+                    if (_datecontroller.text != '') sum++;
+                  }
+                  if (isChecked_name) {
+                    total++;
+                    if (_nameController.text != '') sum++;
+                  }
+                  if (isChecked_postal) {
+                    total++;
+                    if (_postalcontroller.text != '') sum++;
+                  }
+                  if (isChecked_surname) {
+                    total++;
+                    if (_surnameController.text != '') sum++;
+                  }
+                  if (isChecked_username) {
+                    total++;
+                    if (_usernameController.text != '') sum++;
+                  }
+
+                  if (total == 0) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.entry_no_fields,
+                        ),
+                      ),
+                    );
+                  } else if (sum < total) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.entry_empty_fields,
+                        ),
+                      ),
+                    );
+                  } else if (sum == total) {
+                    String domain = await getURL();
+                    String favIcon = await getFavIconUrl();
+                    Saver.saveInfo(
+                      _nameController.text,
+                      _surnameController.text,
+                      favIcon,
+                      domain,
+                      _addresscontroller.text,
+                      _citycontroller.text,
+                      _countrycontroller.text,
+                      _datecontroller.text,
+                      _postalcontroller.text,
+                      _usernameController.text,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.entry_saved,
+                        ),
+                      ),
+                    );
+                  }
                   if (_nameController.text == '' &&
                       _surnameController.text == '') {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -351,17 +425,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     );
                     return;
                   }
-                  var favIcon = await getFavIconUrl();
-                  Saver.saveInfo(
-                    _nameController.text,
-                    _surnameController.text,
-                    favIcon.toString(),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(AppLocalizations.of(context)!.entry_saved),
-                    ),
-                  );
                 },
                 child: Text(AppLocalizations.of(context)!.button_save_entry),
               ),
