@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/generation.dart';
@@ -54,11 +55,28 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     super.initState();
     SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
+    _loadSavedValues();
+    _nameController.addListener(_saveCurrentValues);
+    _surnameController.addListener(_saveCurrentValues);
+    _usernameController.addListener(_saveCurrentValues);
+    _datecontroller.addListener(_saveCurrentValues);
+    _countrycontroller.addListener(_saveCurrentValues);
+    _citycontroller.addListener(_saveCurrentValues);
+    _addresscontroller.addListener(_saveCurrentValues);
+    _postalcontroller.addListener(_saveCurrentValues);
   }
 
   @override
   void dispose() {
     SettingProvider.getInstance().removeListener(_loadCSVData);
+    _nameController.removeListener(_saveCurrentValues);
+    _surnameController.removeListener(_saveCurrentValues);
+    _usernameController.removeListener(_saveCurrentValues);
+    _datecontroller.removeListener(_saveCurrentValues);
+    _countrycontroller.removeListener(_saveCurrentValues);
+    _citycontroller.removeListener(_saveCurrentValues);
+    _addresscontroller.removeListener(_saveCurrentValues);
+    _postalcontroller.removeListener(_saveCurrentValues);
     super.dispose();
   }
 
@@ -88,6 +106,56 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       surNamesFreq = result2.$2;
       cities = result3;
     });
+  }
+
+  Future<void> _loadSavedValues() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      _nameController.text = prefs.getString('generated_name') ?? '';
+      _surnameController.text = prefs.getString('generated_surname') ?? '';
+      _usernameController.text = prefs.getString('generated_username') ?? '';
+      _datecontroller.text = prefs.getString('generated_date') ?? '';
+      _countrycontroller.text = prefs.getString('generated_country') ?? '';
+      _citycontroller.text = prefs.getString('generated_city') ?? '';
+      _addresscontroller.text = prefs.getString('generated_address') ?? '';
+      _postalcontroller.text = prefs.getString('generated_postal') ?? '';
+
+      List<String>? selectedIndices = prefs.getStringList('selected_items');
+      if (selectedIndices != null) {
+        for (int i = 0; i < selectedItems.length; i++) {
+          selectedItems[i] = false;
+        }
+
+        for (String indexStr in selectedIndices) {
+          int index = int.tryParse(indexStr) ?? -1;
+          if (index >= 0 && index < selectedItems.length) {
+            selectedItems[index] = true;
+          }
+        }
+      }
+    });
+  }
+
+  Future<void> _saveCurrentValues() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString('generated_name', _nameController.text);
+    await prefs.setString('generated_surname', _surnameController.text);
+    await prefs.setString('generated_username', _usernameController.text);
+    await prefs.setString('generated_date', _datecontroller.text);
+    await prefs.setString('generated_country', _countrycontroller.text);
+    await prefs.setString('generated_city', _citycontroller.text);
+    await prefs.setString('generated_address', _addresscontroller.text);
+    await prefs.setString('generated_postal', _postalcontroller.text);
+
+    List<String> selectedItemsStrings = [];
+    for (int i = 0; i < selectedItems.length; i++) {
+      if (selectedItems[i]) {
+        selectedItemsStrings.add(i.toString());
+      }
+    }
+    await prefs.setStringList('selected_items', selectedItemsStrings);
   }
 
   void _generateName() async {
@@ -156,6 +224,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       if (isChecked_postal) _postalcontroller.text = locationInfo['postcode'];
     });
 
+    _saveCurrentValues();
     Timer(Duration(seconds: 2), () {
       setState(() {
         _isButtonDisabled = false;
@@ -270,6 +339,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           onTap: () {
                             setState(() {
                               selectedItems[index] = !selectedItems[index];
+                              _saveCurrentValues(); // Save when selection changes
                             });
                           },
                         );
