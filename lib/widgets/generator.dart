@@ -342,37 +342,69 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 onPressed: () async {
                   int total = 0;
                   int sum = 0;
+                  String address = '';
+                  String city = '';
+                  String country = '';
+                  String date = '';
+                  String name = '';
+                  String postal = '';
+                  String surname = '';
+                  String username = '';
                   if (isChecked_address) {
                     total++;
-                    if (_addresscontroller.text != '') sum++;
+                    if (_addresscontroller.text != '') {
+                      sum++;
+                      address = _addresscontroller.text;
+                    }
                   }
                   if (isChecked_city) {
                     total++;
-                    if (_citycontroller.text != '') sum++;
+                    if (_citycontroller.text != '') {
+                      sum++;
+                      city = _citycontroller.text;
+                    }
                   }
                   if (isChecked_country) {
                     total++;
-                    if (_countrycontroller.text != '') sum++;
+                    if (_countrycontroller.text != '') {
+                      sum++;
+                      country = _countrycontroller.text;
+                    }
                   }
                   if (isChecked_date) {
                     total++;
-                    if (_datecontroller.text != '') sum++;
+                    if (_datecontroller.text != '') {
+                      sum++;
+                      date = _datecontroller.text;
+                    }
                   }
                   if (isChecked_name) {
                     total++;
-                    if (_nameController.text != '') sum++;
+                    if (_nameController.text != '') {
+                      sum++;
+                      name = _nameController.text;
+                    }
                   }
                   if (isChecked_postal) {
                     total++;
-                    if (_postalcontroller.text != '') sum++;
+                    if (_postalcontroller.text != '') {
+                      sum++;
+                      postal = _postalcontroller.text;
+                    }
                   }
                   if (isChecked_surname) {
                     total++;
-                    if (_surnameController.text != '') sum++;
+                    if (_surnameController.text != '') {
+                      sum++;
+                      surname = _surnameController.text;
+                    }
                   }
                   if (isChecked_username) {
                     total++;
-                    if (_usernameController.text != '') sum++;
+                    if (_usernameController.text != '') {
+                      sum++;
+                      username = _usernameController.text;
+                    }
                   }
 
                   if (total == 0) {
@@ -395,16 +427,16 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     String domain = await getURL();
                     String favIcon = await getFavIconUrl();
                     Saver.saveInfo(
-                      _nameController.text,
-                      _surnameController.text,
+                      name,
+                      surname,
                       favIcon,
                       domain,
-                      _addresscontroller.text,
-                      _citycontroller.text,
-                      _countrycontroller.text,
-                      _datecontroller.text,
-                      _postalcontroller.text,
-                      _usernameController.text,
+                      address,
+                      city,
+                      country,
+                      date,
+                      postal,
+                      username,
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
