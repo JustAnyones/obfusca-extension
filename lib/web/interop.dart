@@ -9,6 +9,9 @@ external JSPromise<JSObject> _fillFields(JSNumber frameId, JSAny? fields);
 @JS('getFavIconUrl')
 external JSPromise<JSObject> _getFavIconURL();
 
+@JS('getURL')
+external JSPromise<JSObject> _getURL();
+
 @JS('exportEntries')
 external JSPromise<JSObject> _exportEntries(JSAny? entries);
 
@@ -24,6 +27,11 @@ Future<void> fillFields(int frameId, List<Map> fields) async {
 Future<String> getFavIconUrl() async {
   var result = await _getFavIconURL().toDart;
   return result.dartify() as String;
+}
+
+Future<String> getURL() async {
+  var res = await _getURL().toDart;
+  return res.dartify() as String;
 }
 
 Future<void> exportEntries(List<String> entries) async {

@@ -308,6 +308,112 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
               ElevatedButton(
                 onPressed: () async {
+                  int total = 0;
+                  int sum = 0;
+                  String address = '';
+                  String city = '';
+                  String country = '';
+                  String date = '';
+                  String name = '';
+                  String postal = '';
+                  String surname = '';
+                  String username = '';
+                  if (isChecked_address) {
+                    total++;
+                    if (_addresscontroller.text != '') {
+                      sum++;
+                      address = _addresscontroller.text;
+                    }
+                  }
+                  if (isChecked_city) {
+                    total++;
+                    if (_citycontroller.text != '') {
+                      sum++;
+                      city = _citycontroller.text;
+                    }
+                  }
+                  if (isChecked_country) {
+                    total++;
+                    if (_countrycontroller.text != '') {
+                      sum++;
+                      country = _countrycontroller.text;
+                    }
+                  }
+                  if (isChecked_date) {
+                    total++;
+                    if (_datecontroller.text != '') {
+                      sum++;
+                      date = _datecontroller.text;
+                    }
+                  }
+                  if (isChecked_name) {
+                    total++;
+                    if (_nameController.text != '') {
+                      sum++;
+                      name = _nameController.text;
+                    }
+                  }
+                  if (isChecked_postal) {
+                    total++;
+                    if (_postalcontroller.text != '') {
+                      sum++;
+                      postal = _postalcontroller.text;
+                    }
+                  }
+                  if (isChecked_surname) {
+                    total++;
+                    if (_surnameController.text != '') {
+                      sum++;
+                      surname = _surnameController.text;
+                    }
+                  }
+                  if (isChecked_username) {
+                    total++;
+                    if (_usernameController.text != '') {
+                      sum++;
+                      username = _usernameController.text;
+                    }
+                  }
+
+                  if (total == 0) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.entry_no_fields,
+                        ),
+                      ),
+                    );
+                  } else if (sum < total) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.entry_empty_fields,
+                        ),
+                      ),
+                    );
+                  } else if (sum == total) {
+                    String domain = await getURL();
+                    String favIcon = await getFavIconUrl();
+                    Saver.saveInfo(
+                      name,
+                      surname,
+                      favIcon,
+                      domain,
+                      address,
+                      city,
+                      country,
+                      date,
+                      postal,
+                      username,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context)!.entry_saved,
+                        ),
+                      ),
+                    );
+                  }
                   if (_nameController.text == '' &&
                       _surnameController.text == '') {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -319,17 +425,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     );
                     return;
                   }
-                  var favIcon = await getFavIconUrl();
-                  Saver.saveInfo(
-                    _nameController.text,
-                    _surnameController.text,
-                    favIcon.toString(),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(AppLocalizations.of(context)!.entry_saved),
-                    ),
-                  );
                 },
                 child: Text(AppLocalizations.of(context)!.button_save_entry),
               ),

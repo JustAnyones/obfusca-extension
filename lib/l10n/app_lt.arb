@@ -17,6 +17,8 @@
 
     "button_save_entry": "Išsaugoti",
     "entry_saved": "Įrašas išsaugotas!",
+    "entry_no_fields": "Pasirinkite kuriuos laukus generuosite ir saugosite",
+    "entry_empty_fields": "Užpildikyte visus pasirinktus laukus",
     "missing_name_surname": "Įveskite vardą ir pavardę",
     "button_view_entries": "Įrašais",
     "entries_title": "Išsaugoti įrašai",
