@@ -27,6 +27,8 @@
     "import_no_file": "Pasirinkite failą",
     "import_bad_file": "Negalima importuoti iš šio failo",
     "import_success": "Įrašai importuoti",
+    "entry_details": "Įrašo detalės",
+    "button_entry_details": "Detaliau",
 
     "settings_title": "Nustatymai",
     "setting_locale_title": "Kalba",
