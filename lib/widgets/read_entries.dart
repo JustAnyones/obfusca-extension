@@ -25,6 +25,7 @@ class _EntriesPageState extends State<EntriesPage> {
 
   Future<List<TableRow>> _getRows() async {
     List<TableRow> rows = [];
+    print('first');
     rows.add(
       TableRow(
         children: <Widget>[
@@ -35,9 +36,11 @@ class _EntriesPageState extends State<EntriesPage> {
           Container(
             child: Text(AppLocalizations.of(context)!.generator_surname_name),
           ),
+          Container(),
         ],
       ),
     );
+    print('sec');
     if (_entries == null) {
       return Future.value(rows);
     }
@@ -59,15 +62,25 @@ class _EntriesPageState extends State<EntriesPage> {
                       return Text("??");
                     },
                   );
+                  print('img');
                   return image;
                 },
               ),
             ),
             Container(child: Text(entry['name'])),
             Container(child: Text(entry['surname'])),
+            Container(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/entry', arguments: i);
+                },
+                child: Text('detail'),
+              ),
+            ),
           ],
         ),
       );
+      print('work');
     }
     return Future.value(rows);
   }
@@ -92,6 +105,7 @@ class _EntriesPageState extends State<EntriesPage> {
                     0: FlexColumnWidth(),
                     1: FlexColumnWidth(),
                     2: FlexColumnWidth(),
+                    3: FlexColumnWidth(),
                   },
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   children: snapshot.data!,
