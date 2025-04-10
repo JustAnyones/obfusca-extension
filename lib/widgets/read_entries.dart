@@ -25,7 +25,6 @@ class _EntriesPageState extends State<EntriesPage> {
 
   Future<List<TableRow>> _getRows() async {
     List<TableRow> rows = [];
-    print('first');
     rows.add(
       TableRow(
         children: <Widget>[
@@ -40,7 +39,6 @@ class _EntriesPageState extends State<EntriesPage> {
         ],
       ),
     );
-    print('sec');
     if (_entries == null) {
       return Future.value(rows);
     }
@@ -62,7 +60,6 @@ class _EntriesPageState extends State<EntriesPage> {
                       return Text("??");
                     },
                   );
-                  print('img');
                   return image;
                 },
               ),
@@ -80,7 +77,6 @@ class _EntriesPageState extends State<EntriesPage> {
           ],
         ),
       );
-      print('work');
     }
     return Future.value(rows);
   }
