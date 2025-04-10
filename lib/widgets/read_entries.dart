@@ -74,7 +74,7 @@ class _EntriesPageState extends State<EntriesPage> {
                 onPressed: () {
                   Navigator.pushNamed(context, '/entry', arguments: i);
                 },
-                child: Text('detail'),
+                child: Text(AppLocalizations.of(context)!.button_entry_details),
               ),
             ),
           ],

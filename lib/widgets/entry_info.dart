@@ -40,7 +40,7 @@ class _EntryPageState extends State<EntryPage> {
   Widget build(BuildContext context) {
     int index = ModalRoute.of(context)!.settings.arguments as int;
     return Scaffold(
-      appBar: AppBar(title: Text('Entry details')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.entry_details)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(children: _getEntryValues(index)),

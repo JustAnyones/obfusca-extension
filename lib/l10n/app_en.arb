@@ -27,6 +27,8 @@
   "import_no_file": "Choose a file",
   "import_bad_file": "Cannot import from this file",
   "import_success": "Entries imported",
+  "entry_details": "Entry details",
+  "button_entry_details": "Details",
 
   "settings_title": "Settings",
   "@settings_title": {
