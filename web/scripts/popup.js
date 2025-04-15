@@ -89,6 +89,6 @@ async function createSettingsPage(){
 	const tab = tabs[0];
 	chrome.tabs.create({
 		index: tab.index + 1,
-		url: '/settings.html',
+		url: '/settings.html#/settings',
 	});
 }

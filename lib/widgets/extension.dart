@@ -1,4 +1,5 @@
 import 'package:browser_extension/widgets/entry_info.dart';
+import 'package:browser_extension/widgets/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -31,7 +32,10 @@ class _ExtensionState extends State<Extension> {
           locale: localeProvider.locale,
           supportedLocales: [Locale('en'), Locale('lt')],
           home: NameGeneratorPage(),
-          routes: {'/entry': (context) => const EntryPage()},
+          routes: {
+            '/entry': (context) => const EntryPage(),
+            '/settings': (context) => const SettingsPage(),
+          },
         );
       },
     );
