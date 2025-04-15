@@ -584,11 +584,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  await createSettingsPage();
+                  /*
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => SettingsPage()),
                   );
+                  */
                 },
                 child: Text(AppLocalizations.of(context)!.settings_title),
               ),
