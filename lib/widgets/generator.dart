@@ -524,14 +524,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: () {
-                  Saver.clear();
-                },
-                child: Text("Clear"),
-              ),
-              SizedBox(height: 16),
-
-              ElevatedButton(
                 onPressed: () async {
                   var result = await queryFields();
                   if (result["status"] != "FOUND") {
