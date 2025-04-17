@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:browser_extension/providers/user.dart';
@@ -13,6 +14,7 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   String? _generalError;
+  List<String> _emailAddresses = [];
 
   @override
   void initState() {
@@ -66,6 +68,59 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 Text(_generalError ?? "", style: TextStyle(color: errorColor)),
                 SizedBox(height: 16),
               ],
+
+              for (var emailAddress in _emailAddresses) ...[
+                Row(
+                  children: [
+                    Icon(Icons.email, color: Colors.grey),
+                    SizedBox(width: 8),
+                    Text(emailAddress),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: emailAddress));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("COPIED TO CLIPBOARD")),
+                        );
+                      },
+                      child: Text("COPY"),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/email/list',
+                          arguments: {'address': emailAddress},
+                        );
+                      },
+                      child: Text("VIEW"),
+                    ),
+                  ],
+                ),
+              ],
+              SizedBox(height: 16),
+
+              ElevatedButton(
+                onPressed: () async {
+                  setState(() {
+                    _generalError = null;
+                  });
+                  var (emails, err) = await ObfuscaAPI.getUserAddresses(
+                    UserProvider.getInstance().userToken!,
+                  );
+                  if (err != null) {
+                    setState(() {
+                      _generalError = "Could not fetch email addresses: $err";
+                    });
+                    return;
+                  }
+                  setState(() {
+                    _emailAddresses = emails;
+                  });
+                },
+                child: Text("FETCH USER EMAIL ADDRESSES"),
+              ),
             ],
           ),
         ),
