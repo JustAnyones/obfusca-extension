@@ -14,7 +14,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   String? _selectedLanguage;
   String? _selectedRegion;
-  List<String>? _entries;
 
   @override
   void initState() {
@@ -28,7 +27,6 @@ class _SettingsPageState extends State<SettingsPage> {
       _selectedLanguage = SettingProvider.getInstance().localeAsString;
       _selectedRegion = SettingProvider.getInstance().region;
     });
-    _entries = Saver.readInfo();
   }
 
   // Saves the settings to the settings provider.

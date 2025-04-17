@@ -8,7 +8,6 @@ import 'package:browser_extension/utils/generation.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
-import 'package:browser_extension/widgets/settings.dart';
 import 'package:browser_extension/widgets/read_entries.dart';
 
 //import '' if (dart.library.html) 'package:browser_extension/web/interop.dart';
