@@ -50,5 +50,19 @@
     },
 
     "settings_save_button": "Išsaugoti nustatymus",
-    "settings_saved_popup": "Nustatymai išsaugoti!"
+    "settings_saved_popup": "Nustatymai išsaugoti!",
+
+    "user_register_page_title": "Registracija",
+    "user_register_page_hint": "Sukurti naują paskyrą",
+    "user_register_page_button": "Registruotis",
+  
+    "user_login_page_title": "Prisijungimas",
+    "user_login_page_hint": "Prisijungti prie savo paskyros",
+    "user_login_page_button": "Prisijungti",
+    "user_login_page_register_upsell_1": "Neturite paskyros? Sukurkite savo paskyrą",
+    "user_login_page_register_upsell_2": "čia",
+  
+    "field_username_title": "Naudotojo vardas",
+    "field_password_title": "Slaptažodis",
+    "field_empty": "Laukas negali būti tuščias"
 }
