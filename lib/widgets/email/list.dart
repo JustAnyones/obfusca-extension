@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:browser_extension/providers/user.dart';
+import 'package:browser_extension/utils/format.dart';
 import 'package:browser_extension/utils/obfusca.dart';
-import 'package:intl/intl.dart';
 
 class EmailListPage extends StatefulWidget {
   const EmailListPage({super.key});
@@ -15,26 +15,41 @@ class _EmailListPageState extends State<EmailListPage> {
   String? _generalError;
   List<SlimEmailData> _emails = [];
 
+  late final String _emailAddress;
+
   @override
   void initState() {
     super.initState();
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _emailAddress = args['address'] as String;
   }
 
-  String formatDate(DateTime date) {
-    DateTime localDate = date.toLocal();
-    String locale = Localizations.localeOf(context).languageCode;
-    String yearMonthDay = DateFormat.yMd(locale).format(localDate);
-    String hourMinutes = DateFormat.Hm(locale).format(localDate);
-    String formattedDate = "$yearMonthDay $hourMinutes";
-    return formattedDate;
+  void fetchMessages() async {
+    setState(() {
+      _generalError = null;
+    });
+
+    var (emails, err) = await ObfuscaAPI.getUserEmails(
+      UserProvider.getInstance().userToken!,
+      _emailAddress,
+    );
+    if (err != null) {
+      setState(() {
+        _generalError = "Could not fetch emails: $err";
+      });
+      return;
+    }
+    setState(() {
+      _emails = emails;
+      if (_emails.isEmpty) {
+        _generalError = "No emails found";
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final emailAddress = args['address'] as String;
-
     final errorColor = Colors.red; // TODO: use theme color
 
     return GestureDetector(
@@ -43,12 +58,21 @@ class _EmailListPageState extends State<EmailListPage> {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(title: Text("EMAIL LIST FOR $emailAddress")),
+        appBar: AppBar(title: Text("EMAIL LIST FOR $_emailAddress")),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Text("EMAILS", style: TextStyle(fontSize: 18)),
+                  IconButton(
+                    onPressed: fetchMessages,
+                    icon: Icon(Icons.refresh),
+                  ),
+                ],
+              ),
               Table(
                 border: TableBorder.all(),
                 defaultColumnWidth: IntrinsicColumnWidth(),
@@ -59,7 +83,7 @@ class _EmailListPageState extends State<EmailListPage> {
                         SizedBox(child: Icon(Icons.email)),
                         Container(
                           padding: EdgeInsets.all(4),
-                          child: Text(formatDate(email.date)),
+                          child: Text(formatDate(context, email.date)),
                         ),
                         Container(
                           padding: EdgeInsets.all(4),
@@ -76,7 +100,35 @@ class _EmailListPageState extends State<EmailListPage> {
                         SizedBox(
                           child: IconButton(
                             icon: Icon(Icons.visibility),
-                            onPressed: () {},
+                            onPressed: () async {
+                              var (
+                                fetchedEmail,
+                                err,
+                              ) = await ObfuscaAPI.getUserEmail(
+                                UserProvider.getInstance().userToken!,
+                                _emailAddress,
+                                email.uid,
+                              );
+
+                              if (err != null) {
+                                setState(() {
+                                  _generalError = "Could not fetch email: $err";
+                                });
+                                return;
+                              }
+                              if (fetchedEmail == null) {
+                                setState(() {
+                                  _generalError = "Could not fetch email: $err";
+                                });
+                                return;
+                              }
+
+                              Navigator.pushNamed(
+                                context,
+                                '/email/view',
+                                arguments: {'email': fetchedEmail},
+                              );
+                            },
                           ),
                         ),
                         SizedBox(
@@ -102,29 +154,6 @@ class _EmailListPageState extends State<EmailListPage> {
                 Text(_generalError ?? "", style: TextStyle(color: errorColor)),
                 SizedBox(height: 16),
               ],
-
-              ElevatedButton(
-                onPressed: () async {
-                  setState(() {
-                    _generalError = null;
-                  });
-
-                  var (emails, err) = await ObfuscaAPI.getUserEmails(
-                    UserProvider.getInstance().userToken!,
-                    emailAddress,
-                  );
-                  if (err != null) {
-                    setState(() {
-                      _generalError = "Could not fetch emails: $err";
-                    });
-                    return;
-                  }
-                  setState(() {
-                    _emails = emails;
-                  });
-                },
-                child: Text("FETCH USER EMAILS"),
-              ),
             ],
           ),
         ),

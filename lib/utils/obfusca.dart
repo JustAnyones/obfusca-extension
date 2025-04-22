@@ -7,12 +7,28 @@ const String apiUrl = "https://obfusca.site";
 typedef LoginData = ({String token, DateTime dateExpire});
 
 typedef Addresant = ({String name, String address});
+
+typedef Part = ({String mediaType, String content, bool encoded});
+typedef Attachment = ({String filename});
+
 typedef SlimEmailData =
     ({
       int uid,
       Addresant from,
       Addresant to,
       String subject,
+      DateTime date,
+      bool read,
+    });
+
+typedef EmailData =
+    ({
+      int uid,
+      Addresant from,
+      Addresant to,
+      String subject,
+      List<Part> parts,
+      List<Attachment> attachments,
       DateTime date,
       bool read,
     });
@@ -131,6 +147,59 @@ class ObfuscaAPI {
       return (emails, data["message"] as String);
     } catch (e) {
       return (emails, e.toString());
+    }
+  }
+
+  static Future<(EmailData?, String?)> getUserEmail(
+    String token,
+    String address,
+    int uid,
+  ) async {
+    try {
+      var response = await http.get(
+        Uri.parse("$apiUrl/email/$address/$uid"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        var email = data["Email"];
+
+        return (
+          (
+            uid: email["Uid"] as int,
+            from: (
+              name: email["From"]["Name"] as String,
+              address: email["From"]["Address"] as String,
+            ),
+            to: (
+              name: email["To"]["Name"] as String,
+              address: email["To"]["Address"] as String,
+            ),
+            subject: email["Subject"] as String,
+            parts:
+                (email["Parts"] as List<dynamic>).map((part) {
+                  return (
+                    mediaType: part["MediaType"] as String,
+                    content: part["Content"] as String,
+                    encoded: part["Encoded"] as bool,
+                  );
+                }).toList(),
+            attachments:
+                (email["Attachments"] as List<dynamic>).map((part) {
+                  return (filename: part["Filename"] as String);
+                }).toList(),
+            date: DateTime.parse(email["Date"] as String),
+            read: email["Read"] as bool,
+          ),
+          null,
+        );
+      }
+      return (null, data["message"] as String);
+    } catch (e) {
+      return (null, e.toString());
     }
   }
 }

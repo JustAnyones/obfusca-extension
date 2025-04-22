@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_web/webview_flutter_web.dart';
 
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/providers/user.dart';
@@ -13,6 +15,7 @@ Future<void> initializeProviders() async {
 }
 
 void main() async {
+  WebViewPlatform.instance = WebWebViewPlatform();
   await initializeProviders();
   runApp(
     MultiProvider(

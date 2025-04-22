@@ -17,8 +17,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
   List<String> _emailAddresses = [];
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
+    await fetchAddresses();
+  }
+
+  Future<void> fetchAddresses() async {
+    setState(() {
+      _generalError = null;
+    });
+    var (emails, err) = await ObfuscaAPI.getUserAddresses(
+      UserProvider.getInstance().userToken!,
+    );
+    if (err != null) {
+      setState(() {
+        _generalError = "Could not fetch email addresses: $err";
+      });
+      return;
+    }
+    setState(() {
+      _emailAddresses = emails;
+    });
   }
 
   void logout() async {
@@ -69,6 +88,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 SizedBox(height: 16),
               ],
 
+              Row(
+                children: [
+                  Text("USER EMAIL ADDRESSES", style: TextStyle(fontSize: 18)),
+                  IconButton(
+                    onPressed: fetchAddresses,
+                    icon: Icon(Icons.refresh),
+                  ),
+                ],
+              ),
               for (var emailAddress in _emailAddresses) ...[
                 Row(
                   children: [
@@ -99,28 +127,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ],
-              SizedBox(height: 16),
-
-              ElevatedButton(
-                onPressed: () async {
-                  setState(() {
-                    _generalError = null;
-                  });
-                  var (emails, err) = await ObfuscaAPI.getUserAddresses(
-                    UserProvider.getInstance().userToken!,
-                  );
-                  if (err != null) {
-                    setState(() {
-                      _generalError = "Could not fetch email addresses: $err";
-                    });
-                    return;
-                  }
-                  setState(() {
-                    _emailAddresses = emails;
-                  });
-                },
-                child: Text("FETCH USER EMAIL ADDRESSES"),
-              ),
             ],
           ),
         ),

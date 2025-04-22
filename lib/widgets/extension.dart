@@ -7,6 +7,7 @@ import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/widgets/entry_info.dart';
 import 'package:browser_extension/widgets/generator.dart';
 import 'package:browser_extension/widgets/email/list.dart';
+import 'package:browser_extension/widgets/email/view.dart';
 import 'package:browser_extension/widgets/user/login.dart';
 import 'package:browser_extension/widgets/user/profile.dart';
 import 'package:browser_extension/widgets/user/register.dart';
@@ -24,7 +25,7 @@ class _ExtensionState extends State<Extension> {
     return Consumer<SettingProvider>(
       builder: (context, localeProvider, child) {
         return MaterialApp(
-          title: 'Name Generator Extension',
+          title: 'Obfusca',
           theme: ThemeData(primarySwatch: Colors.blue),
           localizationsDelegates: [
             AppLocalizations.delegate,
@@ -41,6 +42,7 @@ class _ExtensionState extends State<Extension> {
             '/register': (context) => const UserRegisterPage(),
             '/profile': (context) => const UserProfilePage(),
             '/email/list': (context) => const EmailListPage(),
+            '/email/view': (context) => const EmailViewPage(),
           },
         );
       },
