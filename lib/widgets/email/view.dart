@@ -59,14 +59,34 @@ class _EmailViewPageState extends State<EmailViewPage> {
               _generalError = "Failed to load HTML content: $error";
             });
           });
-
-      print(_part.content);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final errorColor = Colors.red; // TODO: use theme color
+
+    // Ugly workaround to get the available height for the WebView
+    // because the WebView doesn't take the full height of the screen
+    final screenHeight = MediaQuery.of(context).size.height;
+    final appBarHeight = AppBar().preferredSize.height;
+    double adjustment = 0;
+
+    // TODO: fix eyeballed values
+    adjustment += 4 * 8;
+    adjustment += 64;
+    adjustment += 8;
+    adjustment += 16;
+
+    // Adjust for attachment bar
+    if (_message.attachments.isNotEmpty) {
+      adjustment += 8 + 8 + 16 + 16;
+    }
+
+    final availableHeight =
+        screenHeight -
+        appBarHeight -
+        adjustment; // Adjust for other fixed elements
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -99,12 +119,12 @@ class _EmailViewPageState extends State<EmailViewPage> {
                 if (_part.mediaType == "text/html") ...[
                   if (_htmlLoaded) ...[
                     // WebView for HTML content
-                    // TODO: Disabled for now as I don't know how to make it use the entire page height
-                    //SizedBox.expand(
-                    //  child: WebViewWidget(controller: _controller),
-                    //),
-                    //Expanded(child: WebViewWidget(controller: _controller)),
-                    Text(_part.content),
+                    SizedBox(
+                      height: availableHeight,
+                      // as far as I can tell, it isn't aware of the available height
+                      // so this dirty hack is needed
+                      child: WebViewWidget(controller: _controller),
+                    ),
                   ] else ...[
                     CircularProgressIndicator(),
                   ],
@@ -118,6 +138,8 @@ class _EmailViewPageState extends State<EmailViewPage> {
                   ),
                   Text(_part.content),
                 ],
+
+                Divider(thickness: 2, color: Colors.grey),
 
                 // Display attachments
                 if (_message.attachments.isNotEmpty) ...[

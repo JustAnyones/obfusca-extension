@@ -71,23 +71,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: ElevatedButton(
-                  onPressed: logout,
-                  child: Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.user_profile_page_logout_button,
-                  ),
-                ),
-              ),
-              // Show an error message if there is one
-              // This is a general error message, not specific to username or password
-              if (_generalError != null) ...[
-                Text(_generalError ?? "", style: TextStyle(color: errorColor)),
-                SizedBox(height: 16),
-              ],
-
               Row(
                 children: [
                   Text("USER EMAIL ADDRESSES", style: TextStyle(fontSize: 18)),
@@ -127,6 +110,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ],
+              // Show an error message if there is one
+              // This is a general error message, not specific to username or password
+              if (_generalError != null) ...[
+                Text(_generalError ?? "", style: TextStyle(color: errorColor)),
+                SizedBox(height: 16),
+              ],
+              Center(
+                child: ElevatedButton(
+                  onPressed: logout,
+                  child: Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.user_profile_page_logout_button,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
