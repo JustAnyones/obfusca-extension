@@ -6,32 +6,168 @@ const String apiUrl = "https://obfusca.site";
 
 typedef LoginData = ({String token, DateTime dateExpire});
 
-typedef Addresant = ({String name, String address});
-
 typedef Part = ({String mediaType, String content, bool encoded});
 typedef Attachment = ({String filename, int size});
 
-typedef SlimEmailData =
-    ({
-      int uid,
-      Addresant from,
-      Addresant to,
-      String subject,
-      DateTime date,
-      bool read,
-    });
+class Addresant {
+  final String name;
+  final String address;
 
-typedef EmailData =
-    ({
-      int uid,
-      Addresant from,
-      Addresant to,
-      String subject,
-      List<Part> parts,
-      List<Attachment> attachments,
-      DateTime date,
-      bool read,
-    });
+  Addresant({required this.name, required this.address});
+
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'address': address};
+  }
+}
+
+abstract class SerializableEmail {
+  Map<String, dynamic> toJson();
+
+  int getUid();
+
+  factory SerializableEmail.fromJson(Map<String, dynamic> json) {
+    throw UnimplementedError("fromJson not implemented");
+  }
+}
+
+class SlimEmailData implements SerializableEmail {
+  final int uid;
+  final Addresant from;
+  final Addresant to;
+  final String subject;
+  final DateTime date;
+  bool read;
+
+  SlimEmailData({
+    required this.uid,
+    required this.from,
+    required this.to,
+    required this.subject,
+    required this.date,
+    required this.read,
+  });
+
+  /// Converts the SlimEmailData object to a JSON representation.
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'from': from.toJson(),
+      'to': to.toJson(),
+      'subject': subject,
+      'date': date.toIso8601String(),
+      'read': read,
+    };
+  }
+
+  /// Converts JSON representation to SlimEmailData object.
+  factory SlimEmailData.fromJson(Map<String, dynamic> json) {
+    return SlimEmailData(
+      uid: json['uid'] as int,
+      from: Addresant(
+        name: json['from']['name'] as String,
+        address: json['from']['address'] as String,
+      ),
+      to: Addresant(
+        name: json['to']['name'] as String,
+        address: json['to']['address'] as String,
+      ),
+      subject: json['subject'] as String,
+      date: DateTime.parse(json['date'] as String),
+      read: json['read'] as bool,
+    );
+  }
+
+  @override
+  int getUid() {
+    return uid;
+  }
+}
+
+class EmailData extends SlimEmailData {
+  final List<Part> parts;
+  final List<Attachment> attachments;
+
+  EmailData({
+    required int uid,
+    required Addresant from,
+    required Addresant to,
+    required String subject,
+    required this.parts,
+    required this.attachments,
+    required DateTime date,
+    required bool read,
+  }) : super(
+         uid: uid,
+         from: from,
+         to: to,
+         subject: subject,
+         date: date,
+         read: read,
+       );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'from': from.toJson(),
+      'to': to.toJson(),
+      'subject': subject,
+      'parts':
+          parts
+              .map(
+                (part) => {
+                  'mediaType': part.mediaType,
+                  'content': part.content,
+                  'encoded': part.encoded,
+                },
+              )
+              .toList(),
+      'attachments':
+          attachments
+              .map(
+                (attachment) => {
+                  'filename': attachment.filename,
+                  'size': attachment.size,
+                },
+              )
+              .toList(),
+      'date': date.toIso8601String(),
+      'read': read,
+    };
+  }
+
+  factory EmailData.fromJson(Map<String, dynamic> json) {
+    return EmailData(
+      uid: json['uid'] as int,
+      from: Addresant(
+        name: json['from']['name'] as String,
+        address: json['from']['address'] as String,
+      ),
+      to: Addresant(
+        name: json['to']['name'] as String,
+        address: json['to']['address'] as String,
+      ),
+      subject: json['subject'] as String,
+      parts:
+          (json['parts'] as List<dynamic>).map((part) {
+            return (
+              mediaType: part['mediaType'] as String,
+              content: part['content'] as String,
+              encoded: part['encoded'] as bool,
+            );
+          }).toList(),
+      attachments:
+          (json['attachments'] as List<dynamic>).map((attachment) {
+            return (
+              filename: attachment['filename'] as String,
+              size: attachment['size'] as int,
+            );
+          }).toList(),
+      date: DateTime.parse(json['date'] as String),
+      read: json['read'] as bool,
+    );
+  }
+}
 
 class ObfuscaAPI {
   /// Logs in a user with the given username and password.
@@ -127,20 +263,22 @@ class ObfuscaAPI {
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         for (var email in data["Emails"]) {
-          emails.add((
-            uid: email["Uid"] as int,
-            from: (
-              name: email["From"]["Name"] as String,
-              address: email["From"]["Address"] as String,
+          emails.add(
+            SlimEmailData(
+              uid: email["Uid"] as int,
+              from: Addresant(
+                name: email["From"]["Name"] as String,
+                address: email["From"]["Address"] as String,
+              ),
+              to: Addresant(
+                name: email["To"]["Name"] as String,
+                address: email["To"]["Address"] as String,
+              ),
+              subject: email["Subject"] as String,
+              date: DateTime.parse(email["Date"] as String),
+              read: email["Read"] as bool,
             ),
-            to: (
-              name: email["To"]["Name"] as String,
-              address: email["To"]["Address"] as String,
-            ),
-            subject: email["Subject"] as String,
-            date: DateTime.parse(email["Date"] as String),
-            read: email["Read"] as bool,
-          ));
+          );
         }
         return (emails, null);
       }
@@ -178,13 +316,13 @@ class ObfuscaAPI {
         var email = data["Email"];
 
         return (
-          (
+          EmailData(
             uid: email["Uid"] as int,
-            from: (
+            from: Addresant(
               name: email["From"]["Name"] as String,
               address: email["From"]["Address"] as String,
             ),
-            to: (
+            to: Addresant(
               name: email["To"]["Name"] as String,
               address: email["To"]["Address"] as String,
             ),

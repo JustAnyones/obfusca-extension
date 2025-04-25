@@ -15,7 +15,6 @@ class EmailListPage extends StatefulWidget {
 
 class _EmailListPageState extends State<EmailListPage> {
   String? _generalError;
-  List<SlimEmailData> _emails = [];
 
   late final String _emailAddress;
 
@@ -29,11 +28,9 @@ class _EmailListPageState extends State<EmailListPage> {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _emailAddress = args['address'] as String;
-    //await fetchMessages();
 
+    // Setup periodic refresh of messages
     _startTimer();
-
-    // Setup periodic refresh
   }
 
   @override
@@ -69,11 +66,72 @@ class _EmailListPageState extends State<EmailListPage> {
     }
     setState(() {
       _isRefreshing = false;
-      _emails = emails;
-      if (_emails.isEmpty) {
+      if (emails.isEmpty) {
         _generalError = "No emails found";
       }
+      for (var email in emails) {
+        UserProvider.getInstance().setMessageForEmailAddress(
+          _emailAddress,
+          email,
+        );
+      }
     });
+  }
+
+  Future<void> viewMessage(SlimEmailData message) async {
+    /*ivar cachedMessage = UserProvider.getInstance().getMessageForEmailAddress(
+      _emailAddress,
+      message.uid,
+    );
+    if (cachedMessage == null) {
+      setState(() {
+        _generalError = "Could not find email in cache";
+      });
+      return;
+    }
+
+    f (cachedMessage is EmailData) {
+      print("Cached message found");
+      Navigator.pushNamed(
+        context,
+        '/email/view',
+        arguments: {'email': cachedMessage},
+      );
+      return;
+    }*/
+
+    var (fetchedEmail, err) = await ObfuscaAPI.getUserEmail(
+      UserProvider.getInstance().userToken!,
+      _emailAddress,
+      message.uid,
+    );
+
+    if (err != null) {
+      setState(() {
+        _generalError = "Could not fetch email: $err";
+      });
+      return;
+    }
+    if (fetchedEmail == null) {
+      setState(() {
+        _generalError = "Could not fetch email: $err";
+      });
+      return;
+    }
+
+    // On second thought, horrible idea to cache this
+    // because it will be a lot of data
+    /*UserProvider.getInstance().setMessageForEmailAddress(
+      _emailAddress,
+      fetchedEmail,
+    );
+    print("Caching fetched message");*/
+
+    Navigator.pushNamed(
+      context,
+      '/email/view',
+      arguments: {'email': fetchedEmail},
+    );
   }
 
   @override
@@ -105,7 +163,8 @@ class _EmailListPageState extends State<EmailListPage> {
                 border: TableBorder.all(),
                 defaultColumnWidth: IntrinsicColumnWidth(),
                 children: [
-                  for (var email in _emails) ...[
+                  for (var email in UserProvider.getInstance()
+                      .getMessagesForEmailAddress(_emailAddress)) ...[
                     TableRow(
                       decoration: BoxDecoration(
                         color: email.read ? Colors.white : Colors.grey[300],
@@ -132,33 +191,7 @@ class _EmailListPageState extends State<EmailListPage> {
                           child: IconButton(
                             icon: Icon(Icons.visibility),
                             onPressed: () async {
-                              var (
-                                fetchedEmail,
-                                err,
-                              ) = await ObfuscaAPI.getUserEmail(
-                                UserProvider.getInstance().userToken!,
-                                _emailAddress,
-                                email.uid,
-                              );
-
-                              if (err != null) {
-                                setState(() {
-                                  _generalError = "Could not fetch email: $err";
-                                });
-                                return;
-                              }
-                              if (fetchedEmail == null) {
-                                setState(() {
-                                  _generalError = "Could not fetch email: $err";
-                                });
-                                return;
-                              }
-
-                              Navigator.pushNamed(
-                                context,
-                                '/email/view',
-                                arguments: {'email': fetchedEmail},
-                              );
+                              await viewMessage(email);
                             },
                           ),
                         ),
