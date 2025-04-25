@@ -76,11 +76,11 @@ class _EmailViewPageState extends State<EmailViewPage> {
     adjustment += 4 * 8;
     adjustment += 64;
     adjustment += 8;
-    adjustment += 16;
+    adjustment += 24;
 
     // Adjust for attachment bar
     if (_message.attachments.isNotEmpty) {
-      adjustment += 8 + 8 + 16 + 16;
+      adjustment += 8 + 8 + 16 + 16 + 32;
     }
 
     final availableHeight =
@@ -129,7 +129,7 @@ class _EmailViewPageState extends State<EmailViewPage> {
                     CircularProgressIndicator(),
                   ],
                 ] else if (_part.mediaType == "text/plain") ...[
-                  Text(_part.content),
+                  SelectableText(_part.content),
                 ] else ...[
                   // Fallback to displaying the content as plain text
                   Text(
@@ -161,7 +161,8 @@ class _EmailViewPageState extends State<EmailViewPage> {
                             Icon(Icons.attach_file, color: Colors.grey),
                             SizedBox(width: 4),
                             Text(attachment.filename),
-                            //Text(" (${attachment.content} bytes)"),
+                            SizedBox(width: 4),
+                            Text(" (${attachment.size} BYTES)"),
                           ],
                         ),
                       ),

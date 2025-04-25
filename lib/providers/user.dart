@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 const String _keyUserToken = 'user.token';
 const String _keyUserTokenExpire = 'user.tokenExpire';
 
+const String _keyEmailAddresses = 'user.email.addresses';
+
 class UserProvider extends ChangeNotifier {
   static final UserProvider _instance = UserProvider._internal();
   static SharedPreferences? _prefs;
@@ -23,6 +25,9 @@ class UserProvider extends ChangeNotifier {
   DateTime? _userTokenExpire;
   DateTime? get userTokenExpire => _userTokenExpire;
 
+  List<String> _emailAddresses = [];
+  List<String> get emailAddresses => _emailAddresses;
+
   bool get isLoggedIn =>
       _userToken != null &&
       _userTokenExpire != null &&
@@ -33,6 +38,7 @@ class UserProvider extends ChangeNotifier {
 
     _userToken = await getString(_keyUserToken, null);
     _userTokenExpire = await getDateTime(_keyUserTokenExpire, null);
+    _emailAddresses = await _getEmailAddresses() ?? [];
   }
 
   Future<void> setUserToken(String token, DateTime expire) async {
@@ -49,6 +55,18 @@ class UserProvider extends ChangeNotifier {
     _userToken = null;
     _userTokenExpire = null;
     notifyListeners();
+  }
+
+  // Sets the list of email addresses in the SharedPreferences.
+  Future<void> setEmailAddresses(List<String> emails) async {
+    await _prefs!.setStringList(_keyEmailAddresses, emails);
+    _emailAddresses = emails;
+    notifyListeners();
+  }
+
+  // Returns the list of email addresses from the SharedPreferences.
+  Future<List<String>?> _getEmailAddresses() async {
+    return _prefs!.getStringList(_keyEmailAddresses);
   }
 
   Future<String?> getString(String key, String? defaultValue) async {

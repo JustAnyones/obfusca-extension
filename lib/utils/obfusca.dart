@@ -9,7 +9,7 @@ typedef LoginData = ({String token, DateTime dateExpire});
 typedef Addresant = ({String name, String address});
 
 typedef Part = ({String mediaType, String content, bool encoded});
-typedef Attachment = ({String filename});
+typedef Attachment = ({String filename, int size});
 
 typedef SlimEmailData =
     ({
@@ -150,6 +150,16 @@ class ObfuscaAPI {
     }
   }
 
+  static Future<void> changeEmailReadStatus(
+    String token,
+    String address,
+    int uid,
+    bool read,
+  ) async {
+    // TODO: not supported on the backend yet
+    return;
+  }
+
   static Future<(EmailData?, String?)> getUserEmail(
     String token,
     String address,
@@ -189,7 +199,10 @@ class ObfuscaAPI {
                 }).toList(),
             attachments:
                 (email["Attachments"] as List<dynamic>).map((part) {
-                  return (filename: part["Filename"] as String);
+                  return (
+                    filename: part["Filename"] as String,
+                    size: part["Size"] as int,
+                  );
                 }).toList(),
             date: DateTime.parse(email["Date"] as String),
             read: email["Read"] as bool,

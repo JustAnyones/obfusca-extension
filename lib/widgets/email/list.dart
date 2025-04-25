@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:browser_extension/providers/user.dart';
@@ -17,16 +19,40 @@ class _EmailListPageState extends State<EmailListPage> {
 
   late final String _emailAddress;
 
+  Timer? _timer;
+
+  bool _isRefreshing = false;
+
   @override
-  void initState() {
+  void initState() async {
     super.initState();
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _emailAddress = args['address'] as String;
+    //await fetchMessages();
+
+    _startTimer();
+
+    // Setup periodic refresh
   }
 
-  void fetchMessages() async {
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    fetchMessages();
+    _timer = Timer.periodic(Duration(seconds: 15), (Timer timer) {
+      fetchMessages();
+    });
+  }
+
+  Future<void> fetchMessages() async {
+    print("fetching messages");
     setState(() {
+      _isRefreshing = true;
       _generalError = null;
     });
 
@@ -36,11 +62,13 @@ class _EmailListPageState extends State<EmailListPage> {
     );
     if (err != null) {
       setState(() {
+        _isRefreshing = false;
         _generalError = "Could not fetch emails: $err";
       });
       return;
     }
     setState(() {
+      _isRefreshing = false;
       _emails = emails;
       if (_emails.isEmpty) {
         _generalError = "No emails found";
@@ -68,7 +96,7 @@ class _EmailListPageState extends State<EmailListPage> {
                 children: [
                   Text("EMAILS", style: TextStyle(fontSize: 18)),
                   IconButton(
-                    onPressed: fetchMessages,
+                    onPressed: _isRefreshing ? null : fetchMessages,
                     icon: Icon(Icons.refresh),
                   ),
                 ],
@@ -79,6 +107,9 @@ class _EmailListPageState extends State<EmailListPage> {
                 children: [
                   for (var email in _emails) ...[
                     TableRow(
+                      decoration: BoxDecoration(
+                        color: email.read ? Colors.white : Colors.grey[300],
+                      ),
                       children: [
                         SizedBox(child: Icon(Icons.email)),
                         Container(
@@ -131,18 +162,45 @@ class _EmailListPageState extends State<EmailListPage> {
                             },
                           ),
                         ),
-                        SizedBox(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("MARK AS READ/UNREAD"),
+                        if (email.read) ...[
+                          SizedBox(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                ObfuscaAPI.changeEmailReadStatus(
+                                  UserProvider.getInstance().userToken!,
+                                  _emailAddress,
+                                  email.uid,
+                                  false,
+                                );
+                                fetchMessages();
+                              },
+                              child: Text("MARK AS UNREAD"),
+                            ),
                           ),
-                        ),
+                        ] else ...[
+                          SizedBox(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                ObfuscaAPI.changeEmailReadStatus(
+                                  UserProvider.getInstance().userToken!,
+                                  _emailAddress,
+                                  email.uid,
+                                  true,
+                                );
+                                fetchMessages();
+                              },
+                              child: Text("MARK AS READ"),
+                            ),
+                          ),
+                        ],
+                        /*
+                        // Not gonna support this yet
                         SizedBox(
                           child: IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () {},
                           ),
-                        ),
+                        ),*/
                       ],
                     ),
                   ],

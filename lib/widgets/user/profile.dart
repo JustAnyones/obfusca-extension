@@ -14,7 +14,6 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   String? _generalError;
-  List<String> _emailAddresses = [];
 
   @override
   void initState() async {
@@ -36,7 +35,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       return;
     }
     setState(() {
-      _emailAddresses = emails;
+      UserProvider.getInstance().setEmailAddresses(emails);
     });
   }
 
@@ -80,22 +79,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ),
                 ],
               ),
-              for (var emailAddress in _emailAddresses) ...[
+              for (var emailAddress
+                  in UserProvider.getInstance().emailAddresses) ...[
                 Row(
                   children: [
                     Icon(Icons.email, color: Colors.grey),
                     SizedBox(width: 8),
                     Text(emailAddress),
-                    SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: emailAddress));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("COPIED TO CLIPBOARD")),
-                        );
-                      },
-                      child: Text("COPY"),
-                    ),
                     SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
@@ -106,6 +96,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         );
                       },
                       child: Text("VIEW"),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: emailAddress));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("COPIED TO CLIPBOARD")),
+                        );
+                      },
+                      child: Text("COPY"),
                     ),
                   ],
                 ),
