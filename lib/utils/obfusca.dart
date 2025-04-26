@@ -224,6 +224,26 @@ class ObfuscaAPI {
     return null;
   }
 
+  /// Creates a new email address for the user.
+  static Future<String?> createAddress(String token) async {
+    try {
+      var response = await http.post(
+        Uri.parse("$apiUrl/email"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        return null;
+      }
+      return data["message"] as String;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
   static Future<(List<String>, String?)> getUserAddresses(String token) async {
     List<String> emails = [];
     try {

@@ -52,6 +52,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
     Navigator.pushReplacementNamed(context, "/login");
   }
 
+  void createNewAddress() async {
+    setState(() {
+      _generalError = null;
+    });
+    var err = await ObfuscaAPI.createAddress(
+      UserProvider.getInstance().userToken!,
+    );
+    if (err != null) {
+      setState(() {
+        _generalError = "Could not create new address: $err";
+      });
+      return;
+    }
+    await fetchAddresses();
+  }
+
   @override
   Widget build(BuildContext context) {
     final errorColor = Colors.red; // TODO: use theme color
@@ -73,6 +89,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
               Row(
                 children: [
                   Text("USER EMAIL ADDRESSES", style: TextStyle(fontSize: 18)),
+                  ElevatedButton(
+                    onPressed: createNewAddress,
+                    child: Text("CREATE NEW"),
+                  ),
                   IconButton(
                     onPressed: fetchAddresses,
                     icon: Icon(Icons.refresh),
