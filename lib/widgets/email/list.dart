@@ -78,6 +78,26 @@ class _EmailListPageState extends State<EmailListPage> {
     });
   }
 
+  Future<void> changeReadStatus(SlimEmailData message) async {
+    setState(() {
+      _generalError = null;
+    });
+
+    var (err) = await ObfuscaAPI.changeEmailReadStatus(
+      UserProvider.getInstance().userToken!,
+      _emailAddress,
+      message.uid,
+      !message.read,
+    );
+    if (err != null) {
+      setState(() {
+        _generalError = "Could not change email read status: $err";
+      });
+      return;
+    }
+    fetchMessages();
+  }
+
   Future<void> viewMessage(SlimEmailData message) async {
     /*ivar cachedMessage = UserProvider.getInstance().getMessageForEmailAddress(
       _emailAddress,
@@ -199,13 +219,7 @@ class _EmailListPageState extends State<EmailListPage> {
                           SizedBox(
                             child: ElevatedButton(
                               onPressed: () {
-                                ObfuscaAPI.changeEmailReadStatus(
-                                  UserProvider.getInstance().userToken!,
-                                  _emailAddress,
-                                  email.uid,
-                                  false,
-                                );
-                                fetchMessages();
+                                changeReadStatus(email);
                               },
                               child: Text("MARK AS UNREAD"),
                             ),
@@ -214,13 +228,7 @@ class _EmailListPageState extends State<EmailListPage> {
                           SizedBox(
                             child: ElevatedButton(
                               onPressed: () {
-                                ObfuscaAPI.changeEmailReadStatus(
-                                  UserProvider.getInstance().userToken!,
-                                  _emailAddress,
-                                  email.uid,
-                                  true,
-                                );
-                                fetchMessages();
+                                changeReadStatus(email);
                               },
                               child: Text("MARK AS READ"),
                             ),

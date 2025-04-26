@@ -308,16 +308,6 @@ class ObfuscaAPI {
     }
   }
 
-  static Future<void> changeEmailReadStatus(
-    String token,
-    String address,
-    int uid,
-    bool read,
-  ) async {
-    // TODO: not supported on the backend yet
-    return;
-  }
-
   static Future<(EmailData?, String?)> getUserEmail(
     String token,
     String address,
@@ -325,7 +315,7 @@ class ObfuscaAPI {
   ) async {
     try {
       var response = await http.get(
-        Uri.parse("$apiUrl/email/$address/$uid"),
+        Uri.parse("$apiUrl/email/$address/$uid?read=1"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -371,6 +361,31 @@ class ObfuscaAPI {
       return (null, data["message"] as String);
     } catch (e) {
       return (null, e.toString());
+    }
+  }
+
+  static Future<String?> changeEmailReadStatus(
+    String token,
+    String address,
+    int uid,
+    bool read,
+  ) async {
+    int readAsInt = read ? 1 : 0;
+    try {
+      var response = await http.post(
+        Uri.parse("$apiUrl/email/$address/$uid?read=$readAsInt"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return null;
+      }
+      return data["message"] as String;
+    } catch (e) {
+      return e.toString();
     }
   }
 }
