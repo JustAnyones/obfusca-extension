@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:browser_extension/providers/settings.dart';
+import 'package:browser_extension/utils/Saver/saver.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -37,7 +38,10 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.settings_title)),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.settings_title),
+        automaticallyImplyLeading: false,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -104,6 +108,58 @@ class _SettingsPageState extends State<SettingsPage> {
                 );
               },
               child: Text(AppLocalizations.of(context)!.settings_save_button),
+            ),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () async {
+                await Saver.writeEntries();
+              },
+              child: Text(AppLocalizations.of(context)!.button_export_entries),
+            ),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () async {
+                String res = await Saver.importEntries();
+                if (res == "BadFile") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_bad_file,
+                      ),
+                    ),
+                  );
+                } else if (res == "NoFile") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_no_file,
+                      ),
+                    ),
+                  );
+                } else if (res == "Saved") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_success,
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.button_import_entries),
+            ),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () {
+                Saver.clear();
+              },
+              child: Text(AppLocalizations.of(context)!.button_clear_entries),
             ),
           ],
         ),

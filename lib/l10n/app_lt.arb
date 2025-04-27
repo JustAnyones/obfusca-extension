@@ -29,6 +29,7 @@
     "import_success": "Įrašai importuoti",
     "entry_details": "Įrašo detalės",
     "button_entry_details": "Detaliau",
+    "button_clear_entries": "Ištrinti įrašus",
 
     "settings_title": "Nustatymai",
     "setting_locale_title": "Kalba",

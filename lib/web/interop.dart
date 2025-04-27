@@ -15,6 +15,9 @@ external JSPromise<JSObject> _getURL();
 @JS('exportEntries')
 external JSPromise<JSObject> _exportEntries(JSAny? entries);
 
+@JS('createSettingsPage')
+external JSPromise<JSObject> _createSettingsPage();
+
 Future<Map> queryFields() async {
   var result = await _queryFields().toDart;
   return result.dartify() as Map;
@@ -36,4 +39,8 @@ Future<String> getURL() async {
 
 Future<void> exportEntries(List<String> entries) async {
   await _exportEntries(entries.jsify()).toDart;
+}
+
+Future<void> createSettingsPage() async {
+  await _createSettingsPage().toDart;
 }

@@ -83,3 +83,12 @@ async function getFavIconUrl(){
 	const domain = await getURL();
 	return "https://www.google.com/s2/favicons?domain=" + domain;
 }
+
+async function createSettingsPage(){
+	const tabs = await chrome.tabs.query({ active: true, currentWindow: true});
+	const tab = tabs[0];
+	chrome.tabs.create({
+		index: tab.index + 1,
+		url: '/settings.html#/settings',
+	});
+}

@@ -9,7 +9,6 @@ import 'package:browser_extension/utils/generation.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
-import 'package:browser_extension/widgets/settings.dart';
 import 'package:browser_extension/widgets/read_entries.dart';
 
 //import '' if (dart.library.html) 'package:browser_extension/web/interop.dart';
@@ -525,14 +524,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: () {
-                  Saver.clear();
-                },
-                child: Text("Clear"),
-              ),
-              SizedBox(height: 16),
-
-              ElevatedButton(
                 onPressed: () async {
                   var result = await queryFields();
                   if (result["status"] != "FOUND") {
@@ -585,11 +576,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               SizedBox(height: 16),
 
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  await createSettingsPage();
+                  /*
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => SettingsPage()),
                   );
+                  */
                 },
                 child: Text(AppLocalizations.of(context)!.settings_title),
               ),

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/widgets/entry_info.dart';
 import 'package:browser_extension/widgets/generator.dart';
+import 'package:browser_extension/widgets/settings.dart';
 import 'package:browser_extension/widgets/email/list.dart';
 import 'package:browser_extension/widgets/email/view.dart';
 import 'package:browser_extension/widgets/user/login.dart';
@@ -43,6 +44,7 @@ class _ExtensionState extends State<Extension> {
             '/profile': (context) => const UserProfilePage(),
             '/email/list': (context) => const EmailListPage(),
             '/email/view': (context) => const EmailViewPage(),
+            '/settings': (context) => const SettingsPage(),
           },
         );
       },

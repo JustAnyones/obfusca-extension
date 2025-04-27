@@ -9,6 +9,9 @@
         "default_popup": "popup.html",
         "default_icon": "icons/Icon-192.png"
     },
+    "options_ui": {
+        "page": "settings.html"
+    },
     "permissions": ["scripting", "activeTab", "webNavigation", "tabs", "downloads"],
     "manifest_version": 3,
     "web_accessible_resources": [{
