@@ -92,3 +92,14 @@ async function createSettingsPage(){
 		url: '/settings.html#/settings',
 	});
 }
+
+// Function to create a new tab with the specified page.
+// Page must be exactly as a route that is defined in extension state.
+async function navigateToPageRoute(route) {
+	const tabs = await chrome.tabs.query({ active: true, currentWindow: true});
+	const tab = tabs[0];
+	chrome.tabs.create({
+		index: tab.index + 1,
+		url: '/index.html#' + route,
+	});
+}

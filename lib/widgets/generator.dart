@@ -600,9 +600,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
               ),
 
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (UserProvider.getInstance().isLoggedIn) {
-                    Navigator.pushNamed(context, '/profile');
+                    await navigateToPageRoute('/profile');
                   } else {
                     Navigator.pushNamed(context, '/login');
                   }

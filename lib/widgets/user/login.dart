@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:browser_extension/providers/user.dart';
 import 'package:browser_extension/utils/obfusca.dart';
+import 'package:browser_extension/web/interop.dart';
 
 class UserLoginPage extends StatefulWidget {
   const UserLoginPage({super.key});
@@ -71,7 +72,8 @@ class _UserLoginPageState extends State<UserLoginPage> {
 
     // Save user state
     await UserProvider.getInstance().setUserToken(data!.token, data.dateExpire);
-    Navigator.pushReplacementNamed(context, "/profile");
+    await navigateToPageRoute("/profile");
+    Navigator.pop(context);
   }
 
   @override
