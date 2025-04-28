@@ -45,6 +45,7 @@ dependencies:
   faker: ^2.2.0
   file_picker: ^10.0.0
   web: ^1.1.1
+  english_words: ^4.0.0
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +70,7 @@ flutter:
     - assets/LTNames.csv
     - assets/LTSur.csv
     - assets/CityList.csv
+    - assets/dice.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

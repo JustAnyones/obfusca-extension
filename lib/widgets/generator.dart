@@ -375,17 +375,34 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 final index = entry.key;
                 final field = entry.value;
                 if (!selectedItems[index]) return SizedBox.shrink();
-                return CheckboxListTile(
-                  title: TextField(
-                    controller: field['controller'] as TextEditingController?,
-                    decoration: InputDecoration(
-                      labelText: field['label'] as String?,
-                      border: OutlineInputBorder(),
+                return Row(
+                  children: [
+                    Expanded(
+                      child: CheckboxListTile(
+                        title: TextField(
+                          controller:
+                              field['controller'] as TextEditingController?,
+                          decoration: InputDecoration(
+                            labelText: field['label'] as String?,
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        value: field['isChecked'] as bool?,
+                        onChanged: field['onChanged'] as ValueChanged<bool?>?,
+                        controlAffinity: ListTileControlAffinity.leading,
+                      ),
                     ),
-                  ),
-                  value: field['isChecked'] as bool?,
-                  onChanged: field['onChanged'] as ValueChanged<bool?>?,
-                  controlAffinity: ListTileControlAffinity.leading,
+                    ElevatedButton(
+                      onPressed: () {
+                        // Placeholder for button action
+                      },
+                      child: Image.asset(
+                        'assets/dice.png',
+                        width: 24,
+                        height: 24,
+                      ),
+                    ),
+                  ],
                 );
               }).toList(),
               ElevatedButton(

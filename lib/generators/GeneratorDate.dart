@@ -14,8 +14,8 @@ class Generatordate extends Generators {
 
   @override
   void generate() {
-    this.dateTime = getRandomDateTime();
-    controller.text = this.dateTime.toString();
+    dateTime = getRandomDateTime();
+    controller.text = dateTime.toString();
   }
 
   static DateTime getRandomDateTime() {

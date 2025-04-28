@@ -7,12 +7,11 @@ class GeneratorName extends Generators {
   String name = '';
   List<String> names;
   List<double> nameWeights;
-  BuildContext context;
 
   GeneratorName(
+    BuildContext context,
     this.names,
     this.nameWeights,
-    this.context,
     localization,
     String namespace,
   ) : super(

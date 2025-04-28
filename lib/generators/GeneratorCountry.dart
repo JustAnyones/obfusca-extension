@@ -10,4 +10,15 @@ class Generatorcountry extends Generators {
         AppLocalizations.of(context)!.generator_country,
         "namespace::country_generator",
       );
+
+  String getCountry(bool check) {
+    switch (country) {
+      case 'us':
+        return "United States";
+      case 'lt':
+        return check ? "Lithuania" : "Lietuva";
+      default:
+        return "Unknown Country";
+    }
+  }
 }

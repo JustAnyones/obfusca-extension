@@ -7,12 +7,11 @@ class GeneratorSurName extends Generators {
   String surName = '';
   List<String> surNames;
   List<double> surNameWeights;
-  BuildContext context;
 
   GeneratorSurName(
+    BuildContext context,
     this.surNames,
     this.surNameWeights,
-    this.context,
     localization,
     String namespace,
   ) : super(
