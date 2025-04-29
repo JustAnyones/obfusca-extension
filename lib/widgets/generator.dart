@@ -22,14 +22,6 @@ class NameGeneratorPage extends StatefulWidget {
 
 class _NameGeneratorPageState extends State<NameGeneratorPage> {
   bool _isButtonDisabled = false;
-  bool isChecked_name = true;
-  bool isChecked_surname = true;
-  bool isChecked_username = true;
-  bool isChecked_date = true;
-  bool isChecked_country = true;
-  bool isChecked_city = true;
-  bool isChecked_address = true;
-  bool isChecked_postal = true;
 
   late List<String> names;
   late List<double> nameFreq;
@@ -37,15 +29,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<double> surNamesFreq;
   late List<String> cities;
   final List<bool> selectedItems = List.filled(8, false);
-
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _surnameController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _datecontroller = TextEditingController();
-  final TextEditingController _countrycontroller = TextEditingController();
-  final TextEditingController _citycontroller = TextEditingController();
-  final TextEditingController _addresscontroller = TextEditingController();
-  final TextEditingController _postalcontroller = TextEditingController();
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -56,49 +39,20 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   void initState() {
     super.initState();
     SettingProvider.getInstance().addListener(_loadCSVData);
-    _loadCSVData();
+    _loadCSVData(); // Load data asynchronously
     generatorsList = [
-      GeneratorName(names, nameFreq),
-      GeneratorSurName(surNames, surNamesFreq),
+      GeneratorName(),
+      GeneratorSurName(),
       Generatorusername(),
       Generatordate(),
-      Generatorcountry(),
-      Generatorcity(cities),
+      Generatorcountry(SettingProvider.getInstance().region),
+      Generatorcity(),
       Generatoraddress(SettingProvider.getInstance().region),
       Generatorpostal(SettingProvider.getInstance().region),
     ];
-    _loadSavedValues();
     for (Generators generator in generatorsList) {
       generator.controller.addListener(_saveCurrentValues);
     }
-    // To do : remove later
-    _nameController.addListener(_saveCurrentValues);
-    _surnameController.addListener(_saveCurrentValues);
-    _usernameController.addListener(_saveCurrentValues);
-    _datecontroller.addListener(_saveCurrentValues);
-    _countrycontroller.addListener(_saveCurrentValues);
-    _citycontroller.addListener(_saveCurrentValues);
-    _addresscontroller.addListener(_saveCurrentValues);
-    _postalcontroller.addListener(_saveCurrentValues);
-    _loadCSVData();
-  }
-
-  @override
-  void dispose() {
-    SettingProvider.getInstance().removeListener(_loadCSVData);
-    for (Generators generator in generatorsList) {
-      generator.controller.removeListener(_saveCurrentValues);
-    }
-    // To do : remove later
-    _nameController.removeListener(_saveCurrentValues);
-    _surnameController.removeListener(_saveCurrentValues);
-    _usernameController.removeListener(_saveCurrentValues);
-    _datecontroller.removeListener(_saveCurrentValues);
-    _countrycontroller.removeListener(_saveCurrentValues);
-    _citycontroller.removeListener(_saveCurrentValues);
-    _addresscontroller.removeListener(_saveCurrentValues);
-    _postalcontroller.removeListener(_saveCurrentValues);
-    super.dispose();
   }
 
   Future<void> _loadCSVData() async {
@@ -121,25 +75,21 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     var result3 = await readCities('assets/CityList.csv', country);
 
     setState(() {
-      if (generatorsList[0] is GeneratorName) {
-        (generatorsList[0] as GeneratorName).setNames(result.$1, result.$2);
-      }
-      if (generatorsList[1] is GeneratorSurName) {
-        (generatorsList[1] as GeneratorSurName).setSurnames(
-          result2.$1,
-          result2.$2,
-        );
-      }
-      if (generatorsList[5] is Generatorcity) {
-        (generatorsList[5] as Generatorcity).setCities(result3);
-      }
-      //To do: delete later
       names = result.$1;
       nameFreq = result.$2;
       surNames = result2.$1;
       surNamesFreq = result2.$2;
       cities = result3;
     });
+  }
+
+  @override
+  void dispose() {
+    SettingProvider.getInstance().removeListener(_loadCSVData);
+    for (Generators generator in generatorsList) {
+      generator.controller.removeListener(_saveCurrentValues);
+    }
+    super.dispose();
   }
 
   Future<void> _loadSavedValues() async {
@@ -153,16 +103,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
             ) ??
             '';
       }
-
-      // To do: delete later
-      _nameController.text = prefs.getString('generated_name') ?? '';
-      _surnameController.text = prefs.getString('generated_surname') ?? '';
-      _usernameController.text = prefs.getString('generated_username') ?? '';
-      _datecontroller.text = prefs.getString('generated_date') ?? '';
-      _countrycontroller.text = prefs.getString('generated_country') ?? '';
-      _citycontroller.text = prefs.getString('generated_city') ?? '';
-      _addresscontroller.text = prefs.getString('generated_address') ?? '';
-      _postalcontroller.text = prefs.getString('generated_postal') ?? '';
 
       List<String>? selectedIndices = prefs.getStringList('selected_items');
       if (selectedIndices != null) {
@@ -190,16 +130,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       );
     }
 
-    // To do: delete later
-    await prefs.setString('generated_name', _nameController.text);
-    await prefs.setString('generated_surname', _surnameController.text);
-    await prefs.setString('generated_username', _usernameController.text);
-    await prefs.setString('generated_date', _datecontroller.text);
-    await prefs.setString('generated_country', _countrycontroller.text);
-    await prefs.setString('generated_city', _citycontroller.text);
-    await prefs.setString('generated_address', _addresscontroller.text);
-    await prefs.setString('generated_postal', _postalcontroller.text);
-
     List<String> selectedItemsStrings = [];
     for (int i = 0; i < selectedItems.length; i++) {
       if (selectedItems[i]) {
@@ -221,54 +151,33 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       return;
     }
 
+    (generatorsList[0] as GeneratorName).setNames(names, nameFreq);
+    (generatorsList[1] as GeneratorSurName).setSurnames(surNames, surNamesFreq);
+    (generatorsList[5] as Generatorcity).setCities(cities);
+
     for (Generators generator in generatorsList) {
       generator.generate();
     }
 
-    // To do: delete later
-
-    final locationInfo = await Generation.getRandomLocation(cities);
-
-    String name = (generatorsList[0] as GeneratorName).name;
-    String surname = (generatorsList[1] as GeneratorSurName).surName;
-    surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
-
-    while (true) {
-      if (name[name.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0) &&
-          surname[surname.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0)) {
-        break;
-      } else if (name[name.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0) &&
-          surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)) {
-        break;
-      }
-      generatorsList[0].generate();
-      generatorsList[1].generate();
-      name = (generatorsList[0] as GeneratorName).name;
-      surname = (generatorsList[1] as GeneratorSurName).surName;
+    if (generatorsList[0].isChecked && generatorsList[1].isChecked) {
+      String name = (generatorsList[0] as GeneratorName).name;
+      String surname = (generatorsList[1] as GeneratorSurName).surName;
       surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
+      while (true) {
+        if (name[name.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0) &&
+            surname[surname.length - 1].codeUnitAt(0) == 's'.codeUnitAt(0)) {
+          break;
+        } else if (name[name.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0) &&
+            surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)) {
+          break;
+        }
+        generatorsList[0].generate();
+        generatorsList[1].generate();
+        name = (generatorsList[0] as GeneratorName).name;
+        surname = (generatorsList[1] as GeneratorSurName).surName;
+        surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
+      }
     }
-
-    // To do: delete later
-    setState(() {
-      if (isChecked_name) _nameController.text = name;
-      if (isChecked_surname) _surnameController.text = surname;
-      if (isChecked_username) {
-        _usernameController.text = Generation.generateUsername(name, surname);
-      }
-      if (isChecked_date) {
-        _datecontroller.text =
-            Generation.getRandomDateTime().toIso8601String().split('T')[0];
-      }
-      if (isChecked_country) {
-        _countrycontroller.text = Generation.getCountry(
-          SettingProvider.getInstance().region,
-          false,
-        );
-      }
-      if (isChecked_city) _citycontroller.text = locationInfo['city'];
-      if (isChecked_address) _addresscontroller.text = locationInfo['street'];
-      if (isChecked_postal) _postalcontroller.text = locationInfo['postcode'];
-    });
 
     _saveCurrentValues();
     Timer(Duration(seconds: 2), () {
@@ -276,44 +185,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
         _isButtonDisabled = false;
       });
     });
-  }
-
-  // TO DO: remove later
-  List<String> getLocalizedGenerators(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-    return [
-      localizations.generator_name_name,
-      localizations.generator_surname_name,
-      localizations.generator_username,
-      localizations.generator_city,
-      localizations.generator_country,
-      localizations.generator_street,
-      localizations.generator_postal_code,
-      localizations.generator_date_of_birth,
-    ];
-  }
-
-  String getGeneratorName(String generator) {
-    switch (generator) {
-      case "namespace::username_generator":
-        return _usernameController.text;
-      case "namespace::firstname_generator":
-        return _nameController.text;
-      case "namespace::lastname_generator":
-        return _surnameController.text;
-      case "namespace::birthdate_generator":
-        return _datecontroller.text;
-      case "namespace::birth_day_generator":
-        return _datecontroller.text.split('-')[2];
-      case "namespace::birth_month_generator":
-        return _datecontroller.text.split('-')[1];
-      case "namespace::birth_year_generator":
-        return _datecontroller.text.split('-')[0];
-      case "namespace::country_generator":
-        return _countrycontroller.text;
-      default:
-        return "nera autofill";
-    }
   }
 
   @override
@@ -324,7 +195,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       generators.add(generator.localization);
     }
 
-    final fieldsNew =
+    final fields =
         generatorsList.asMap().entries.map((entry) {
           final generator = entry.value;
           return {
@@ -337,70 +208,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                   _saveCurrentValues();
                 }),
             'generator': generator,
-            'generate': () => generator.generate(),
           };
         }).toList();
-
-    // To do : delete later
-    final fields = [
-      {
-        'controller': _nameController,
-        'label': AppLocalizations.of(context)!.generator_name_name,
-        'isChecked': isChecked_name,
-        'onChanged':
-            (bool? value) => setState(() => isChecked_name = value ?? false),
-      },
-      {
-        'controller': _surnameController,
-        'label': AppLocalizations.of(context)!.generator_surname_name,
-        'isChecked': isChecked_surname,
-        'onChanged':
-            (bool? value) => setState(() => isChecked_surname = value ?? false),
-      },
-      {
-        'controller': _usernameController,
-        'label': AppLocalizations.of(context)!.generator_username,
-        'isChecked': isChecked_username,
-        'onChanged':
-            (bool? value) =>
-                setState(() => isChecked_username = value ?? false),
-      },
-      {
-        'controller': _citycontroller,
-        'label': AppLocalizations.of(context)!.generator_city,
-        'isChecked': isChecked_city,
-        'onChanged':
-            (bool? value) => setState(() => isChecked_city = value ?? false),
-      },
-      {
-        'controller': _countrycontroller,
-        'label': AppLocalizations.of(context)!.generator_country,
-        'isChecked': isChecked_country,
-        'onChanged':
-            (bool? value) => setState(() => isChecked_country = value ?? false),
-      },
-      {
-        'controller': _addresscontroller,
-        'label': AppLocalizations.of(context)!.generator_street,
-        'isChecked': isChecked_address,
-        'onChanged':
-            (bool? value) => setState(() => isChecked_address = value ?? false),
-      },
-      {
-        'controller': _postalcontroller,
-        'label': AppLocalizations.of(context)!.generator_postal_code,
-        'isChecked': isChecked_postal,
-        'onChanged':
-            (bool? value) => setState(() => isChecked_postal = value ?? false),
-      },
-      {
-        'controller': _datecontroller,
-        'label': AppLocalizations.of(context)!.generator_date_of_birth,
-        'isChecked': isChecked_date,
-        'onChanged':
-            (bool? value) => setState(() => isChecked_date = value ?? false),
-      },
-    ];
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -464,7 +273,29 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // Placeholder for button action
+                        if (field['generator'] is GeneratorName) {
+                          (field['generator'] as GeneratorName).generate();
+                        } else if (field['generator'] is GeneratorSurName) {
+                          (field['generator'] as GeneratorSurName).generate();
+                        } else if (field['generator'] is Generatorusername) {
+                          (field['generator'] as Generatorusername).generate();
+                        } else if (field['generator'] is Generatordate) {
+                          (field['generator'] as Generatordate).generate();
+                        } else if (field['generator'] is Generatorcountry) {
+                          (field['generator'] as Generatorcountry).generate();
+                        } else if (field['generator'] is Generatorcity) {
+                          (field['generator'] as Generatorcity).generate();
+                          (generatorsList[6] as Generatoraddress).setCity(
+                            (field['generator'] as Generatorcity).city,
+                          );
+                          (generatorsList[7] as Generatorpostal).setCity(
+                            (field['generator'] as Generatorcity).city,
+                          );
+                        } else if (field['generator'] is Generatoraddress) {
+                          (field['generator'] as Generatoraddress).generate();
+                        } else if (field['generator'] is Generatorpostal) {
+                          (field['generator'] as Generatorpostal).generate();
+                        }
                       },
                       child: Image.asset(
                         'assets/dice.png',
@@ -489,68 +320,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 onPressed: () async {
                   int total = 0;
                   int sum = 0;
-                  String address = '';
-                  String city = '';
-                  String country = '';
-                  String date = '';
-                  String name = '';
-                  String postal = '';
-                  String surname = '';
-                  String username = '';
-                  if (isChecked_address) {
-                    total++;
-                    if (_addresscontroller.text != '') {
-                      sum++;
-                      address = _addresscontroller.text;
-                    }
-                  }
-                  if (isChecked_city) {
-                    total++;
-                    if (_citycontroller.text != '') {
-                      sum++;
-                      city = _citycontroller.text;
-                    }
-                  }
-                  if (isChecked_country) {
-                    total++;
-                    if (_countrycontroller.text != '') {
-                      sum++;
-                      country = _countrycontroller.text;
-                    }
-                  }
-                  if (isChecked_date) {
-                    total++;
-                    if (_datecontroller.text != '') {
-                      sum++;
-                      date = _datecontroller.text;
-                    }
-                  }
-                  if (isChecked_name) {
-                    total++;
-                    if (_nameController.text != '') {
-                      sum++;
-                      name = _nameController.text;
-                    }
-                  }
-                  if (isChecked_postal) {
-                    total++;
-                    if (_postalcontroller.text != '') {
-                      sum++;
-                      postal = _postalcontroller.text;
-                    }
-                  }
-                  if (isChecked_surname) {
-                    total++;
-                    if (_surnameController.text != '') {
-                      sum++;
-                      surname = _surnameController.text;
-                    }
-                  }
-                  if (isChecked_username) {
-                    total++;
-                    if (_usernameController.text != '') {
-                      sum++;
-                      username = _usernameController.text;
+                  List<String> saverFields = [];
+                  for (Generators generator in generatorsList) {
+                    if (generator.isChecked) {
+                      total++;
+                      if (generator.controller.text != '') {
+                        sum++;
+                        saverFields.add(generator.controller.text);
+                      }
                     }
                   }
 
@@ -574,16 +351,16 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     String domain = await getURL();
                     String favIcon = await getFavIconUrl();
                     Saver.saveInfo(
-                      name,
-                      surname,
+                      saverFields[0],
+                      saverFields[1],
                       favIcon,
                       domain,
-                      address,
-                      city,
-                      country,
-                      date,
-                      postal,
-                      username,
+                      saverFields[6],
+                      saverFields[5],
+                      saverFields[4],
+                      saverFields[3],
+                      saverFields[7],
+                      saverFields[2],
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -592,17 +369,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                         ),
                       ),
                     );
-                  }
-                  if (_nameController.text == '' &&
-                      _surnameController.text == '') {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          AppLocalizations.of(context)!.missing_name_surname,
-                        ),
-                      ),
-                    );
-                    return;
                   }
                 },
                 child: Text(AppLocalizations.of(context)!.button_save_entry),
@@ -650,9 +416,16 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                   for (var i = 0; i < _detectedFields.length; i++) {
                     fieldsToFill.add({
                       "ref": _detectedFields[i]["ref"],
-                      "value": getGeneratorName(
-                        _detectedFields[i]["generator"],
-                      ),
+                      "value": generatorsList
+                          .map(
+                            (generator) => generator.checkNamespace(
+                              _detectedFields[i]["ref"],
+                            ),
+                          )
+                          .firstWhere(
+                            (value) => value.isNotEmpty,
+                            orElse: () => '',
+                          ),
                     });
                   }
                   fillFields(_frameId, fieldsToFill);

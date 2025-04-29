@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Generatorcountry extends Generators {
-  String country = '';
+  String country;
 
-  Generatorcountry() : super("namespace::country_generator");
+  Generatorcountry(this.country) : super("namespace::country_generator");
 
   String getCountry(bool check) {
     switch (country) {
@@ -21,7 +21,7 @@ class Generatorcountry extends Generators {
   @override
   void generate() {
     if (isChecked) {
-      controller.text = this.localization;
+      controller.text = getCountry(false);
     }
   }
 

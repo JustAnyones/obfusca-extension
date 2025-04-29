@@ -27,6 +27,7 @@ class Generatorpostal extends Generators {
 
   void setCity(String city) {
     City = city;
+    BoundingBox = [];
   }
 
   void setBoundingBox(List<String> boundingBox) {

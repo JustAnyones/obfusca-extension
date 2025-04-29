@@ -8,11 +8,11 @@ class Generators {
 
   Generators(this.namespace);
 
-  bool checkNamespace(String namespace) {
+  String checkNamespace(String namespace) {
     if (this.namespace == namespace) {
-      return true;
+      return controller.text;
     }
-    return false;
+    return '';
   }
 
   void generate() {}

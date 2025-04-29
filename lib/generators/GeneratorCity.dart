@@ -5,9 +5,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Generatorcity extends Generators {
   String city = '';
-  List<String> Cities;
+  List<String> Cities = [];
 
-  Generatorcity(this.Cities) : super("nera");
+  Generatorcity() : super("nera");
 
   void setCities(List<String> cities) {
     Cities = cities;

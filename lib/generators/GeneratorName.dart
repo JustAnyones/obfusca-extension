@@ -5,11 +5,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GeneratorName extends Generators {
   String name = '';
-  List<String> names;
-  List<double> nameWeights;
+  List<String> names = [];
+  List<double> nameWeights = [];
 
-  GeneratorName(this.names, this.nameWeights)
-    : super("namespace::firstname_generator");
+  GeneratorName() : super("namespace::firstname_generator");
 
   @override
   void generate() {

@@ -5,11 +5,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GeneratorSurName extends Generators {
   String surName = '';
-  List<String> surNames;
-  List<double> surNameWeights;
+  List<String> surNames = [];
+  List<double> surNameWeights = [];
 
-  GeneratorSurName(this.surNames, this.surNameWeights)
-    : super("namespace::lastname_generator");
+  GeneratorSurName() : super("namespace::lastname_generator");
 
   void setSurnames(List<String> surNames, List<double> surNameWeights) {
     this.surNameWeights = surNameWeights;
