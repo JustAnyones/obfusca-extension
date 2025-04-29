@@ -50,6 +50,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       Generatoraddress(SettingProvider.getInstance().region),
       Generatorpostal(SettingProvider.getInstance().region),
     ];
+    _loadSavedValues();
     for (Generators generator in generatorsList) {
       generator.controller.addListener(_saveCurrentValues);
     }
@@ -273,28 +274,12 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        if (field['generator'] is GeneratorName) {
-                          (field['generator'] as GeneratorName).generate();
-                        } else if (field['generator'] is GeneratorSurName) {
-                          (field['generator'] as GeneratorSurName).generate();
-                        } else if (field['generator'] is Generatorusername) {
-                          (field['generator'] as Generatorusername).generate();
-                        } else if (field['generator'] is Generatordate) {
-                          (field['generator'] as Generatordate).generate();
-                        } else if (field['generator'] is Generatorcountry) {
-                          (field['generator'] as Generatorcountry).generate();
-                        } else if (field['generator'] is Generatorcity) {
-                          (field['generator'] as Generatorcity).generate();
-                          (generatorsList[6] as Generatoraddress).setCity(
-                            (field['generator'] as Generatorcity).city,
-                          );
-                          (generatorsList[7] as Generatorpostal).setCity(
-                            (field['generator'] as Generatorcity).city,
-                          );
-                        } else if (field['generator'] is Generatoraddress) {
-                          (field['generator'] as Generatoraddress).generate();
-                        } else if (field['generator'] is Generatorpostal) {
-                          (field['generator'] as Generatorpostal).generate();
+                        final generator = field['generator'] as Generators;
+                        generator.generate();
+                        if (generator is Generatorcity) {
+                          final city = generator.city;
+                          (generatorsList[6] as Generatoraddress).setCity(city);
+                          (generatorsList[7] as Generatorpostal).setCity(city);
                         }
                       },
                       child: Image.asset(
