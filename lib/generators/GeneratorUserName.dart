@@ -7,15 +7,13 @@ import 'package:english_words/english_words.dart';
 class Generatorusername extends Generators {
   String username = '';
 
-  Generatorusername(BuildContext context, localization, String namespace)
-    : super(
-        AppLocalizations.of(context)!.generator_username,
-        "namespace::username_generator",
-      );
+  Generatorusername() : super("namespace::username_generator");
   @override
   void generate() {
-    this.username = generateUsername();
-    controller.text = this.username;
+    if (isChecked) {
+      this.username = generateUsername();
+      controller.text = this.username;
+    }
   }
 
   static String generateUsername() {
@@ -23,5 +21,10 @@ class Generatorusername extends Generators {
     int next = 100 + _random.nextInt(1000 - 100);
     final wordPair = WordPair.random();
     return '$wordPair$next';
+  }
+
+  @override
+  void setLocalization(BuildContext context) {
+    localization = AppLocalizations.of(context)!.generator_username;
   }
 }

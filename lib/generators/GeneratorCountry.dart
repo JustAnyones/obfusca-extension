@@ -5,11 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class Generatorcountry extends Generators {
   String country = '';
 
-  Generatorcountry(BuildContext context, localization, String namespace)
-    : super(
-        AppLocalizations.of(context)!.generator_country,
-        "namespace::country_generator",
-      );
+  Generatorcountry() : super("namespace::country_generator");
 
   String getCountry(bool check) {
     switch (country) {
@@ -20,5 +16,17 @@ class Generatorcountry extends Generators {
       default:
         return "Unknown Country";
     }
+  }
+
+  @override
+  void generate() {
+    if (isChecked) {
+      controller.text = this.localization;
+    }
+  }
+
+  @override
+  void setLocalization(BuildContext context) {
+    localization = AppLocalizations.of(context)!.generator_country;
   }
 }

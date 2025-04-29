@@ -8,21 +8,20 @@ class GeneratorSurName extends Generators {
   List<String> surNames;
   List<double> surNameWeights;
 
-  GeneratorSurName(
-    BuildContext context,
-    this.surNames,
-    this.surNameWeights,
-    localization,
-    String namespace,
-  ) : super(
-        AppLocalizations.of(context)!.generator_surname_name,
-        "namespace::lastname_generator",
-      );
+  GeneratorSurName(this.surNames, this.surNameWeights)
+    : super("namespace::lastname_generator");
+
+  void setSurnames(List<String> surNames, List<double> surNameWeights) {
+    this.surNameWeights = surNameWeights;
+    this.surNames = surNames;
+  }
 
   @override
   void generate() {
-    this.surName = _weightedRandomChoice(surNames, surNameWeights);
-    controller.text = this.surName;
+    if (isChecked) {
+      this.surName = _weightedRandomChoice(surNames, surNameWeights);
+      controller.text = this.surName;
+    }
   }
 
   static String _weightedRandomChoice(
@@ -42,5 +41,10 @@ class GeneratorSurName extends Generators {
     }
 
     return items.last;
+  }
+
+  @override
+  void setLocalization(BuildContext context) {
+    localization = AppLocalizations.of(context)!.generator_surname_name;
   }
 }

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/generation.dart';
+import 'package:browser_extension/generators/gens.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
@@ -49,12 +50,28 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   int _frameId = -1;
   List<Map> _detectedFields = [];
 
+  late List<Generators> generatorsList;
+
   @override
   void initState() {
     super.initState();
     SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
+    generatorsList = [
+      GeneratorName(names, nameFreq),
+      GeneratorSurName(surNames, surNamesFreq),
+      Generatorusername(),
+      Generatordate(),
+      Generatorcountry(),
+      Generatorcity(cities),
+      Generatoraddress(SettingProvider.getInstance().region),
+      Generatorpostal(SettingProvider.getInstance().region),
+    ];
     _loadSavedValues();
+    for (Generators generator in generatorsList) {
+      generator.controller.addListener(_saveCurrentValues);
+    }
+    // To do : remove later
     _nameController.addListener(_saveCurrentValues);
     _surnameController.addListener(_saveCurrentValues);
     _usernameController.addListener(_saveCurrentValues);
@@ -63,11 +80,16 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     _citycontroller.addListener(_saveCurrentValues);
     _addresscontroller.addListener(_saveCurrentValues);
     _postalcontroller.addListener(_saveCurrentValues);
+    _loadCSVData();
   }
 
   @override
   void dispose() {
     SettingProvider.getInstance().removeListener(_loadCSVData);
+    for (Generators generator in generatorsList) {
+      generator.controller.removeListener(_saveCurrentValues);
+    }
+    // To do : remove later
     _nameController.removeListener(_saveCurrentValues);
     _surnameController.removeListener(_saveCurrentValues);
     _usernameController.removeListener(_saveCurrentValues);
@@ -99,6 +121,19 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     var result3 = await readCities('assets/CityList.csv', country);
 
     setState(() {
+      if (generatorsList[0] is GeneratorName) {
+        (generatorsList[0] as GeneratorName).setNames(result.$1, result.$2);
+      }
+      if (generatorsList[1] is GeneratorSurName) {
+        (generatorsList[1] as GeneratorSurName).setSurnames(
+          result2.$1,
+          result2.$2,
+        );
+      }
+      if (generatorsList[5] is Generatorcity) {
+        (generatorsList[5] as Generatorcity).setCities(result3);
+      }
+      //To do: delete later
       names = result.$1;
       nameFreq = result.$2;
       surNames = result2.$1;
@@ -111,6 +146,15 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     final prefs = await SharedPreferences.getInstance();
 
     setState(() {
+      for (int i = 0; i < generatorsList.length; i++) {
+        generatorsList[i].controller.text =
+            prefs.getString(
+              'generated_${generatorsList[i].runtimeType.toString().toLowerCase()}',
+            ) ??
+            '';
+      }
+
+      // To do: delete later
       _nameController.text = prefs.getString('generated_name') ?? '';
       _surnameController.text = prefs.getString('generated_surname') ?? '';
       _usernameController.text = prefs.getString('generated_username') ?? '';
@@ -139,6 +183,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   Future<void> _saveCurrentValues() async {
     final prefs = await SharedPreferences.getInstance();
 
+    for (Generators generator in generatorsList) {
+      await prefs.setString(
+        'generated_${generator.runtimeType.toString().toLowerCase()}',
+        generator.controller.text,
+      );
+    }
+
+    // To do: delete later
     await prefs.setString('generated_name', _nameController.text);
     await prefs.setString('generated_surname', _surnameController.text);
     await prefs.setString('generated_username', _usernameController.text);
@@ -162,7 +214,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       _isButtonDisabled = true;
     });
 
-    final locationInfo = await Generation.getRandomLocation(cities);
     if (names.isEmpty ||
         nameFreq.isEmpty ||
         surNames.isEmpty ||
@@ -170,16 +221,16 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       return;
     }
 
-    String fullName = Generation.generateName(
-      names,
-      nameFreq,
-      surNames,
-      surNamesFreq,
-    );
+    for (Generators generator in generatorsList) {
+      generator.generate();
+    }
 
-    List<String> nameParts = fullName.split(" ");
-    String name = nameParts[0];
-    String surname = nameParts[1];
+    // To do: delete later
+
+    final locationInfo = await Generation.getRandomLocation(cities);
+
+    String name = (generatorsList[0] as GeneratorName).name;
+    String surname = (generatorsList[1] as GeneratorSurName).surName;
     surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
 
     while (true) {
@@ -190,18 +241,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
           surname[surname.length - 1].codeUnitAt(0) != 's'.codeUnitAt(0)) {
         break;
       }
-      fullName = Generation.generateName(
-        names,
-        nameFreq,
-        surNames,
-        surNamesFreq,
-      );
-      nameParts = fullName.split(" ");
-      name = nameParts[0];
-      surname = nameParts[1];
+      generatorsList[0].generate();
+      generatorsList[1].generate();
+      name = (generatorsList[0] as GeneratorName).name;
+      surname = (generatorsList[1] as GeneratorSurName).surName;
       surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
     }
 
+    // To do: delete later
     setState(() {
       if (isChecked_name) _nameController.text = name;
       if (isChecked_surname) _surnameController.text = surname;
@@ -231,6 +278,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     });
   }
 
+  // TO DO: remove later
   List<String> getLocalizedGenerators(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     return [
@@ -270,8 +318,30 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
   @override
   Widget build(BuildContext context) {
-    final generators = getLocalizedGenerators(context);
+    List<String> generators = [];
+    for (Generators generator in generatorsList) {
+      generator.setLocalization(context);
+      generators.add(generator.localization);
+    }
 
+    final fieldsNew =
+        generatorsList.asMap().entries.map((entry) {
+          final generator = entry.value;
+          return {
+            'controller': generator.controller,
+            'label': generator.localization,
+            'isChecked': generator.isChecked,
+            'onChanged':
+                (bool? value) => setState(() {
+                  generator.isChecked = value ?? false;
+                  _saveCurrentValues();
+                }),
+            'generator': generator,
+            'generate': () => generator.generate(),
+          };
+        }).toList();
+
+    // To do : delete later
     final fields = [
       {
         'controller': _nameController,

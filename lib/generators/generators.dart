@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class Generators {
   bool isChecked = false;
   final TextEditingController controller = TextEditingController();
-  final localization;
+  String localization = "";
   String namespace;
 
-  Generators(this.localization, this.namespace);
+  Generators(this.namespace);
 
   bool checkNamespace(String namespace) {
     if (this.namespace == namespace) {
@@ -20,4 +20,6 @@ class Generators {
   String getValue() {
     return controller.text;
   }
+
+  void setLocalization(BuildContext context) {}
 }

@@ -7,17 +7,23 @@ class Generatorcity extends Generators {
   String city = '';
   List<String> Cities;
 
-  Generatorcity(
-    this.Cities,
-    BuildContext context,
-    localization,
-    String namespace,
-  ) : super(AppLocalizations.of(context)!.generator_city, "nera");
+  Generatorcity(this.Cities) : super("nera");
+
+  void setCities(List<String> cities) {
+    Cities = cities;
+  }
 
   @override
   void generate() {
-    Random _random = Random();
-    this.city = Cities[_random.nextInt(19)];
-    controller.text = this.city;
+    if (isChecked) {
+      Random _random = Random();
+      this.city = Cities[_random.nextInt(19)];
+      controller.text = this.city;
+    }
+  }
+
+  @override
+  void setLocalization(BuildContext context) {
+    localization = AppLocalizations.of(context)!.generator_city;
   }
 }

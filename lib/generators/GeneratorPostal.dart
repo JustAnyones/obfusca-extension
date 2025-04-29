@@ -6,41 +6,61 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Generatorpostal extends Generators {
-  String City;
-  String postal;
-  List<String> BoundingBox;
-  Random _random = Random();
+  String City = '';
+  String postal = '';
+  List<String> BoundingBox = [];
+  final Random _random = Random();
 
-  Generatorpostal(
-    this.City,
-    this.postal,
-    this.BoundingBox,
-    BuildContext context,
-    localization,
-    String namespace,
-  ) : super(AppLocalizations.of(context)!.generator_street, "nera");
+  Generatorpostal(String short) : super("nera") {
+    setDefault(short);
+  }
+
+  void setDefault(String short) {
+    if (short == 'us') {
+      City = 'New York';
+      BoundingBox = ['40.4765780', '40.9176300', '-74.2588430', '-73.7002330'];
+    } else {
+      City = 'Vilnius';
+      BoundingBox = ['54.5689058', '54.8323200', '25.0245351', '25.4814574'];
+    }
+  }
+
+  void setCity(String city) {
+    City = city;
+  }
+
+  void setBoundingBox(List<String> boundingBox) {
+    BoundingBox = boundingBox;
+  }
+
+  @override
+  void setLocalization(BuildContext context) {
+    localization = AppLocalizations.of(context)!.generator_postal_code;
+  }
 
   @override
   void generate() async {
-    Map<String, dynamic> info;
-    if (BoundingBox.isEmpty) {
-      final coords = await getRandomCoords(City);
-      info = await getInfo(coords);
-    } else {
-      final coords = {
-        'lat': randomDoubleInRange(
-          double.parse(BoundingBox[0]),
-          double.parse(BoundingBox[1]),
-        ),
-        'lng': randomDoubleInRange(
-          double.parse(BoundingBox[2]),
-          double.parse(BoundingBox[3]),
-        ),
-      };
-      info = await getInfo(coords);
+    if (isChecked) {
+      Map<String, dynamic> info;
+      if (BoundingBox.isEmpty) {
+        final coords = await getRandomCoords(City);
+        info = await getInfo(coords);
+      } else {
+        final coords = {
+          'lat': randomDoubleInRange(
+            double.parse(BoundingBox[0]),
+            double.parse(BoundingBox[1]),
+          ),
+          'lng': randomDoubleInRange(
+            double.parse(BoundingBox[2]),
+            double.parse(BoundingBox[3]),
+          ),
+        };
+        info = await getInfo(coords);
+      }
+      postal = info['postcode'];
+      controller.text = postal;
     }
-    postal = info['postcode'];
-    controller.text = postal;
   }
 
   Future<Map<String, dynamic>> getRandomCoords(String city) async {
