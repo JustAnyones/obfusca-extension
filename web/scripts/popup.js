@@ -103,3 +103,9 @@ async function navigateToPageRoute(route) {
 		url: '/index.html#' + route,
 	});
 }
+
+async function closeCurrentTab() {
+	const tabs = await chrome.tabs.query({ active: true, currentWindow: true});
+	const tab = tabs[0];
+	chrome.tabs.remove(tab.id);
+}

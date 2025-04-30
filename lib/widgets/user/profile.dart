@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:browser_extension/providers/user.dart';
 import 'package:browser_extension/utils/obfusca.dart';
+import 'package:browser_extension/web/interop.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -49,7 +50,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
 
     await UserProvider.getInstance().clearUserToken();
-    Navigator.pushReplacementNamed(context, "/login");
+    await closeCurrentTab();
   }
 
   void createNewAddress() async {
@@ -80,6 +81,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(AppLocalizations.of(context)!.user_profile_page_title),
+          automaticallyImplyLeading: false,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
