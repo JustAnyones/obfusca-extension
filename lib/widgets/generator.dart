@@ -158,6 +158,11 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
     for (Generators generator in generatorsList) {
       generator.generate();
+      if (generator is Generatorcity) {
+        final city = generator.city;
+        (generatorsList[6] as Generatoraddress).setCity(city);
+        (generatorsList[7] as Generatorpostal).setCity(city);
+      }
     }
 
     if (generatorsList[0].isChecked && generatorsList[1].isChecked) {
