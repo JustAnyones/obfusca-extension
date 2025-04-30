@@ -11,6 +11,8 @@
     "generator_street": "Gatvė",
     "generator_postal_code": "Pašto kodas",
     "generator_date_of_birth": "Gimimo metai",
+    "generator_sex": "Lytis",
+    "generator_password": "Slaptažodis",
     "button_wait": "Prašau palaukit...",
     "button_generate": "Generuoti",
     "expansion_tile": "Generatoriai",

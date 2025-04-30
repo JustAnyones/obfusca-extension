@@ -6,4 +6,6 @@ export 'GeneratorName.dart';
 export 'GeneratorUserName.dart';
 export 'GeneratorSurName.dart';
 export 'GeneratorPostal.dart';
+export 'GeneratorSex.dart';
+export 'GeneratorPassword.dart';
 export 'generators.dart';
