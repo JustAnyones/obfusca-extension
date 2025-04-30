@@ -12,10 +12,8 @@ class GeneratorName extends Generators {
 
   @override
   void generate() {
-    if (isChecked) {
-      this.name = _weightedRandomChoice(names, nameWeights);
-      controller.text = this.name;
-    }
+    this.name = _weightedRandomChoice(names, nameWeights);
+    controller.text = this.name;
   }
 
   void setNames(List<String> names, List<double> nameWeights) {

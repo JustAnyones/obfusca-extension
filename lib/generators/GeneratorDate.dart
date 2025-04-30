@@ -14,9 +14,7 @@ class Generatordate extends Generators {
 
   @override
   void generate() {
-    if (isChecked) {
-      controller.text = getRandomDateTime().toIso8601String().split('T')[0];
-    }
+    controller.text = getRandomDateTime().toIso8601String().split('T')[0];
   }
 
   @override

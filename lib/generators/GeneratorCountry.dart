@@ -20,9 +20,7 @@ class Generatorcountry extends Generators {
 
   @override
   void generate() {
-    if (isChecked) {
-      controller.text = getCountry(false);
-    }
+    controller.text = getCountry(false);
   }
 
   @override

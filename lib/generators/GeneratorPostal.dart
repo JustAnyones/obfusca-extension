@@ -41,27 +41,25 @@ class Generatorpostal extends Generators {
 
   @override
   void generate() async {
-    if (isChecked) {
-      Map<String, dynamic> info;
-      if (BoundingBox.isEmpty) {
-        final coords = await getRandomCoords(City);
-        info = await getInfo(coords);
-      } else {
-        final coords = {
-          'lat': randomDoubleInRange(
-            double.parse(BoundingBox[0]),
-            double.parse(BoundingBox[1]),
-          ),
-          'lng': randomDoubleInRange(
-            double.parse(BoundingBox[2]),
-            double.parse(BoundingBox[3]),
-          ),
-        };
-        info = await getInfo(coords);
-      }
-      postal = info['postcode'];
-      controller.text = postal;
+    Map<String, dynamic> info;
+    if (BoundingBox.isEmpty) {
+      final coords = await getRandomCoords(City);
+      info = await getInfo(coords);
+    } else {
+      final coords = {
+        'lat': randomDoubleInRange(
+          double.parse(BoundingBox[0]),
+          double.parse(BoundingBox[1]),
+        ),
+        'lng': randomDoubleInRange(
+          double.parse(BoundingBox[2]),
+          double.parse(BoundingBox[3]),
+        ),
+      };
+      info = await getInfo(coords);
     }
+    postal = info['postcode'];
+    controller.text = postal;
   }
 
   Future<Map<String, dynamic>> getRandomCoords(String city) async {

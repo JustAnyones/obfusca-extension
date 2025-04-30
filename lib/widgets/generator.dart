@@ -160,11 +160,13 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     (generatorsList[5] as Generatorcity).setBoundingBoxes(boundingBoxes);
 
     for (Generators generator in generatorsList) {
-      generator.generate();
-      if (generator is Generatorcity) {
-        final city = generator.boundingBox;
-        (generatorsList[6] as Generatoraddress).setBoundingBox(city);
-        (generatorsList[7] as Generatorpostal).setBoundingBox(city);
+      if (generator.isChecked) {
+        generator.generate();
+        if (generator is Generatorcity) {
+          final city = generator.boundingBox;
+          (generatorsList[6] as Generatoraddress).setBoundingBox(city);
+          (generatorsList[7] as Generatorpostal).setBoundingBox(city);
+        }
       }
     }
 
@@ -280,7 +282,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                         controlAffinity: ListTileControlAffinity.leading,
                       ),
                     ),
-                    ElevatedButton(
+                    IconButton(
                       onPressed: () {
                         final generator = field['generator'] as Generators;
                         generator.generate();
@@ -293,11 +295,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           );
                         }
                       },
-                      child: Image.asset(
-                        'assets/dice.png',
-                        width: 24,
-                        height: 24,
-                      ),
+                      icon: Icon(Icons.casino, size: 24),
                     ),
                   ],
                 );
@@ -388,6 +386,23 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                   _frameId = result["frameId"];
                   _detectedFields = result["data"];
 
+                  print("Detected fields size: ${_detectedFields.length}");
+                  print("Generators size: ${generatorsList.length}");
+
+                  for (int i = 0; i < generatorsList.length; i++) {
+                    for (int j = 0; j < _detectedFields.length; j++) {
+                      if (generatorsList[i].checkNamespace(
+                            _detectedFields[j]["generator"],
+                          ) !=
+                          '') {
+                        setState(() {
+                          selectedItems[i] = true;
+                          generatorsList[i].isChecked = true;
+                        });
+                      }
+                    }
+                  }
+
                   print("Received fields:");
                   print(_detectedFields);
                 },
@@ -397,23 +412,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
               ElevatedButton(
                 onPressed: () {
-                  print((generatorsList[3] as Generatordate).dateTime);
-                  print(generatorsList[3].controller.text);
-                  print(
-                    generatorsList[3].checkNamespace(
-                      "namespace::birth_day_generator",
-                    ),
-                  );
-                  print(
-                    generatorsList[3].checkNamespace(
-                      "namespace::birth_month_generator",
-                    ),
-                  );
-                  print(
-                    generatorsList[3].checkNamespace(
-                      "namespace::birth_year_generator",
-                    ),
-                  );
                   if (_detectedFields.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

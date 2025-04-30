@@ -10,10 +10,8 @@ class Generatorusername extends Generators {
   Generatorusername() : super("namespace::username_generator");
   @override
   void generate() {
-    if (isChecked) {
-      this.username = generateUsername();
-      controller.text = this.username;
-    }
+    this.username = generateUsername();
+    controller.text = this.username;
   }
 
   static String generateUsername() {

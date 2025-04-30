@@ -21,18 +21,16 @@ class Generatorcity extends Generators {
 
   @override
   void generate() {
-    if (isChecked) {
-      Random _random = Random();
-      int num = _random.nextInt(19);
-      this.city = Cities[num];
-      boundingBox = [
-        boundingBoxes[num][0].toString(),
-        boundingBoxes[num][1].toString(),
-        boundingBoxes[num][2].toString(),
-        boundingBoxes[num][3].toString(),
-      ];
-      controller.text = this.city;
-    }
+    Random _random = Random();
+    int num = _random.nextInt(19);
+    this.city = Cities[num];
+    boundingBox = [
+      boundingBoxes[num][0].toString(),
+      boundingBoxes[num][1].toString(),
+      boundingBoxes[num][2].toString(),
+      boundingBoxes[num][3].toString(),
+    ];
+    controller.text = this.city;
   }
 
   @override

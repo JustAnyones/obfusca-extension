@@ -17,10 +17,8 @@ class GeneratorSurName extends Generators {
 
   @override
   void generate() {
-    if (isChecked) {
-      this.surName = _weightedRandomChoice(surNames, surNameWeights);
-      controller.text = this.surName;
-    }
+    this.surName = _weightedRandomChoice(surNames, surNameWeights);
+    controller.text = this.surName;
   }
 
   static String _weightedRandomChoice(
