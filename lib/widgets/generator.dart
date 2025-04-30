@@ -391,6 +391,23 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
               ElevatedButton(
                 onPressed: () {
+                  print((generatorsList[3] as Generatordate).dateTime);
+                  print(generatorsList[3].controller.text);
+                  print(
+                    generatorsList[3].checkNamespace(
+                      "namespace::birth_day_generator",
+                    ),
+                  );
+                  print(
+                    generatorsList[3].checkNamespace(
+                      "namespace::birth_month_generator",
+                    ),
+                  );
+                  print(
+                    generatorsList[3].checkNamespace(
+                      "namespace::birth_year_generator",
+                    ),
+                  );
                   if (_detectedFields.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -409,7 +426,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                       "value": generatorsList
                           .map(
                             (generator) => generator.checkNamespace(
-                              _detectedFields[i]["ref"],
+                              _detectedFields[i]["generator"],
                             ),
                           )
                           .firstWhere(

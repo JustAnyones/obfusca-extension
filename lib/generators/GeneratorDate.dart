@@ -4,7 +4,11 @@ import 'dart:math';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Generatordate extends Generators {
-  DateTime dateTime = DateTime.now();
+  DateTime dateTime = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
 
   Generatordate() : super("namespace::birth_date_generator");
 
@@ -12,7 +16,8 @@ class Generatordate extends Generators {
   void generate() {
     if (isChecked) {
       dateTime = getRandomDateTime();
-      controller.text = dateTime.toString();
+      controller.text =
+          "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
     }
   }
 
@@ -21,11 +26,11 @@ class Generatordate extends Generators {
     if (this.namespace == namespace) {
       return controller.text;
     } else if (namespace == "namespace::birth_day_generator") {
-      return controller.text.split(" ")[0];
+      return controller.text.split("-")[0];
     } else if (namespace == "namespace::birth_month_generator") {
-      return controller.text.split(" ")[1];
+      return controller.text.split("-")[1];
     } else if (namespace == "namespace::birth_year_generator") {
-      return controller.text.split(" ")[2];
+      return controller.text.split("-")[2];
     }
     return '';
   }
