@@ -15,9 +15,7 @@ class Generatordate extends Generators {
   @override
   void generate() {
     if (isChecked) {
-      dateTime = getRandomDateTime();
-      controller.text =
-          "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
+      controller.text = getRandomDateTime().toIso8601String().split('T')[0];
     }
   }
 
@@ -26,11 +24,11 @@ class Generatordate extends Generators {
     if (this.namespace == namespace) {
       return controller.text;
     } else if (namespace == "namespace::birth_day_generator") {
-      return controller.text.split("-")[0];
+      return controller.text.split("-")[2];
     } else if (namespace == "namespace::birth_month_generator") {
       return controller.text.split("-")[1];
     } else if (namespace == "namespace::birth_year_generator") {
-      return controller.text.split("-")[2];
+      return controller.text.split("-")[0];
     }
     return '';
   }
