@@ -18,6 +18,12 @@ external JSPromise<JSObject> _exportEntries(JSAny? entries);
 @JS('createSettingsPage')
 external JSPromise<JSObject> _createSettingsPage();
 
+@JS('navigateToPageRoute')
+external JSPromise<JSObject> _navigateToPageRoute(JSString route);
+
+@JS('closeCurrentTab')
+external JSPromise<JSObject> _closeCurrentTab();
+
 Future<Map> queryFields() async {
   var result = await _queryFields().toDart;
   return result.dartify() as Map;
@@ -43,4 +49,12 @@ Future<void> exportEntries(List<String> entries) async {
 
 Future<void> createSettingsPage() async {
   await _createSettingsPage().toDart;
+}
+
+Future<void> navigateToPageRoute(String route) async {
+  await _navigateToPageRoute(route.toJS).toDart;
+}
+
+Future<void> closeCurrentTab() async {
+  await _closeCurrentTab().toDart;
 }
