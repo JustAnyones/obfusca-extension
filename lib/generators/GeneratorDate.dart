@@ -31,6 +31,20 @@ class Generatordate extends Generators {
     return '';
   }
 
+  @override
+  bool checkNamespaceBool(String namespace) {
+    if (this.namespace == namespace) {
+      return true;
+    } else if (namespace == "namespace::birth_day_generator") {
+      return true;
+    } else if (namespace == "namespace::birth_month_generator") {
+      return true;
+    } else if (namespace == "namespace::birth_year_generator") {
+      return true;
+    }
+    return false;
+  }
+
   static DateTime getRandomDateTime() {
     Random _random = Random();
     int year = 1950 + _random.nextInt(2006 - 1950 + 1);

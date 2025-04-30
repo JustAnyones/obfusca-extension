@@ -391,10 +391,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
                   for (int i = 0; i < generatorsList.length; i++) {
                     for (int j = 0; j < _detectedFields.length; j++) {
-                      if (generatorsList[i].checkNamespace(
-                            _detectedFields[j]["generator"],
-                          ) !=
-                          '') {
+                      if (generatorsList[i].checkNamespaceBool(
+                        _detectedFields[j]["generator"],
+                      )) {
                         setState(() {
                           selectedItems[i] = true;
                           generatorsList[i].isChecked = true;

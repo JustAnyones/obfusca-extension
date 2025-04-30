@@ -19,6 +19,13 @@ class Generators {
     return '';
   }
 
+  bool checkNamespaceBool(String namespace) {
+    if (this.namespace == namespace) {
+      return true;
+    }
+    return false;
+  }
+
   void generate() {}
 
   String getValue() {
