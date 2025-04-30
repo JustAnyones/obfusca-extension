@@ -31,7 +31,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<double> surNamesFreq;
   late List<String> cities;
   late List<List<double>> boundingBoxes;
-  final List<bool> selectedItems = List.filled(10, false);
+  final List<bool> selectedItems = List.filled(11, false);
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -54,6 +54,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       Generatorpostal(SettingProvider.getInstance().region),
       GeneratorSex(SettingProvider.getInstance().region),
       GeneratorPassword(),
+      GeneratorEmail(),
     ];
     _loadSavedValues();
     for (Generators generator in generatorsList) {
@@ -259,7 +260,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           onTap: () {
                             setState(() {
                               selectedItems[index] = !selectedItems[index];
-                              _saveCurrentValues(); // Save when selection changes
+                              _saveCurrentValues();
                             });
                           },
                         );
@@ -276,19 +277,56 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 return Row(
                   children: [
                     Expanded(
-                      child: CheckboxListTile(
-                        title: TextField(
-                          controller:
-                              field['controller'] as TextEditingController?,
-                          decoration: InputDecoration(
-                            labelText: field['label'] as String?,
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        value: field['isChecked'] as bool?,
-                        onChanged: field['onChanged'] as ValueChanged<bool?>?,
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
+                      child:
+                          field['generator'] is GeneratorEmail
+                              ? DropdownButtonFormField<String>(
+                                value:
+                                    (field['controller']
+                                            as TextEditingController?)
+                                        ?.text,
+                                decoration: InputDecoration(
+                                  labelText: field['label'] as String?,
+                                  border: OutlineInputBorder(),
+                                ),
+                                isExpanded: true,
+                                items:
+                                    (field['generator'] as GeneratorEmail)
+                                        .getEmails()
+                                        .map(
+                                          (email) => DropdownMenuItem<String>(
+                                            value: email,
+                                            child: Text(
+                                              email,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    (field['controller']
+                                            as TextEditingController?)
+                                        ?.text = value ?? '';
+                                  });
+                                },
+                              )
+                              : CheckboxListTile(
+                                title: TextField(
+                                  controller:
+                                      field['controller']
+                                          as TextEditingController?,
+                                  decoration: InputDecoration(
+                                    labelText: field['label'] as String?,
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                value: field['isChecked'] as bool?,
+                                onChanged:
+                                    field['onChanged'] as ValueChanged<bool?>?,
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                              ),
                     ),
                     IconButton(
                       onPressed: () {

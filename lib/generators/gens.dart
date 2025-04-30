@@ -8,4 +8,5 @@ export 'GeneratorSurName.dart';
 export 'GeneratorPostal.dart';
 export 'GeneratorSex.dart';
 export 'GeneratorPassword.dart';
+export 'GeneratorEmail.dart';
 export 'generators.dart';
