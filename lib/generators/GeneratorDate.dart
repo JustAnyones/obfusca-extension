@@ -4,18 +4,45 @@ import 'dart:math';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Generatordate extends Generators {
-  DateTime dateTime = DateTime.now();
+  DateTime dateTime = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
 
-  Generatordate(BuildContext context, localization, String namespace)
-    : super(
-        AppLocalizations.of(context)!.generator_date_of_birth,
-        "namespace::birth_date_generator",
-      );
+  Generatordate() : super("namespace::birth_date_generator");
 
   @override
   void generate() {
-    this.dateTime = getRandomDateTime();
-    controller.text = this.dateTime.toString();
+    controller.text = getRandomDateTime().toIso8601String().split('T')[0];
+  }
+
+  @override
+  String checkNamespace(String namespace) {
+    if (this.namespace == namespace) {
+      return controller.text;
+    } else if (namespace == "namespace::birth_day_generator") {
+      return controller.text.split("-")[2];
+    } else if (namespace == "namespace::birth_month_generator") {
+      return controller.text.split("-")[1];
+    } else if (namespace == "namespace::birth_year_generator") {
+      return controller.text.split("-")[0];
+    }
+    return '';
+  }
+
+  @override
+  bool checkNamespaceBool(String namespace) {
+    if (this.namespace == namespace) {
+      return true;
+    } else if (namespace == "namespace::birth_day_generator") {
+      return true;
+    } else if (namespace == "namespace::birth_month_generator") {
+      return true;
+    } else if (namespace == "namespace::birth_year_generator") {
+      return true;
+    }
+    return false;
   }
 
   static DateTime getRandomDateTime() {
@@ -25,5 +52,10 @@ class Generatordate extends Generators {
     int day = _random.nextInt(DateTime(year, month + 1, 0).day) + 1;
 
     return DateTime(year, month, day);
+  }
+
+  @override
+  void setLocalization(BuildContext context) {
+    localization = AppLocalizations.of(context)!.generator_date_of_birth;
   }
 }

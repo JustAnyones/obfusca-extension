@@ -5,20 +5,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GeneratorSurName extends Generators {
   String surName = '';
-  List<String> surNames;
-  List<double> surNameWeights;
-  BuildContext context;
+  List<String> surNames = [];
+  List<double> surNameWeights = [];
 
-  GeneratorSurName(
-    this.surNames,
-    this.surNameWeights,
-    this.context,
-    localization,
-    String namespace,
-  ) : super(
-        AppLocalizations.of(context)!.generator_surname_name,
-        "namespace::lastname_generator",
-      );
+  GeneratorSurName() : super("namespace::lastname_generator");
+
+  void setSurnames(List<String> surNames, List<double> surNameWeights) {
+    this.surNameWeights = surNameWeights;
+    this.surNames = surNames;
+  }
 
   @override
   void generate() {
@@ -43,5 +38,10 @@ class GeneratorSurName extends Generators {
     }
 
     return items.last;
+  }
+
+  @override
+  void setLocalization(BuildContext context) {
+    localization = AppLocalizations.of(context)!.generator_surname_name;
   }
 }

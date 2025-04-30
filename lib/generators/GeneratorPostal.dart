@@ -5,13 +5,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class Generatoraddress extends Generators {
+class Generatorpostal extends Generators {
   String City = '';
-  String address = '';
+  String postal = '';
   List<String> BoundingBox = [];
   final Random _random = Random();
 
-  Generatoraddress(String short) : super("nera") {
+  Generatorpostal(String short) : super("nera") {
     setDefault(short);
   }
 
@@ -36,7 +36,7 @@ class Generatoraddress extends Generators {
 
   @override
   void setLocalization(BuildContext context) {
-    localization = AppLocalizations.of(context)!.generator_street;
+    localization = AppLocalizations.of(context)!.generator_postal_code;
   }
 
   @override
@@ -58,8 +58,8 @@ class Generatoraddress extends Generators {
       };
       info = await getInfo(coords);
     }
-    address = '${info['road']} ${info['house_number']}';
-    controller.text = address;
+    postal = info['postcode'];
+    controller.text = postal;
   }
 
   Future<Map<String, dynamic>> getRandomCoords(String city) async {

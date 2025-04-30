@@ -5,25 +5,20 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GeneratorName extends Generators {
   String name = '';
-  List<String> names;
-  List<double> nameWeights;
-  BuildContext context;
+  List<String> names = [];
+  List<double> nameWeights = [];
 
-  GeneratorName(
-    this.names,
-    this.nameWeights,
-    this.context,
-    localization,
-    String namespace,
-  ) : super(
-        AppLocalizations.of(context)!.generator_name_name,
-        "namespace::firstname_generator",
-      );
+  GeneratorName() : super("namespace::firstname_generator");
 
   @override
   void generate() {
     this.name = _weightedRandomChoice(names, nameWeights);
     controller.text = this.name;
+  }
+
+  void setNames(List<String> names, List<double> nameWeights) {
+    this.nameWeights = nameWeights;
+    this.names = names;
   }
 
   static String _weightedRandomChoice(
@@ -43,5 +38,10 @@ class GeneratorName extends Generators {
     }
 
     return items.last;
+  }
+
+  @override
+  void setLocalization(BuildContext context) {
+    localization = AppLocalizations.of(context)!.generator_name_name;
   }
 }

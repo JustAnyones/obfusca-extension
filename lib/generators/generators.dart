@@ -3,12 +3,23 @@ import 'package:flutter/material.dart';
 class Generators {
   bool isChecked = false;
   final TextEditingController controller = TextEditingController();
-  final localization;
+  String localization = "";
   String namespace;
 
-  Generators(this.localization, this.namespace);
+  Generators(this.namespace);
 
-  bool checkNamespace(String namespace) {
+  String checkNamespace(String namespace) {
+    print("Checking namespace: $namespace vs ${this.namespace}");
+    if (this.namespace == namespace) {
+      print(
+        "Namespace matched: $namespace = ${this.namespace}, returning value: ${controller.text}",
+      );
+      return controller.text;
+    }
+    return '';
+  }
+
+  bool checkNamespaceBool(String namespace) {
     if (this.namespace == namespace) {
       return true;
     }
@@ -20,4 +31,6 @@ class Generators {
   String getValue() {
     return controller.text;
   }
+
+  void setLocalization(BuildContext context) {}
 }
