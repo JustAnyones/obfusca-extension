@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:browser_extension/providers/settings.dart';
+import 'package:browser_extension/providers/user.dart';
 import 'package:browser_extension/utils/generation.dart';
 import 'package:browser_extension/generators/gens.dart';
 import 'package:browser_extension/utils/read_csv.dart';
@@ -467,6 +468,20 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 },
                 child: Text(AppLocalizations.of(context)!.button_view_entries),
               ),
+
+              ElevatedButton(
+                onPressed: () async {
+                  if (UserProvider.getInstance().isLoggedIn) {
+                    await navigateToPageRoute('/profile');
+                  } else {
+                    Navigator.pushNamed(context, '/login');
+                  }
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.user_profile_page_title,
+                ),
+              ),
+              SizedBox(height: 16),
             ],
           ),
         ),

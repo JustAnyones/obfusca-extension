@@ -455,6 +455,8 @@ function detectFields(data) {
     // Otherwise, if there is no override, detect automatically
 
     const entry = data[window.location.hostname]
-    if (entry === undefined) return detectAutomatically()
-    return detectFromPredefined(entry)
+    if (entry !== undefined) {
+        console.log("Found override entry for", window.location.hostname, entry, "that will be ignored")
+    }
+    return detectAutomatically()
 }
