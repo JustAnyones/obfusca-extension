@@ -28,6 +28,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<String> surNames;
   late List<double> surNamesFreq;
   late List<String> cities;
+  late List<List<double>> boundingBoxes;
   final List<bool> selectedItems = List.filled(8, false);
 
   int _frameId = -1;
@@ -80,7 +81,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       nameFreq = result.$2;
       surNames = result2.$1;
       surNamesFreq = result2.$2;
-      cities = result3;
+      cities = result3.$1;
+      boundingBoxes = result3.$2;
     });
   }
 
@@ -155,13 +157,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     (generatorsList[0] as GeneratorName).setNames(names, nameFreq);
     (generatorsList[1] as GeneratorSurName).setSurnames(surNames, surNamesFreq);
     (generatorsList[5] as Generatorcity).setCities(cities);
+    (generatorsList[5] as Generatorcity).setBoundingBoxes(boundingBoxes);
 
     for (Generators generator in generatorsList) {
       generator.generate();
       if (generator is Generatorcity) {
-        final city = generator.city;
-        (generatorsList[6] as Generatoraddress).setCity(city);
-        (generatorsList[7] as Generatorpostal).setCity(city);
+        final city = generator.boundingBox;
+        (generatorsList[6] as Generatoraddress).setBoundingBox(city);
+        (generatorsList[7] as Generatorpostal).setBoundingBox(city);
       }
     }
 
@@ -282,9 +285,12 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                         final generator = field['generator'] as Generators;
                         generator.generate();
                         if (generator is Generatorcity) {
-                          final city = generator.city;
-                          (generatorsList[6] as Generatoraddress).setCity(city);
-                          (generatorsList[7] as Generatorpostal).setCity(city);
+                          final city = generator.boundingBox;
+                          (generatorsList[6] as Generatoraddress)
+                              .setBoundingBox(city);
+                          (generatorsList[7] as Generatorpostal).setBoundingBox(
+                            city,
+                          );
                         }
                       },
                       child: Image.asset(

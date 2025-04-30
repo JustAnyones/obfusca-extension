@@ -6,6 +6,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class Generatorcity extends Generators {
   String city = '';
   List<String> Cities = [];
+  List<List<double>> boundingBoxes = [];
+  List<String> boundingBox = [];
 
   Generatorcity() : super("nera");
 
@@ -13,11 +15,22 @@ class Generatorcity extends Generators {
     Cities = cities;
   }
 
+  void setBoundingBoxes(List<List<double>> boundingBoxes) {
+    this.boundingBoxes = boundingBoxes;
+  }
+
   @override
   void generate() {
     if (isChecked) {
       Random _random = Random();
-      this.city = Cities[_random.nextInt(19)];
+      int num = _random.nextInt(19);
+      this.city = Cities[num];
+      boundingBox = [
+        boundingBoxes[num][0].toString(),
+        boundingBoxes[num][1].toString(),
+        boundingBoxes[num][2].toString(),
+        boundingBoxes[num][3].toString(),
+      ];
       controller.text = this.city;
     }
   }
