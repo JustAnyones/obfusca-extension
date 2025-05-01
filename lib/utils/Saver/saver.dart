@@ -39,7 +39,6 @@ class Saver {
     final String json = jsonEncode(newSave);
     var entries = _prefs!.getStringList('entries') ?? [];
     entries.add(json);
-    print(entries);
     await _prefs!.setStringList('entries', entries);
   }
 
@@ -78,7 +77,6 @@ class Saver {
       if (i != entries.length - 1) save += ',';
     }
     save += ']';
-    print(save);
     String mainKey = "";
     mainKey += input_key;
     if (mainKey.length < 32) {
@@ -110,7 +108,6 @@ class Saver {
     );
     if (result != null) {
       PlatformFile file = result.files.first;
-      print(file);
       return file;
     }
     return result!.files.first;
@@ -131,22 +128,16 @@ class Saver {
         mainKey = mainKey + _keyExtension;
       }
       final key = Key.fromUtf8(mainKey.substring(0, 32));
-      print(key.base64);
       final iv = IV.fromBase64(
         key.base64.substring(0, 8) + _keyExtension.substring(8, 16),
       );
-      print(iv.base64);
 
       final encrypter = Encrypter(AES(key));
-      print(dataCypher);
       Encrypted encrypt = Encrypted.from64(dataCypher);
-      print("break");
-      print(encrypt.base64);
       dataString = encrypter.decrypt(encrypt, iv: iv);
     } else {
       dataString = String.fromCharCodes(file.bytes!);
     }
-    print(dataString);
     var data = jsonDecode(dataString);
     if (data[0]['name'] == null &&
         data[0]['surname'] == null &&
@@ -158,7 +149,6 @@ class Saver {
         data[0]['date'] == null &&
         data[0]['postal'] == null &&
         data[0]['username'] == null) {
-      print('bad');
       return "BadFile";
     }
     List<String> entries = [];
@@ -167,8 +157,8 @@ class Saver {
         'name': data[i]['name'],
         'surname': data[i]['surname'],
         'favicon': data[i]['favicon'],
-        'domain': data[i]['surname'],
-        'address': data[i]['surname'],
+        'domain': data[i]['domain'],
+        'address': data[i]['address'],
         'city': data[i]['city'],
         'country': data[i]['country'],
         'date': data[i]['date'],
@@ -176,9 +166,7 @@ class Saver {
         'username': data[i]['username'],
       };
       final String json = jsonEncode(entry);
-      entries.add(json);
     }
-    print(entries);
     await _prefs!.setStringList('entries', entries);
     return "Saved";
   }

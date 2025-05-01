@@ -175,8 +175,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 bool encrypted = false;
                 PlatformFile file = await Saver.encryptedImportCheck();
                 String dataString = String.fromCharCodes(file.bytes!);
-                print('break');
-                print(file);
                 if (file == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -188,7 +186,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   return;
                 }
                 if (dataString.substring(0, 4) == 'obfu') {
-                  print("check");
                   encrypted = true;
                   await _displayTextInputDialog(context);
                 }

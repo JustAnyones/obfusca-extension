@@ -28,7 +28,7 @@ class _EntryPageState extends State<EntryPage> {
     List<String> keys = entry.keys.toList();
     for (var key in keys) {
       if (key == 'favicon') continue;
-      if (entry[key] != '' && entry[key] != 'null') {
+      if (entry[key] != '' && entry[key] != null) {
         params.add(Text("$key:\t${entry[key]}"));
         params.add(SizedBox(height: 16));
       }
