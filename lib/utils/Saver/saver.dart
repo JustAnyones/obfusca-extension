@@ -1,10 +1,12 @@
 import "dart:convert";
-import "package:flutter/foundation.dart";
+import "package:flutter/foundation.dart" hide Key;
 import 'package:file_picker/file_picker.dart';
 import "package:shared_preferences/shared_preferences.dart";
+import 'package:encrypt/encrypt.dart';
 
 class Saver {
   static SharedPreferences? _prefs;
+  static String _keyExtension = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 
   static Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
@@ -61,60 +63,123 @@ class Saver {
     Uint8List bytes = new Uint8List.fromList(save.codeUnits);
     FilePicker? platform;
     platform = FilePicker.platform;
-    String? outputFile = await platform.saveFile(
+    await platform.saveFile(
       dialogTitle: 'SaveFile',
       fileName: 'entries.json',
       bytes: bytes,
     );
-    print(outputFile);
   }
 
-  static Future<String> importEntries() async {
+  static Future<void> exportEncrypted(String input_key) async {
+    List<String> entries = _prefs!.getStringList('entries')!;
+    String save = '[';
+    for (int i = 0; i < entries.length; i++) {
+      save += entries[i];
+      if (i != entries.length - 1) save += ',';
+    }
+    save += ']';
+    print(save);
+    String mainKey = "";
+    mainKey += input_key;
+    if (mainKey.length < 32) {
+      mainKey = mainKey + _keyExtension;
+    }
+    final key = Key.fromUtf8(mainKey.substring(0, 32));
+    final iv = IV.fromBase64(
+      key.base64.substring(0, 8) + _keyExtension.substring(8, 16),
+    );
+    final encrypter = Encrypter(AES(key));
+    final cypherText = encrypter.encrypt(save, iv: iv);
+    String export = 'obfu' + cypherText.base64;
+    Uint8List bytes = new Uint8List.fromList(export.codeUnits);
+    FilePicker? platform;
+    platform = FilePicker.platform;
+    await platform.saveFile(
+      dialogTitle: 'SaveFile',
+      fileName: 'entries.obfu',
+      bytes: bytes,
+    );
+  }
+
+  static Future<PlatformFile> encryptedImportCheck() async {
     FilePicker? platform;
     platform = FilePicker.platform;
     FilePickerResult? result = await platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['json'],
+      allowedExtensions: ['json', 'obfu'],
     );
     if (result != null) {
       PlatformFile file = result.files.first;
-      String dataString = String.fromCharCodes(file.bytes!);
-      var data = jsonDecode(dataString);
-      if (data[0]['name'] == null ||
-          data[0]['surname'] == null ||
-          data[0]['favicon'] == null ||
-          data[0]['domain'] == null ||
-          data[0]['address'] == null ||
-          data[0]['city'] == null ||
-          data[0]['country'] == null ||
-          data[0]['date'] == null ||
-          data[0]['postal'] == null ||
-          data[0]['username'] == null) {
-        print('bad');
-        return "BadFile";
-      }
-      List<String> entries = [];
-      for (int i = 0; i < data.length; i++) {
-        var entry = {
-          'name': data[i]['name'],
-          'surname': data[i]['surname'],
-          'favicon': data[i]['favicon'],
-          'domain': data[i]['surname'],
-          'address': data[i]['surname'],
-          'city': data[i]['city'],
-          'country': data[i]['country'],
-          'date': data[i]['date'],
-          'postal': data[i]['postal'],
-          'username': data[i]['username'],
-        };
-        final String json = jsonEncode(entry);
-        entries.add(json);
-      }
-      print(entries);
-      await _prefs!.setStringList('entries', entries);
-      return "Saved";
-    } else {
-      return "NoFile";
+      print(file);
+      return file;
     }
+    return result!.files.first;
+  }
+
+  static Future<String> importEntries(
+    PlatformFile file,
+    bool encrypted,
+    String? input_key,
+  ) async {
+    print('Start');
+    String dataString;
+    if (encrypted == true) {
+      String dataCypher = String.fromCharCodes(file.bytes!).substring(4);
+      String mainKey = "";
+      mainKey += input_key!;
+      if (mainKey.length < 32) {
+        mainKey = mainKey + _keyExtension;
+      }
+      final key = Key.fromUtf8(mainKey.substring(0, 32));
+      print(key.base64);
+      final iv = IV.fromBase64(
+        key.base64.substring(0, 8) + _keyExtension.substring(8, 16),
+      );
+      print(iv.base64);
+
+      final encrypter = Encrypter(AES(key));
+      print(dataCypher);
+      Encrypted encrypt = Encrypted.from64(dataCypher);
+      print("break");
+      print(encrypt.base64);
+      dataString = encrypter.decrypt(encrypt, iv: iv);
+    } else {
+      dataString = String.fromCharCodes(file.bytes!);
+    }
+    print(dataString);
+    var data = jsonDecode(dataString);
+    if (data[0]['name'] == null &&
+        data[0]['surname'] == null &&
+        data[0]['favicon'] == null &&
+        data[0]['domain'] == null &&
+        data[0]['address'] == null &&
+        data[0]['city'] == null &&
+        data[0]['country'] == null &&
+        data[0]['date'] == null &&
+        data[0]['postal'] == null &&
+        data[0]['username'] == null) {
+      print('bad');
+      return "BadFile";
+    }
+    List<String> entries = [];
+    for (int i = 0; i < data.length; i++) {
+      var entry = {
+        'name': data[i]['name'],
+        'surname': data[i]['surname'],
+        'favicon': data[i]['favicon'],
+        'domain': data[i]['surname'],
+        'address': data[i]['surname'],
+        'city': data[i]['city'],
+        'country': data[i]['country'],
+        'date': data[i]['date'],
+        'postal': data[i]['postal'],
+        'username': data[i]['username'],
+      };
+      final String json = jsonEncode(entry);
+      entries.add(json);
+    }
+    print(entries);
+    await _prefs!.setStringList('entries', entries);
+    return "Saved";
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:file_picker/file_picker.dart';
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 
@@ -14,6 +14,9 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   String? _selectedLanguage;
   String? _selectedRegion;
+  bool? _encrypt = false;
+  final TextEditingController _keyController = TextEditingController();
+  String? _key;
 
   @override
   void initState() {
@@ -33,6 +36,32 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _saveSettings() async {
     await SettingProvider.getInstance().setLocale(_selectedLanguage!);
     await SettingProvider.getInstance().setRegion(_selectedRegion!);
+  }
+
+  Future<void> _displayTextInputDialog(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("input password"),
+          content: TextField(
+            controller: _keyController,
+            decoration: InputDecoration(hintText: "password"),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _key = _keyController.text;
+                  Navigator.pop(context);
+                });
+              },
+              child: Text("Ok"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -112,9 +141,27 @@ class _SettingsPageState extends State<SettingsPage> {
 
             SizedBox(height: 16),
 
+            CheckboxListTile(
+              title: Text("Encryption"),
+              value: _encrypt,
+              onChanged: (bool? newValue) {
+                setState(() {
+                  _encrypt = newValue;
+                });
+              },
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+
+            SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () async {
-                await Saver.writeEntries();
+                if (_encrypt == true) {
+                  await _displayTextInputDialog(context);
+                  await Saver.exportEncrypted(_key!);
+                } else {
+                  await Saver.writeEntries();
+                }
               },
               child: Text(AppLocalizations.of(context)!.button_export_entries),
             ),
@@ -123,20 +170,32 @@ class _SettingsPageState extends State<SettingsPage> {
 
             ElevatedButton(
               onPressed: () async {
-                String res = await Saver.importEntries();
+                bool encrypted = false;
+                PlatformFile file = await Saver.encryptedImportCheck();
+                String dataString = String.fromCharCodes(file.bytes!);
+                print('break');
+                print(file);
+                if (file == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.import_no_file,
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                if (dataString.substring(0, 4) == 'obfu') {
+                  print("check");
+                  encrypted = true;
+                  await _displayTextInputDialog(context);
+                }
+                String res = await Saver.importEntries(file, encrypted, _key);
                 if (res == "BadFile") {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
                         AppLocalizations.of(context)!.import_bad_file,
-                      ),
-                    ),
-                  );
-                } else if (res == "NoFile") {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        AppLocalizations.of(context)!.import_no_file,
                       ),
                     ),
                   );
