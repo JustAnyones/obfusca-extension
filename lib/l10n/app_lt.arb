@@ -32,6 +32,9 @@
     "entry_details": "Įrašo detalės",
     "button_entry_details": "Detaliau",
     "button_clear_entries": "Ištrinti įrašus",
+    "input_password": "Input encryption password",
+    "hint_password": "Password",
+    "button_submit_password": "Ok",
 
     "settings_title": "Nustatymai",
     "setting_locale_title": "Kalba",
