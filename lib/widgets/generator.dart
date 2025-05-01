@@ -1,3 +1,4 @@
+import 'package:browser_extension/generators/GeneratorSex.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -30,7 +31,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<double> surNamesFreq;
   late List<String> cities;
   late List<List<double>> boundingBoxes;
-  final List<bool> selectedItems = List.filled(8, false);
+  final List<bool> selectedItems = List.filled(11, false);
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -41,7 +42,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   void initState() {
     super.initState();
     SettingProvider.getInstance().addListener(_loadCSVData);
-    _loadCSVData(); // Load data asynchronously
+    _loadCSVData();
     generatorsList = [
       GeneratorName(),
       GeneratorSurName(),
@@ -51,6 +52,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       Generatorcity(),
       Generatoraddress(SettingProvider.getInstance().region),
       Generatorpostal(SettingProvider.getInstance().region),
+      GeneratorSex(SettingProvider.getInstance().region),
+      GeneratorPassword(),
+      GeneratorEmail(),
     ];
     _loadSavedValues();
     for (Generators generator in generatorsList) {
@@ -163,6 +167,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     for (Generators generator in generatorsList) {
       if (generator.isChecked) {
         generator.generate();
+        if (generator is GeneratorName) {
+          final name = generator.name.trim();
+          (generatorsList[8] as GeneratorSex).name = name;
+        }
         if (generator is Generatorcity) {
           final city = generator.boundingBox;
           (generatorsList[6] as Generatoraddress).setBoundingBox(city);
@@ -252,7 +260,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           onTap: () {
                             setState(() {
                               selectedItems[index] = !selectedItems[index];
-                              _saveCurrentValues(); // Save when selection changes
+                              _saveCurrentValues();
                             });
                           },
                         );
@@ -269,19 +277,56 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 return Row(
                   children: [
                     Expanded(
-                      child: CheckboxListTile(
-                        title: TextField(
-                          controller:
-                              field['controller'] as TextEditingController?,
-                          decoration: InputDecoration(
-                            labelText: field['label'] as String?,
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        value: field['isChecked'] as bool?,
-                        onChanged: field['onChanged'] as ValueChanged<bool?>?,
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
+                      child:
+                          field['generator'] is GeneratorEmail
+                              ? DropdownButtonFormField<String>(
+                                value:
+                                    (field['controller']
+                                            as TextEditingController?)
+                                        ?.text,
+                                decoration: InputDecoration(
+                                  labelText: field['label'] as String?,
+                                  border: OutlineInputBorder(),
+                                ),
+                                isExpanded: true,
+                                items:
+                                    (field['generator'] as GeneratorEmail)
+                                        .getEmails()
+                                        .map(
+                                          (email) => DropdownMenuItem<String>(
+                                            value: email,
+                                            child: Text(
+                                              email,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    (field['controller']
+                                            as TextEditingController?)
+                                        ?.text = value ?? '';
+                                  });
+                                },
+                              )
+                              : CheckboxListTile(
+                                title: TextField(
+                                  controller:
+                                      field['controller']
+                                          as TextEditingController?,
+                                  decoration: InputDecoration(
+                                    labelText: field['label'] as String?,
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                value: field['isChecked'] as bool?,
+                                onChanged:
+                                    field['onChanged'] as ValueChanged<bool?>?,
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                              ),
                     ),
                     IconButton(
                       onPressed: () {
@@ -294,6 +339,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           (generatorsList[7] as Generatorpostal).setBoundingBox(
                             city,
                           );
+                        }
+                        if (generator is GeneratorName) {
+                          final name = generator.name.trim();
+                          (generatorsList[8] as GeneratorSex).name = name;
                         }
                       },
                       icon: Icon(Icons.casino, size: 24),
