@@ -33,6 +33,9 @@
   "entry_details": "Entry details",
   "button_entry_details": "Details",
   "button_clear_entries": "Clear entries",
+  "input_password": "Input encryption password",
+  "hint_password": "Password",
+  "button_submit_password": "Ok",
 
   "settings_title": "Settings",
   "@settings_title": {

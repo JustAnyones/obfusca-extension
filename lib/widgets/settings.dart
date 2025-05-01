@@ -43,10 +43,12 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("input password"),
+          title: Text(AppLocalizations.of(context)!.input_password),
           content: TextField(
             controller: _keyController,
-            decoration: InputDecoration(hintText: "password"),
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.hint_password,
+            ),
           ),
           actions: <Widget>[
             ElevatedButton(
@@ -56,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Navigator.pop(context);
                 });
               },
-              child: Text("Ok"),
+              child: Text(AppLocalizations.of(context)!.button_submit_password),
             ),
           ],
         );
