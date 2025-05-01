@@ -159,6 +159,7 @@ const Generators = {
     USERNAME: new Generator("namespace::username_generator"),
     FIRSTNAME: new Generator("namespace::firstname_generator"),
     LASTNAME: new Generator("namespace::lastname_generator"),
+    FULLNAME: new Generator("namespace::fullname_generator"),
     EMAIL: new Generator("namespace::email_generator"),
     PASSWORD: new Generator("namespace::password_generator"),
 
@@ -276,6 +277,23 @@ const ignoredDetectors = [
  * @type {((field: ParseableElement) => Generator[] | Generator | undefined)[]}
  */
 const heuristicDetectors = [
+
+    // Email or phone
+    // Specifically found on Instagram
+    (field) => {
+        if (RegExp(/emailOrPhone/, "i").test(field.name)) {
+            return [Generators.EMAIL, Generators.TEL]
+        }
+    },
+
+    // Full name
+    // Specifically found on Instagram
+    (field) => {
+        if (RegExp(/fullName/, "i").test(field.name)) {
+            return [Generators.FULLNAME]
+        }
+    },
+
     // First name
     (field) => {
         if (RegExp(/firstname/, "i").test(field.name)) {
@@ -352,20 +370,22 @@ const heuristicDetectors = [
  */
 function determineFieldData(field) {
     const autocomplete = field.getAttribute("autocomplete")
+
+    let foundGenerators = [];
     if (autocomplete !== null && autocomplete !== "off") {
         console.log("Determining from autocomplete")
         const val = autocomplete_bindings[autocomplete]
         if (val === undefined) {
             console.warn("No autocomplete binding for", autocomplete)
         } else {
-            return val
+            foundGenerators.push(val)
         }
     }
 
     // Explicitly ignore some fields
     for (const detector of ignoredDetectors) {
         if (detector(field)) {
-            return
+            return undefined
         }
     }
 
@@ -373,8 +393,19 @@ function determineFieldData(field) {
     for (const detector of heuristicDetectors) {
         const result = detector(field)
         if (result !== undefined) {
-            return result
+            if (Array.isArray(result)) {
+                // put all the values in front of the array
+                foundGenerators.unshift(...result)
+            } else {
+                // put it in front of the array
+                foundGenerators.unshift(result)
+            }
+            return foundGenerators
         }
+    }
+
+    if (foundGenerators.length > 0) {
+        return foundGenerators
     }
 
     console.warn("Could not determine field data for", field)
