@@ -99,26 +99,17 @@ class _EmailListPageState extends State<EmailListPage> {
   }
 
   Future<void> viewMessage(SlimEmailData message) async {
-    /*ivar cachedMessage = UserProvider.getInstance().getMessageForEmailAddress(
+    var cachedMessage = UserProvider.getInstance().getMessageForEmailAddress(
       _emailAddress,
       message.uid,
     );
-    if (cachedMessage == null) {
-      setState(() {
-        _generalError = "Could not find email in cache";
-      });
-      return;
-    }
-
-    f (cachedMessage is EmailData) {
-      print("Cached message found");
-      Navigator.pushNamed(
-        context,
-        '/email/view',
-        arguments: {'email': cachedMessage},
+    if (cachedMessage != null) {
+      cachedMessage.read = true;
+      await UserProvider.getInstance().setMessageForEmailAddress(
+        _emailAddress,
+        cachedMessage,
       );
-      return;
-    }*/
+    }
 
     var (fetchedEmail, err) = await ObfuscaAPI.getUserEmail(
       UserProvider.getInstance().userToken!,
@@ -197,7 +188,6 @@ class _EmailListPageState extends State<EmailListPage> {
                         ),
                         Container(
                           padding: EdgeInsets.all(4),
-                          width: 180,
                           child: Text(
                             "${email.from.name}\n(${email.from.address})",
                           ),
