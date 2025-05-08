@@ -545,41 +545,18 @@ function detectAutomatically(overrideEntry) {
             if (!Array.isArray(generators)) {
                 fields.push(registerField(field, [generators]))
             } else {
-                fields.push(registerField(field, generators))
+                // Deduplicate the generators
+                const uniqueByName = [
+                    ...new Map(
+                        generators.map(item => [item.name, item])
+                    ).values()
+                ];
+                fields.push(registerField(field, uniqueByName))
             }
         }
     }
     return fields;
 }
-
-/**
- * Detects fields that can be filled in the current frame from a list of predetermined fields.
- * @param {*} entry 
- * @returns {Field[]} A list of fields that can be filled.
- */
-function detectFromPredefined(entry) {
-    console.log("Running on", document, window.location.href)
-
-    let fields = []
-    for (const form of entry["forms"]) {
-        console.log(form);
-
-        if (!isForm(form, window.location.href)) {
-            continue;   
-        }
-        console.log("Matched via", form["match"])
-
-        for (const field of form["fields"]) {
-            const element = document.querySelector(field["selector"])
-            console.log("Query", field["selector"], element)
-            if (element !== null) {
-                fields.push(registerField(element, field["generator"]))
-            }
-        }
-    }
-    return fields;
-}
-
 
 /**
  * Detects fields that can be filled in the current frame.
