@@ -3,6 +3,23 @@
 
 // TODO: research https://gist.github.com/ErosLever/51c794dc1f2bab888f571e47275c85cd
 
+/**
+ * Represents a type of detector that can be used to find a field.
+ * @typedef {string} DetectorType
+ **/
+
+/**
+ * Represents supported detector types.
+ * @enum {DetectorType}
+ */
+const DETECTOR_TYPE = {
+    QUERY_SELECTOR: "querySelector",
+    URL_SELECTOR: "urlSelector",
+}
+
+/**
+ * Represents a generator that can be used to fill a field.
+ */
 class Generator {
     /**
      * @param {string} name 
@@ -13,6 +30,7 @@ class Generator {
 }
 
 /**
+ * Stores additional information about the field.
  * @typedef {Object} FieldContext
  * @property {string} tagName
  * @property {string} type
@@ -38,14 +56,38 @@ class Generator {
  */
 
 /**
- * 
- * This data is passed to Flutter.
+ * Represents a field that can be filled in a form for Flutter backend.
  * @typedef {Object} Field
  * @property {number} ref The reference number to the field.
  * @property {Generator[]} generators A list of generators that can be used to fill the field.
  * @property {string} generator Backwards compatibility with the old format.
  * @property {Option[]} options A list of possible options for the field.
  * @property {FieldContext[]} context A list of context data for each HTML field of this field.
+ */
+
+/**
+ * This represents a detector that can be used to find a field.
+ * @typedef {Object} Detector
+ * @property {DetectorType} type The type of the detector.
+ * @property {string} value The value of the detector.
+ */
+
+/**
+ * Represents a specific field that can be overridden.
+ * This is used to override the default field detection.
+ * @typedef {Object} OverrideField
+ * @property {Detector[]} detectors The detectors to use to find the field.
+ * @property {Generator[]} generators The generators to use to fill the field.
+ */
+
+/**
+ * Represents a domain-based entry in the override list.
+ * @typedef {Object} OverrideEntry
+ * @property {OverrideField[]} fields Fields to override.
+ */
+
+/**
+ * @typedef {Object.<string, OverrideEntry>} OverrideMapping
  */
 
 /**
@@ -173,6 +215,7 @@ const Generators = {
     TEL: new Generator("namespace::tel_generator"),
 
     COUNTRY: new Generator("namespace::country_generator"),
+    POSTAL_CODE: new Generator("namespace::postal_code_generator"),
 
     UNKNOWN: new Generator("namespace::unknown_generator"),
 }
@@ -274,6 +317,10 @@ const ignoredDetectors = [
 ]
 
 /**
+ * This list is used to define which fields should be detected using heuristics.
+ * The order of the detectors is important, as the first one that matches will be used.
+ * That distinction is very important in cases such as name,
+ * where the first name and last name are both detected.
  * @type {((field: ParseableElement) => Generator[] | Generator | undefined)[]}
  */
 const heuristicDetectors = [
@@ -286,6 +333,20 @@ const heuristicDetectors = [
         }
     },
 
+    // Phone
+    (field) => {
+        if (RegExp(/phone/, "i").test(field.name)) {
+            return Generators.TEL
+        }
+    },
+
+    // Post code
+    (field) => {
+        if (RegExp(/post_code/, "i").test(field.name)) {
+            return Generators.POSTAL_CODE
+        }
+    },
+
     // Full name
     // Specifically found on Instagram
     (field) => {
@@ -294,15 +355,9 @@ const heuristicDetectors = [
         }
     },
 
-    // First name
-    (field) => {
-        if (RegExp(/firstname/, "i").test(field.name)) {
-            return Generators.FIRSTNAME
-        }
-    },
     // Last name
     (field) => {
-        if (RegExp(/lastname/, "i").test(field.name)) {
+        if (RegExp(/lastname|surname/, "i").test(field.name)) {
             return Generators.LASTNAME
         }
     },
@@ -317,6 +372,14 @@ const heuristicDetectors = [
             return Generators.USERNAME
         }
     },
+
+    // First name
+    (field) => {
+        if (RegExp(/firstname|name/, "i").test(field.name)) {
+            return Generators.FIRSTNAME
+        }
+    },
+
     // Email
     (field) => {
         if (RegExp(/email/).test(field.name)) {
@@ -364,11 +427,55 @@ const heuristicDetectors = [
 ]
 
 /**
+ * Returns the overridden field generators for a given field.
+ * It will check if the specified field matches any of the fields in the override entry.
+ * It will match the first field whose all detectors match the field.
+ * @param {ParseableElement} field A HTML element.
+ * @param {OverrideEntry} overrideEntry The override entry for the current domain.
+ * @returns {Generator[] | undefined} A list of generators that can be used to fill the field.
+ */
+function getOverriddenFieldGenerators(field, overrideEntry) {
+    for (const overrideField of overrideEntry.fields) {
+        let match = true
+        for (const detector of overrideField.detectors) {
+            if (detector.type === DETECTOR_TYPE.QUERY_SELECTOR) {
+                const element = document.querySelector(detector.value)
+                if (element !== field) {
+                    match = false
+                    break
+                }
+            } else if (detector.type === DETECTOR_TYPE.URL_SELECTOR) {
+                const urlMatch = window.location.href.match(new RegExp(detector.value, "g"))
+                if (urlMatch === null) {
+                    match = false
+                    break
+                }
+            } else {
+                console.error("Unknown detector type " + detector.type.toString())
+            }
+        }
+        if (match) {
+            return overrideField.generators
+        }
+    }
+    return undefined
+}
+
+/**
  * Detects fields that can be filled in the current frame automatically.
  * @param {ParseableElement} field A HTML element.
+ * @param {OverrideEntry?} overrideEntry The override entry for the current domain.
  * @returns {Generator[] | Generator | undefined} A list of generators that can be used to fill the field.
  */
-function determineFieldData(field) {
+function determineFieldData(field, overrideEntry) {
+    if (overrideEntry !== null) {
+        console.log("Checking for overridden field generators")
+        const generators = getOverriddenFieldGenerators(field, overrideEntry)
+        if (generators !== undefined) {
+            return generators
+        }
+    }
+
     const autocomplete = field.getAttribute("autocomplete")
 
     let foundGenerators = [];
@@ -413,9 +520,10 @@ function determineFieldData(field) {
 
 /**
  * Detects fields that can be filled in the current frame automatically.
+ * @param {OverrideEntry?} overrideEntry The override entry for the current domain.
  * @returns {Field[]} A list of fields that can be filled.
  */
-function detectAutomatically() {
+function detectAutomatically(overrideEntry) {
     /** @type {Array<ParseableElement>} */
     //const inputs = document.querySelectorAll('input, select')
     const inputs = deepQuerySelectorAll(document, 'input, select')
@@ -430,7 +538,7 @@ function detectAutomatically() {
             continue
         }
 
-        const generators = determineFieldData(field)
+        const generators = determineFieldData(field, overrideEntry)
         if (generators !== undefined) {
             if (!Array.isArray(generators)) {
                 fields.push(registerField(field, [generators]))
@@ -473,7 +581,7 @@ function detectFromPredefined(entry) {
 
 /**
  * Detects fields that can be filled in the current frame.
- * @param {*} data 
+ * @param {OverrideMapping} data 
  * @returns {Field[]} A list of fields that can be filled.
  */
 function detectFields(data) {
@@ -488,6 +596,7 @@ function detectFields(data) {
     const entry = data[window.location.hostname]
     if (entry !== undefined) {
         console.log("Found override entry for", window.location.hostname, entry, "that will be ignored")
+        return detectAutomatically(entry)
     }
-    return detectAutomatically()
+    return detectAutomatically(null)
 }
