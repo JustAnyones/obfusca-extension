@@ -1,14 +1,48 @@
 {
-    "overrides": {
-        "https://x.com/i/flow/signup": {
-            "fields": [
+    "pigu.lt": {
+        "fields": [{
+            "detectors": [
                 {
-                    "selector": "select[id='SELECTOR_1']",
-                    "generator": {
-                        "name": "namespace::birth_month_generator"
-                    }
+                    "type": "querySelector",
+                    "value": "#city_idFilter"
                 }
-            ]
-        }
+            ],
+            "generators": [{
+                "name": "namespace::city_generator"
+            }]
+        }]
+    },
+
+    "x.com": {
+        "fields": [
+            {
+                "generators": [{
+                    "name": "namespace::birth_month_generator"
+                }],
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "#SELECTOR_1"
+                }]
+            },
+            {
+                "generators": [{
+                    "name": "namespace::birth_day_generator"
+                }],
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "#SELECTOR_2"
+                }]
+            },
+            {
+                "generators": [{
+                    "name": "namespace::birth_year_generator"
+                }],
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "#SELECTOR_3"
+                }]
+            }
+        ]
+
     }
 }

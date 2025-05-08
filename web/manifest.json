@@ -1,6 +1,6 @@
 {
-    "name": "extension demo",
-    "description": "demo",
+    "name": "Obfusca",
+    "description": "A tool for obfuscating and managing your identity online.",
     "version": "1.0.0",
     "content_security_policy": {
         "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
