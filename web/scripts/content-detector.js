@@ -217,6 +217,7 @@ const Generators = {
 
     COUNTRY: new Generator("namespace::country_generator"),
     POSTAL_CODE: new Generator("namespace::postal_code_generator"),
+    CITY: new Generator("namespace::city_generator"),
 
     UNKNOWN: new Generator("namespace::unknown_generator"),
 }
@@ -240,7 +241,7 @@ const autocomplete_bindings = {
     "organization": Generators.UNKNOWN,
 
     // Address
-    "postal-code": Generators.UNKNOWN,
+    "postal-code": Generators.POSTAL_CODE,
     "street-address": Generators.UNKNOWN,
     "address-line1": Generators.UNKNOWN,
     "address-line2": Generators.UNKNOWN,
@@ -270,7 +271,7 @@ const autocomplete_bindings = {
     "language": Generators.UNKNOWN,
 
     // Birth date
-    "bday": Generators.UNKNOWN,
+    "bday": Generators.BIRTH_DATE,
     "bday-day": Generators.BIRTH_DAY,
     "bday-month": Generators.BIRTH_MONTH,
     "bday-year": Generators.BIRTH_YEAR,
@@ -361,6 +362,10 @@ const heuristicDetectors = [
         if (RegExp(/lastname|surname/, "i").test(field.name)) {
             return Generators.LASTNAME
         }
+
+        if (field instanceof HTMLInputElement && RegExp(/last name/, "i").test(field.placeholder)) {
+            return Generators.LASTNAME
+        }
     },
     // Username
     (field) => {
@@ -369,7 +374,10 @@ const heuristicDetectors = [
             return [Generators.USERNAME, Generators.EMAIL, Generators.TEL]
         }
 
-        if (field.name === "username" || RegExp(/username|user_name/, "i").test(field.name)) {
+        if (field.name === "username"
+            || RegExp(/username|user_name/, "i").test(field.name)
+            || RegExp(/username|user_name/, "i").test(field.id)
+        ) {
             return Generators.USERNAME
         }
     },
@@ -379,11 +387,19 @@ const heuristicDetectors = [
         if (RegExp(/firstname|name/, "i").test(field.name)) {
             return Generators.FIRSTNAME
         }
+
+        if (field instanceof HTMLInputElement && RegExp(/first name/, "i").test(field.placeholder)) {
+            return Generators.FIRSTNAME
+        }
     },
 
     // Email
     (field) => {
         if (RegExp(/email/).test(field.name)) {
+            return Generators.EMAIL
+        }
+
+        if (field instanceof HTMLInputElement && RegExp(/email/, "i").test(field.placeholder)) {
             return Generators.EMAIL
         }
     },
@@ -412,10 +428,27 @@ const heuristicDetectors = [
         }
     },
 
+    // Full birth date
+    (field) => {
+        if (field.type === "date"
+            && field instanceof HTMLInputElement
+            && RegExp(/birthday/, "i").test(field.placeholder)
+        ) {
+            return Generators.BIRTH_DATE
+        }
+    },
+
     // Country
     (field) => {
         if (RegExp(/countryregion/, "i").test(field.id)) {
             return Generators.COUNTRY
+        }
+    },
+
+    // City
+    (field) => {
+        if (RegExp(/city/, "i").test(field.name)) {
+            return Generators.CITY
         }
     },
 
