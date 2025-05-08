@@ -44,5 +44,74 @@
             }
         ]
 
+    },
+
+    "auth.wikimedia.org": {
+        "fields": [
+            {
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "#wpName2"
+                }],
+                "generators": [{
+                    "name": "namespace::username_generator"
+                }]
+            }
+        ]
+    },
+
+    "www.amazon.com": {
+        "fields": [{
+            "detectors": [{
+                "type": "querySelector",
+                "value": "#ap_customer_name"
+            }],
+            "generators": [{
+                "name": "namespace::fullname_generator"
+            }]
+        }]
+    },
+    "www.imdb.com": {
+        "fields": [{
+            "detectors": [{
+                "type": "querySelector",
+                "value": "#ap_customer_name"
+            }],
+            "generators": [{
+                "name": "namespace::fullname_generator"
+            }]
+        }]
+    },
+
+    "auth.fandom.com": {
+        "fields": [
+            {
+                "detectors": [{
+                    "type": "xPathSelector",
+                    "value": "//div[text()='Month']/following::input"
+                }],
+                "generators": [{
+                    "name": "namespace::birth_month_generator"
+                }]
+            },
+            {
+                "detectors": [{
+                    "type": "xPathSelector",
+                    "value": "//div[text()='Day']/following::input"
+                }],
+                "generators": [{
+                    "name": "namespace::birth_day_generator"
+                }]
+            },
+            {
+                "detectors": [{
+                    "type": "xPathSelector",
+                    "value": "//div[text()='Year']/following::input"
+                }],
+                "generators": [{
+                    "name": "namespace::birth_year_generator"
+                }]
+            }
+        ]
     }
 }
