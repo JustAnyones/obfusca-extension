@@ -15,6 +15,7 @@
 const DETECTOR_TYPE = {
     QUERY_SELECTOR: "querySelector",
     URL_SELECTOR: "urlSelector",
+    XPATH_SELECTOR: "xPathSelector",
 }
 
 /**
@@ -447,6 +448,13 @@ function getOverriddenFieldGenerators(field, overrideEntry) {
             } else if (detector.type === DETECTOR_TYPE.URL_SELECTOR) {
                 const urlMatch = window.location.href.match(new RegExp(detector.value, "g"))
                 if (urlMatch === null) {
+                    match = false
+                    break
+                }
+            } else if (detector.type === DETECTOR_TYPE.XPATH_SELECTOR) {
+                const xpath = document.evaluate(detector.value, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+                const element = xpath.singleNodeValue
+                if (element !== field) {
                     match = false
                     break
                 }
