@@ -484,6 +484,8 @@ function determineFieldData(field, overrideEntry) {
         const val = autocomplete_bindings[autocomplete]
         if (val === undefined) {
             console.warn("No autocomplete binding for", autocomplete)
+        } else if (Array.isArray(val)) {
+            foundGenerators.push(...val)
         } else {
             foundGenerators.push(val)
         }
