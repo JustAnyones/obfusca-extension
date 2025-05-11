@@ -109,3 +109,37 @@ async function closeCurrentTab() {
 	const tab = tabs[0];
 	chrome.tabs.remove(tab.id);
 }
+
+async function authorize(){
+	const redirectUrl = chrome.identity.getRedirectURL();
+	console.log(redirectUrl);
+	//console.log(redirectUrl);
+	//console.log(encodeURIComponent(redirectUrl));
+	const clientId = "344005524114-elaat47rrc75hh1h1tt5qmn22i4e661u.apps.googleusercontent.com";
+	const scopes = ["https://www.googleapis.com/auth/drive.file"];
+	let authURL = "https://accounts.google.com/o/oauth2/auth";
+	authURL += `?client_id=${clientId}`;
+	authURL += `&response_type=token`;
+	authURL += `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+	authURL += `&scope=${encodeURIComponent(scopes.join(" "))}`;
+	//console.log(authURL);
+	return chrome.identity.launchWebAuthFlow({interactive: true, url: authURL});
+}
+
+async function validate(redirectURL){
+	var access_token = redirectURL.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
+	return access_token;
+}
+
+async function getToken() {
+	const url = await authorize();
+	const access = await validate(url);
+	console.log(access);
+	chrome.storage.session.set({'access_token': access});
+	return access;
+}
+
+async function logout(){
+	const token = await chrome.storage.session.get('access_token');
+	var url = `https://accounts.google.com/o/oauth2/revoke?token=${token}`;
+}

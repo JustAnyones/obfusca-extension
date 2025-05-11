@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
+import 'package:browser_extension/web/interop.dart';
+import 'package:http/http.dart' as http;
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -17,6 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool? _encrypt = false;
   final TextEditingController _keyController = TextEditingController();
   String? _key;
+  String? _access_token;
 
   @override
   void initState() {
@@ -218,6 +224,53 @@ class _SettingsPageState extends State<SettingsPage> {
                 Saver.clear();
               },
               child: Text(AppLocalizations.of(context)!.button_clear_entries),
+            ),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () async {
+                _access_token = await getToken();
+                //await _handleSignIn();
+              },
+              child: Text("Google log in"),
+            ),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () async {
+                await logout();
+              },
+              child: Text("Google logout"),
+            ),
+
+            SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: () async {
+                List<String> entries = Saver.readInfo()!;
+                String save = '[';
+                for (int i = 0; i < entries.length; i++) {
+                  save += entries[i];
+                  if (i != entries.length - 1) save += ',';
+                }
+                save += ']';
+                int bytesCount = utf8.encode(save).length;
+                final response = await http.post(
+                  Uri.parse(
+                    'https://www.googleapis.com/upload/drive/v3/files?uploadType=media',
+                  ),
+                  headers: {
+                    HttpHeaders.authorizationHeader: 'Bearer $_access_token',
+                    HttpHeaders.contentTypeHeader: 'application/json',
+                    HttpHeaders.contentLengthHeader: '$bytesCount',
+                  },
+                  body: save,
+                );
+                print(response.body);
+              },
+              child: Text("Google send test"),
             ),
           ],
         ),

@@ -1,7 +1,12 @@
 {
-    "name": "extension demo",
-    "description": "demo",
+    "name": "Obfusca",
+    "description": "Extension to generate fake data for registration forms",
     "version": "1.0.0",
+    "browser_specific_settings": {
+        "gecko":{
+            "id": "obfusca@obfusca.site"
+        }
+    },
     "content_security_policy": {
         "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
     },
@@ -12,8 +17,9 @@
     "options_ui": {
         "page": "settings.html"
     },
-    "permissions": ["scripting", "activeTab", "webNavigation", "tabs", "downloads"],
+    "permissions": ["scripting", "activeTab", "webNavigation", "tabs", "downloads", "identity", "storage"],
     "manifest_version": 3,
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApKtVrnJgTkh2IA1vUVoLuR3otk6ZpL9NKGd9zbnnb9NgKplvGsYqWbRfefVHay/hPp3Q0jObpqJwH/2ghnXYN8odmfPsLUd1B4nu3eyFfZNTGme0qZ7g5cc978R2/2BwgEwxn7E3+hzL5VxRyCVV9JN45LME/l12LfrdD2LmiIOlFWz5WnTkT/unEClRUu+67cCwkDSZ7NRbNhI/DJqIhOuYuxb7ImlUq+IDiCJs0urN97woWlvpbgKudMaeQ9B6TucTSxPFToLFLkJF7C1L8lICnIGYnFmUgLGvMwCWxrEW+THdVgAZVBWh9aj5/jfKo8ncyTwaL6FxmlgCC4ObRwIDAQAB",
     "web_accessible_resources": [{
         "resources": [
             "predefined.json",

@@ -166,6 +166,7 @@ class Saver {
         'username': data[i]['username'],
       };
       final String json = jsonEncode(entry);
+      entries.add(json);
     }
     await _prefs!.setStringList('entries', entries);
     return "Saved";
