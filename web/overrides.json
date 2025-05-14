@@ -1,0 +1,34 @@
+{
+    "x.com": {
+        "fields": [
+            {
+                "generators": [{
+                    "name": "namespace::birth_month_generator"
+                }],
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "#SELECTOR_4"
+                }]
+            },
+            {
+                "generators": [{
+                    "name": "namespace::birth_day_generator"
+                }],
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "#SELECTOR_5"
+                }]
+            },
+            {
+                "generators": [{
+                    "name": "namespace::birth_year_generator"
+                }],
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "#SELECTOR_6"
+                }]
+            }
+        ]
+
+    }
+}
