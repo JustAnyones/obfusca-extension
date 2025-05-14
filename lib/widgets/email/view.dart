@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:browser_extension/providers/user.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
@@ -28,6 +32,7 @@ class _EmailViewPageState extends State<EmailViewPage> {
   bool _htmlLoaded = false;
 
   late final EmailData _message;
+  late final String _address;
   late final Part _part;
 
   late final WebViewController _controller;
@@ -38,6 +43,7 @@ class _EmailViewPageState extends State<EmailViewPage> {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _message = args['email'] as EmailData;
+    _address = args['address'] as String;
     _part = _getBestContentFormat(_message.parts);
 
     if (_part.mediaType == "text/html") {
@@ -60,6 +66,41 @@ class _EmailViewPageState extends State<EmailViewPage> {
             });
           });
     }
+  }
+
+  void downloadAttachment(int attachmentIndex) async {
+    var (attach, err) = await ObfuscaAPI.getUserEmailAttachment(
+      UserProvider.getInstance().userToken!,
+      _address,
+      _message.uid,
+      attachmentIndex,
+    );
+
+    if (err != null) {
+      setState(() {
+        _generalError = "Could not download attachment: $err";
+      });
+      return;
+    }
+
+    await FilePicker.platform
+        .saveFile(
+          dialogTitle: "Save attachment",
+          fileName: attach!.filename,
+          bytes: base64Decode(attach.content),
+        )
+        .then((String? path) {
+          if (path != null) {
+            print("Attachment saved to $path");
+          } else {
+            print("Attachment download cancelled");
+          }
+        })
+        .catchError((error) {
+          setState(() {
+            _generalError = "Failed to save attachment: $error";
+          });
+        });
   }
 
   @override
@@ -149,21 +190,24 @@ class _EmailViewPageState extends State<EmailViewPage> {
                 Row(
                   children: [
                     for (var attachment in _message.attachments) ...[
-                      Container(
-                        padding: EdgeInsets.all(4),
-                        margin: EdgeInsets.only(top: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.attach_file, color: Colors.grey),
-                            SizedBox(width: 4),
-                            Text(attachment.filename),
-                            SizedBox(width: 4),
-                            Text(" (${attachment.size} BYTES)"),
-                          ],
+                      InkWell(
+                        onTap: () => downloadAttachment(attachment.index),
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          margin: EdgeInsets.only(top: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.attach_file, color: Colors.grey),
+                              SizedBox(width: 4),
+                              Text(attachment.filename),
+                              SizedBox(width: 4),
+                              Text(" (${attachment.size} BYTES)"),
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(width: 6),
