@@ -14,6 +14,7 @@
   "generator_sex": "Sex",
   "generator_password": "Password",
   "generator_email": "Email",
+  "generator_custom": "Custom generator",
   "button_wait": "Please wait...",
   "button_generate": "Generate",
   "expansion_tile": "Generators",

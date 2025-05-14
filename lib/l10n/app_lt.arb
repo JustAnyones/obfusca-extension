@@ -13,6 +13,7 @@
     "generator_date_of_birth": "Gimimo metai",
     "generator_sex": "Lytis",
     "generator_password": "Slaptažodis",
+    "generator_custom": "Pasirinktinis generatorius",
     "button_wait": "Prašau palaukit...",
     "button_generate": "Generuoti",
     "expansion_tile": "Generatoriai",
