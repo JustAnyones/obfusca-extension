@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:browser_extension/providers/user.dart';
 import 'package:browser_extension/utils/format.dart';
@@ -165,7 +166,13 @@ class _EmailListPageState extends State<EmailListPage> {
             FocusManager.instance.primaryFocus?.unfocus();
           },
           child: Scaffold(
-            appBar: AppBar(title: Text("EMAIL LIST FOR $_emailAddress")),
+            appBar: AppBar(
+              title: Text(
+                AppLocalizations.of(
+                  context,
+                )!.email_message_list_page_title(_emailAddress),
+              ),
+            ),
             body: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -174,7 +181,10 @@ class _EmailListPageState extends State<EmailListPage> {
                   children: [
                     Row(
                       children: [
-                        Text("EMAILS", style: TextStyle(fontSize: 18)),
+                        Text(
+                          AppLocalizations.of(context)!.email_message_list_name,
+                          style: TextStyle(fontSize: 18),
+                        ),
                         IconButton(
                           onPressed: _isRefreshing ? null : fetchMessages,
                           icon: Icon(Icons.refresh),
@@ -222,7 +232,11 @@ class _EmailListPageState extends State<EmailListPage> {
                                     onPressed: () {
                                       changeReadStatus(email);
                                     },
-                                    child: Text("MARK AS UNREAD"),
+                                    child: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.email_message_list_mark_as_unread,
+                                    ),
                                   ),
                                 ),
                               ] else ...[
@@ -231,7 +245,11 @@ class _EmailListPageState extends State<EmailListPage> {
                                     onPressed: () {
                                       changeReadStatus(email);
                                     },
-                                    child: Text("MARK AS READ"),
+                                    child: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.email_message_list_mark_as_read,
+                                    ),
                                   ),
                                 ),
                               ],
