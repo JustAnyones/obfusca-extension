@@ -57,11 +57,22 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> clearUserToken() async {
+  Future<void> clearUserState() async {
     await _prefs!.remove(_keyUserToken);
     await _prefs!.remove(_keyUserTokenExpire);
+    await _prefs!.remove(_keyEmailAddresses);
+    for (var emailAddress in _emailAddresses) {
+      var emails = await _getMessagesForEmailAddress(emailAddress);
+      for (var email in emails.keys) {
+        await _prefs!.remove(
+          "$_keyEmailAddressEmails.$emailAddress.${emails[email]!.uid}",
+        );
+      }
+    }
     _userToken = null;
     _userTokenExpire = null;
+    _emailAddresses = [];
+    _emailAddressEmails = {};
     notifyListeners();
   }
 

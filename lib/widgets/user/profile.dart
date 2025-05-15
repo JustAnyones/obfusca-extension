@@ -49,7 +49,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       return;
     }
 
-    await UserProvider.getInstance().clearUserToken();
+    await UserProvider.getInstance().clearUserState();
     await closeCurrentTab();
   }
 
