@@ -39,7 +39,6 @@ class Generatorcity extends Generators {
   }
 
   @override
-  @override
   void checkOptions(Map<dynamic, dynamic> options) {
     for (var option in options["options"]) {
       option["selected"] = false;
