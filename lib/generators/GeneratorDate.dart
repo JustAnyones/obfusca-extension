@@ -76,6 +76,7 @@ class Generatordate extends Generators {
           if (option["value"] != "" &&
               int.parse(option["value"]) == dateTime.day) {
             option["selected"] = true;
+            print("selected day: ${option["value"]}");
           }
         }
         break;
@@ -90,6 +91,7 @@ class Generatordate extends Generators {
           if (option["value"] != "" &&
               int.parse(option["value"]) == dateTime.month) {
             option["selected"] = true;
+            print("selected month: ${option["value"]}");
           }
         }
         break;
@@ -104,6 +106,7 @@ class Generatordate extends Generators {
           if (option["value"] != "" &&
               int.parse(option["value"]) == dateTime.year) {
             option["selected"] = true;
+            print("selected year: ${option["value"]}");
           }
         }
         break;

@@ -665,7 +665,11 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           if (int.parse(_detectedFields[i]["options"].length) !=
                               0) {
                             for (Generators generator in generatorsList) {
-                              generator.checkOptions(_detectedFields[i]);
+                              if (generator.checkNamespaceBool(
+                                _detectedFields[i]["generator"],
+                              )) {
+                                generator.checkOptions(_detectedFields[i]);
+                              }
                             }
                             for (var option in _detectedFields[i]["options"]) {
                               if (option["selected"] == true) {
