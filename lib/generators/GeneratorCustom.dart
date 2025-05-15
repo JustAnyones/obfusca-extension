@@ -23,8 +23,9 @@ class GeneratorCustom extends Generators {
         !namespace.contains("obfusta::")) {
       this.namespace = namespace;
     } else {
-      this.namespace = namespace.replaceAll('namespace::', '');
-      this.namespace = this.namespace.replaceAll('obfusta::', '');
+      throw Exception(
+        "Namespace should not contain 'namespace::' or 'obfusta::'",
+      );
     }
   }
 
