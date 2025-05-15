@@ -12,6 +12,7 @@ import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:browser_extension/widgets/read_entries.dart';
+import 'package:browser_extension/utils/drive.dart';
 
 class NameGeneratorPage extends StatefulWidget {
   const NameGeneratorPage({super.key});
@@ -576,6 +577,17 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                             saverFields[7],
                             saverFields[2],
                           );
+
+                          String res = await Drive.needSend();
+                          if (res == "Files") {
+                            bool import = await Drive.importFromDrive();
+                            if (import == false) {
+                              return;
+                            }
+                            await Drive.updateDrive();
+                          } else if (res == "NoFile") {
+                            await Drive.sendFile();
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
