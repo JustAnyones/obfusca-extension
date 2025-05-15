@@ -159,7 +159,7 @@ class Saver {
       return "BadFile";
     }
     List<String> entries = [];
-    if (_prefs!.getStringList('entries') != null) {
+    if (_prefs!.getStringList('entries') != []) {
       entries = _prefs!.getStringList('entries')!;
     }
     String save = '[';
@@ -201,18 +201,5 @@ class Saver {
     }
     await _prefs!.setStringList('entries', entries);
     return "Saved";
-  }
-
-  static Future<void> SaveAccessToken(String token) async {
-    await _prefs!.setString('access_token', token);
-  }
-
-  static Future<void> RemoveAccessToken() async {
-    await _prefs!.remove('access_token');
-  }
-
-  static Future<String?> GetAccessToken() async {
-    String? token = await _prefs!.getString('access_token');
-    return token;
   }
 }

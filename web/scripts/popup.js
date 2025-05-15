@@ -127,6 +127,7 @@ async function authorize(){
 }
 
 async function validate(redirectURL){
+	console.log(redirectURL);
 	var access_token = redirectURL.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
 	return access_token;
 }
@@ -137,9 +138,4 @@ async function getToken() {
 	console.log(access);
 	chrome.storage.session.set({'access_token': access});
 	return access;
-}
-
-async function logout(){
-	const token = await chrome.storage.session.get('access_token');
-	var url = `https://accounts.google.com/o/oauth2/revoke?token=${token}`;
 }

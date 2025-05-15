@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -8,6 +9,7 @@ import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:http/http.dart' as http;
+import 'package:browser_extension/utils/drive.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -23,11 +25,13 @@ class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _keyController = TextEditingController();
   String? _key;
   String? _access_token;
+  bool? _authorized;
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+    _authorized = false;
   }
 
   // Loads current settings from the settings provider.
@@ -74,6 +78,40 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget login = ElevatedButton(
+      onPressed: () async {
+        await Drive.Login();
+        setState(() {});
+      },
+      child: Text("Google login"),
+    );
+    Widget logout = ElevatedButton(
+      onPressed: () async {
+        _access_token = null;
+        await Drive.logout();
+        setState(() {});
+      },
+      child: Text("Google logout"),
+    );
+    Widget sync = ElevatedButton(
+      onPressed: () async {
+        String res = await Drive.needSend();
+        if (res == "Files") {
+          bool import = await Drive.importFromDrive();
+          if (import == false) {
+            return;
+          }
+          await Drive.updateDrive();
+        } else if (res == "NoFile") {
+          await Drive.sendFile();
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Drive synced")));
+      },
+      child: Text("Google sync"),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.settings_title),
@@ -109,6 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SizedBox(height: 20),
 
+            _encrypt == true ? Text("a") : SizedBox(height: 0),
             // Region
             Text(AppLocalizations.of(context)!.setting_region_title),
             DropdownButton<String>(
@@ -195,7 +234,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   encrypted = true;
                   await _displayTextInputDialog(context);
                 }
-                String res = await Saver.importEntries(file, encrypted, _key);
+                String res = await Saver.importEntries(
+                  dataString,
+                  encrypted,
+                  _key,
+                );
                 if (res == "BadFile") {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -228,50 +271,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
             SizedBox(height: 16),
 
-            ElevatedButton(
-              onPressed: () async {
-                _access_token = await getToken();
-                //await _handleSignIn();
-              },
-              child: Text("Google log in"),
-            ),
+            Drive.Authorized() ? SizedBox(height: 0) : login,
+
+            Drive.Authorized() ? sync : SizedBox(height: 0),
+
+            Drive.Authorized() ? SizedBox(height: 16) : SizedBox(height: 0),
+
+            Drive.Authorized() ? logout : SizedBox(height: 0),
 
             SizedBox(height: 16),
-
-            ElevatedButton(
-              onPressed: () async {
-                await logout();
-              },
-              child: Text("Google logout"),
-            ),
-
-            SizedBox(height: 16),
-
-            ElevatedButton(
-              onPressed: () async {
-                List<String> entries = Saver.readInfo()!;
-                String save = '[';
-                for (int i = 0; i < entries.length; i++) {
-                  save += entries[i];
-                  if (i != entries.length - 1) save += ',';
-                }
-                save += ']';
-                int bytesCount = utf8.encode(save).length;
-                final response = await http.post(
-                  Uri.parse(
-                    'https://www.googleapis.com/upload/drive/v3/files?uploadType=media',
-                  ),
-                  headers: {
-                    HttpHeaders.authorizationHeader: 'Bearer $_access_token',
-                    HttpHeaders.contentTypeHeader: 'application/json',
-                    HttpHeaders.contentLengthHeader: '$bytesCount',
-                  },
-                  body: save,
-                );
-                print(response.body);
-              },
-              child: Text("Google send test"),
-            ),
           ],
         ),
       ),

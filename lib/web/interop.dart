@@ -66,10 +66,7 @@ Future<void> closeCurrentTab() async {
 }
 
 Future<String> getToken() async {
+  print("token");
   var token = await _getToken().toDart;
   return token.dartify() as String;
-}
-
-Future<void> logout() async {
-  await _logout().toDart;
 }
