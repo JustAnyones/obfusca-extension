@@ -8,7 +8,7 @@ class GeneratorCustom extends Generators {
   String returnValue = '';
   List<String> customList = [];
 
-  GeneratorCustom() : super('');
+  GeneratorCustom() : super("");
 
   void setCustom(
     String custom,
@@ -17,9 +17,15 @@ class GeneratorCustom extends Generators {
     String namespace,
   ) {
     this.custom = custom;
-    this.namespace = namespace;
     this.returnValue = returnValue;
     this.customList = customList;
+    if (!namespace.contains('namespace::') ||
+        !namespace.contains("obfusta::")) {
+      this.namespace = namespace;
+    } else {
+      this.namespace = namespace.replaceAll('namespace::', '');
+      this.namespace = this.namespace.replaceAll('obfusta::', '');
+    }
   }
 
   @override

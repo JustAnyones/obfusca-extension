@@ -1,4 +1,3 @@
-import 'package:browser_extension/generators/GeneratorCustom.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -41,7 +40,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
     GeneratorCustom custom1 = GeneratorCustom();
-    custom1.setCustom("returnValue", "Glorp", [], "namespace::custom");
+    custom1.setCustom("returnValue", "Glorp", [], "namespace::glorp");
     GeneratorCustom custom2 = GeneratorCustom();
     List<String> customList = [
       "Glorp",
@@ -52,7 +51,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       "Balding",
       "BLOOMING",
     ];
-    custom2.setCustom("random", "Glorp", customList, "namespace::custom");
+    custom2.setCustom("random", "Glorp", customList, "namespace::buh");
 
     generatorsList = [
       GeneratorName(),
