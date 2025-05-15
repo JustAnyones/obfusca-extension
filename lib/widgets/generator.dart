@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<double> surNamesFreq;
   late List<String> cities;
   late List<List<double>> boundingBoxes;
-  final List<bool> selectedItems = List.filled(11, false);
+  final List<bool> selectedItems = List.filled(13, false);
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -40,6 +41,20 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     super.initState();
     SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
+    GeneratorCustom custom1 = GeneratorCustom();
+    custom1.setCustom("returnValue", "Glorp", [], "custom::glorp");
+    GeneratorCustom custom2 = GeneratorCustom();
+    List<String> customList = [
+      "Glorp",
+      "Buh",
+      "Guh",
+      "Balls",
+      "uhh",
+      "Balding",
+      "BLOOMING",
+    ];
+    custom2.setCustom("random", "Glorp", customList, "custom::buh");
+
     generatorsList = [
       GeneratorName(),
       GeneratorSurName(),
@@ -52,6 +67,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       GeneratorSex(SettingProvider.getInstance().region),
       GeneratorPassword(),
       GeneratorEmail(),
+      custom1,
+      custom2,
     ];
     _loadSavedValues();
     for (Generators generator in generatorsList) {
