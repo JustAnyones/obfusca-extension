@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:browser_extension/utils/format.dart';
 import 'package:browser_extension/utils/obfusca.dart';
@@ -94,16 +95,30 @@ class _EmailViewPageState extends State<EmailViewPage> {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(title: Text("VIEWING EMAIL")),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.email_view_page_title),
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("FROM: ${_message.from.name} (${_message.from.address})"),
-                Text("SUBJECT: ${_message.subject}"),
-                Text("DATE: ${formatDate(context, _message.date)}"),
+                Text(
+                  AppLocalizations.of(
+                    context,
+                  )!.email_view_from(_message.from.toString()),
+                ),
+                Text(
+                  AppLocalizations.of(
+                    context,
+                  )!.email_view_subject(_message.subject),
+                ),
+                Text(
+                  AppLocalizations.of(
+                    context,
+                  )!.email_view_date(formatDate(context, _message.date)),
+                ),
 
                 if (_generalError != null) ...[
                   SizedBox(height: 16),
@@ -144,7 +159,7 @@ class _EmailViewPageState extends State<EmailViewPage> {
                 // Display attachments
                 if (_message.attachments.isNotEmpty) ...[
                   SizedBox(height: 16),
-                  Text("ATTACHMENTS:"),
+                  Text(AppLocalizations.of(context)!.email_view_attachments),
                 ],
                 Row(
                   children: [
@@ -162,7 +177,9 @@ class _EmailViewPageState extends State<EmailViewPage> {
                             SizedBox(width: 4),
                             Text(attachment.filename),
                             SizedBox(width: 4),
-                            Text(" (${attachment.size} BYTES)"),
+                            Text(
+                              " (${AppLocalizations.of(context)!.email_view_attachment_bytes(attachment.size)})",
+                            ),
                           ],
                         ),
                       ),

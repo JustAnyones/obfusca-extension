@@ -656,7 +656,11 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                               print("Received fields:");
                               print(_detectedFields);
                             },
-                            child: Text("Detect fields from current website"),
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.detect_fields_button,
+                            ),
                           ),
                         ),
                       ],
@@ -695,7 +699,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                         }
                         fillFields(_frameId, fieldsToFill);
                       },
-                      child: Text("Fill detected fields"),
+                      child: Text(
+                        AppLocalizations.of(context)!.fill_fields_button,
+                      ),
                     ),
                   ],
                 ),

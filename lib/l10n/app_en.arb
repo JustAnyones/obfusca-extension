@@ -1,5 +1,5 @@
 {
-  "ext_title": "Data Generation Extension",
+  "ext_title": "Obfusca",
 
   "detect_fail": "Failed to detect fields",
 
@@ -64,12 +64,60 @@
     }
   },
 
+  "settings_encryption_toggle": "Encrypt entries on export",
+
   "settings_save_button": "Save Settings",
   "settings_saved_popup": "Settings Saved!",
+
+  "home_title": "Home",
+  "detect_fields_button": "Detect fields from current page",
+  "fill_fields_button": "Fill detected fields",
 
   "user_profile_title": "User account",
   "user_profile_page_title": "User account",
   "user_profile_page_logout_button": "Logout",
+  "user_profile_email_title": "Your email addresses",
+  "user_profile_email_create_button": "Create new email",
+  "user_profile_email_view_button": "View",
+  "user_profile_email_copy_button": "Copy",
+  "user_profile_email_copy_toast": "Address copied to clipboard",
+
+  "email_message_list_page_title": "Email list for {email}",
+    "@email_message_list_page_title": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "email_message_list_name": "Emails",
+  "email_message_list_mark_as_read": "Mark as read",
+  "email_message_list_mark_as_unread": "Mark as unread",
+
+  "email_view_page_title": "Viewing email",
+  "email_view_from": "From: {address}",
+  "@email_view_from": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "email_view_subject": "Subject: {subject}",
+  "@email_view_subject": {
+    "placeholders": {
+      "subject": {"type": "String"}
+    }
+  },
+  "email_view_date": "Date: {date}",
+  "@email_view_date": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "email_view_attachments": "Attachments",
+  "email_view_attachment_bytes": "{size} bytes",
+    "@email_view_attachment_bytes": {
+        "placeholders": {
+        "size": {"type": "int"}
+        }
+    },
 
   "user_register_page_title": "Register",
   "user_register_page_hint": "Create an account",

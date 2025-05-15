@@ -50,6 +50,7 @@ class Generator {
  */
 
 /**
+ * Represents an option in a select field.
  * @typedef {Object} Option
  * @property {string} value
  * @property {string} text
@@ -79,6 +80,7 @@ class Generator {
  * @typedef {Object} OverrideField
  * @property {Detector[]} detectors The detectors to use to find the field.
  * @property {Generator[]} generators The generators to use to fill the field.
+ * @property {boolean} ignore Whether to ignore the field or not.
  */
 
 /**
@@ -93,6 +95,12 @@ class Generator {
 
 /**
  * @typedef {(HTMLInputElement|HTMLSelectElement)} ParseableElement
+ */
+
+/**
+ * @typedef {Object} DetectedFieldOverride
+ * @property {Generator[]} generators The generators to use to fill the field.
+ * @property {boolean} ignored Whether to ignore the field or not.
  */
 
 
@@ -466,9 +474,9 @@ const heuristicDetectors = [
  * It will match the first field whose all detectors match the field.
  * @param {ParseableElement} field A HTML element.
  * @param {OverrideEntry} overrideEntry The override entry for the current domain.
- * @returns {Generator[] | undefined} A list of generators that can be used to fill the field.
+ * @returns {DetectedFieldOverride|undefined} A list of generators that can be used to fill the field.
  */
-function getOverriddenFieldGenerators(field, overrideEntry) {
+function detectOverriddenField(field, overrideEntry) {
     for (const overrideField of overrideEntry.fields) {
         let match = true
         for (const detector of overrideField.detectors) {
@@ -496,7 +504,10 @@ function getOverriddenFieldGenerators(field, overrideEntry) {
             }
         }
         if (match) {
-            return overrideField.generators
+            return {
+                generators: overrideField.generators,
+                ignored: overrideField.ignore,
+            }
         }
     }
     return undefined
@@ -505,18 +516,9 @@ function getOverriddenFieldGenerators(field, overrideEntry) {
 /**
  * Detects fields that can be filled in the current frame automatically.
  * @param {ParseableElement} field A HTML element.
- * @param {OverrideEntry?} overrideEntry The override entry for the current domain.
  * @returns {Generator[] | Generator | undefined} A list of generators that can be used to fill the field.
  */
-function determineFieldData(field, overrideEntry) {
-    if (overrideEntry !== null) {
-        console.log("Checking for overridden field generators")
-        const generators = getOverriddenFieldGenerators(field, overrideEntry)
-        if (generators !== undefined) {
-            return generators
-        }
-    }
-
+function determineFieldData(field) {
     const autocomplete = field.getAttribute("autocomplete")
 
     let foundGenerators = [];
@@ -568,33 +570,63 @@ function determineFieldData(field, overrideEntry) {
  */
 function detectAutomatically(overrideEntry) {
     /** @type {Array<ParseableElement>} */
-    //const inputs = document.querySelectorAll('input, select')
     const inputs = deepQuerySelectorAll(document, 'input, select')
 
     let fields = []
     for (const field of inputs) {
+        // https://stackoverflow.com/a/21696585
+        let isHidden = field.type === "hidden" || field.offsetParent === null
+
+        // Immediately check if the field is overridden
+        let generators = [];
+        if (overrideEntry != null) {
+            const detectionResult = detectOverriddenField(field, overrideEntry)
+            if (detectionResult !== undefined) {
+
+                if (detectionResult.ignored === true) {
+                    isHidden = true
+                    console.log("Field", field, "is ignored by override entry")
+                }
+
+                // If we did detect it and it's not explicitly ignored, we can use it
+                isHidden = false
+                generators = detectionResult.generators
+                console.log("Field", field, "generators are overridden by override entry")
+            }
+        }
 
         // Skip hidden fields
         // https://stackoverflow.com/a/21696585
-        if (field.type === "hidden" || field.offsetParent === null) {
+        if (isHidden) {
             console.log("Skipping hidden field", field)
             continue
         }
 
-        const generators = determineFieldData(field, overrideEntry)
-        if (generators !== undefined) {
-            if (!Array.isArray(generators)) {
-                fields.push(registerField(field, [generators]))
+        // If we didn't find any overrides, we can try to detect it automatically
+        if (generators.length == 0) {
+            const automaticResult = determineFieldData(field)
+            if (automaticResult === undefined) {
+                continue
+            }
+
+            if (Array.isArray(automaticResult)) {
+                generators = automaticResult
             } else {
-                // Deduplicate the generators
-                const uniqueByName = [
-                    ...new Map(
-                        generators.map(item => [item.name, item])
-                    ).values()
-                ];
-                fields.push(registerField(field, uniqueByName))
+                generators = [automaticResult]
             }
         }
+
+        if (generators.length == 0) {
+            console.warn("No generators found for field", field)
+            continue
+        }
+        // Deduplicate the generators
+        const uniqueByName = [
+            ...new Map(
+                generators.map(item => [item.name, item])
+            ).values()
+        ];
+        fields.push(registerField(field, uniqueByName))
     }
     return fields;
 }
@@ -605,17 +637,16 @@ function detectAutomatically(overrideEntry) {
  * @returns {Field[]} A list of fields that can be filled.
  */
 function detectFields(data) {
-    // TODO: replace with overrides
 
-    // The plan would be such:
+    // The override system works the following way:
     // First, check if there is an override for the current domain
     // If there is, check if it's a system override or a user override, prioritize user overrides
-    // If there's a user override and a system override for different fields, merge them
+    // If there's a user override and a system override for different fields, merge them (NOT IMPLEMENTED)
     // Otherwise, if there is no override, detect automatically
 
     const entry = data[window.location.hostname]
     if (entry !== undefined) {
-        console.log("Found override entry for", window.location.hostname, entry, "that will be ignored")
+        console.log("Found override entry for", window.location.hostname)
         return detectAutomatically(entry)
     }
     return detectAutomatically(null)

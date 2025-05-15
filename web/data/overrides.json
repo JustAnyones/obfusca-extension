@@ -4,7 +4,7 @@
             "detectors": [
                 {
                     "type": "querySelector",
-                    "value": "#city_idFilter"
+                    "value": "select#city_id"
                 }
             ],
             "generators": [{
