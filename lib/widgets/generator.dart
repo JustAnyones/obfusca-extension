@@ -42,7 +42,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
     GeneratorCustom custom1 = GeneratorCustom();
-    custom1.setCustom("returnValue", "Glorp", [], "namespace::glorp");
+    custom1.setCustom("returnValue", "Glorp", [], "custom::glorp");
     GeneratorCustom custom2 = GeneratorCustom();
     List<String> customList = [
       "Glorp",
@@ -53,7 +53,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       "Balding",
       "BLOOMING",
     ];
-    custom2.setCustom("random", "Glorp", customList, "namespace::buh");
+    custom2.setCustom("random", "Glorp", customList, "custom::buh");
 
     generatorsList = [
       GeneratorName(),

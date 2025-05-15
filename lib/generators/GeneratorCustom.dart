@@ -20,7 +20,7 @@ class GeneratorCustom extends Generators {
     this.returnValue = returnValue;
     this.customList = customList;
     if (!namespace.contains('namespace::') ||
-        !namespace.contains("obfusta::")) {
+        !namespace.contains("obfusca::")) {
       this.namespace = namespace;
     } else {
       throw Exception(
