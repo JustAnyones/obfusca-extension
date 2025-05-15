@@ -35,6 +35,9 @@ class UserProvider extends ChangeNotifier {
   // {emailAddress: {uid: SlimEmailData}}
   Map<String, Map<int, SlimEmailData>> _emailAddressEmails = {};
 
+  // {emailAddress: [uid]}
+  Map<String, List<int>> _emailAddressSortedUids = {};
+
   bool get isLoggedIn =>
       _userToken != null &&
       _userTokenExpire != null &&
@@ -44,9 +47,9 @@ class UserProvider extends ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
 
     _userToken = await getString(_keyUserToken, null);
-    _userTokenExpire = await getDateTime(_keyUserTokenExpire, null);
+    _userTokenExpire = await _getDateTime(_keyUserTokenExpire, null);
     _emailAddresses = await _getEmailAddresses() ?? [];
-    _emailAddressEmails = await _getMessagesForAllEmailAdresses();
+    _emailAddressEmails = await _getMessagesForAllEmailAddresses();
   }
 
   Future<void> setUserToken(String token, DateTime expire) async {
@@ -73,6 +76,7 @@ class UserProvider extends ChangeNotifier {
     _userTokenExpire = null;
     _emailAddresses = [];
     _emailAddressEmails = {};
+    _emailAddressSortedUids = {};
     notifyListeners();
   }
 
@@ -83,16 +87,36 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Internal function, used to fetch the messages for all email addresses
+  /// from local storage.
   Future<Map<String, Map<int, SlimEmailData>>>
-  _getMessagesForAllEmailAdresses() async {
+  _getMessagesForAllEmailAddresses() async {
     Map<String, Map<int, SlimEmailData>> emailMap = {};
     for (var emailAddress in _emailAddresses) {
+      // Store the slim messages for every email address
       var emails = await _getMessagesForEmailAddress(emailAddress);
       emailMap[emailAddress] = emails;
+      // Sort the messages by date
+      await updateSortOrder(emailAddress);
     }
     return emailMap;
   }
 
+  /// Updates the sort order of the messages for the given email address.
+  Future<void> updateSortOrder(String address) async {
+    var emails = await _getMessagesForEmailAddress(address);
+    // Sort the messages by date
+    var values = emails.values.toList();
+    values.sort((a, b) {
+      return a.date.compareTo(b.date);
+    });
+    // Reverse the list to get the most recent messages first
+    values = values.reversed.toList();
+    // Store the sorted list of UIDs
+    _emailAddressSortedUids[address] = values.map((e) => e.uid).toList();
+  }
+
+  /// Internal function, used to fetch the messages for a specific email address
   Future<Map<int, SlimEmailData>> _getMessagesForEmailAddress(
     String emailAddress,
   ) async {
@@ -120,13 +144,15 @@ class UserProvider extends ChangeNotifier {
     return emailMap;
   }
 
-  List<SlimEmailData> getMessagesForEmailAddress(String emailAddress) {
-    if (_emailAddressEmails[emailAddress] == null) {
+  /// Returns the sorted list of email UIDs.
+  List<int> getMessageUidsForAddress(String emailAddress) {
+    if (_emailAddressSortedUids[emailAddress] == null) {
       return [];
     }
-    return _emailAddressEmails[emailAddress]!.values.toList();
+    return _emailAddressSortedUids[emailAddress]!;
   }
 
+  /// Returns the message for the given email address and UID.
   SlimEmailData? getMessageForEmailAddress(String emailAddress, int uid) {
     if (_emailAddressEmails[emailAddress] == null) {
       return null;
@@ -134,40 +160,55 @@ class UserProvider extends ChangeNotifier {
     return _emailAddressEmails[emailAddress]![uid];
   }
 
+  /// Sets the read status of the message for the given email address and UID.
+  Future<void> setMessageReadStatusForEmailAddress(
+    String emailAddress,
+    int uid,
+    bool read,
+  ) async {
+    if (_emailAddressEmails[emailAddress] == null) {
+      return;
+    }
+    var message = _emailAddressEmails[emailAddress]![uid];
+    if (message == null) {
+      return;
+    }
+    message.read = read;
+    await setMessageForEmailAddress(emailAddress, message);
+    notifyListeners();
+  }
+
   /// Sets the message for the given email address in the SharedPreferences.
+  ///
   /// The message is stored with the key format:
   /// "user.email.address.messages.<emailAddress>.<uid>".
   Future<void> setMessageForEmailAddress(
     String emailAddress,
     SlimEmailData message,
   ) async {
-    var storedMessage = getMessageForEmailAddress(emailAddress, message.uid);
-    // If there's a full message stored, only update the read state
-    if (storedMessage != null && storedMessage is EmailData) {
-      storedMessage.read = message.read;
-      message = storedMessage;
-    }
-
     await _prefs!.setString(
       "$_keyEmailAddressEmails.$emailAddress.${message.uid}",
       jsonEncode(message.toJson()),
     );
     _emailAddressEmails[emailAddress] ??= {};
     _emailAddressEmails[emailAddress]![message.uid] = message;
+    await updateSortOrder(emailAddress);
     notifyListeners();
   }
 
-  /// Returns the list of email addresses from the SharedPreferences.
+  /// Returns the list of email addresses from SharedPreferences.
   Future<List<String>?> _getEmailAddresses() async {
     return _prefs!.getStringList(_keyEmailAddresses);
   }
 
+  /// Returns the String value for the given key from SharedPreferences.
   Future<String?> getString(String key, String? defaultValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key) ?? defaultValue;
   }
 
-  Future<DateTime?> getDateTime(String key, DateTime? defaultValue) async {
+  /// Returns the DateTime value for the given key from SharedPreferences.
+  Future<DateTime?> _getDateTime(String key, DateTime? defaultValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var value = prefs.getString(key);
     if (value == null) {

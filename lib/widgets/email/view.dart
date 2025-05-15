@@ -101,7 +101,7 @@ class _EmailViewPageState extends State<EmailViewPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("FROM: ${_message.from.name} (${_message.from.address})"),
+                Text("FROM: ${_message.from.toString()}"),
                 Text("SUBJECT: ${_message.subject}"),
                 Text("DATE: ${formatDate(context, _message.date)}"),
 
