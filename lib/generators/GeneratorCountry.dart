@@ -27,4 +27,16 @@ class Generatorcountry extends Generators {
   void setLocalization(BuildContext context) {
     localization = AppLocalizations.of(context)!.generator_country;
   }
+
+  @override
+  void checkOptions(Map<dynamic, dynamic> options) {
+    for (var option in options["options"]) {
+      option["selected"] = false;
+    }
+    for (var option in options["options"]) {
+      if (option["value"] == country) {
+        option["selected"] = true;
+      }
+    }
+  }
 }

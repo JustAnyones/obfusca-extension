@@ -15,6 +15,8 @@ class Generatordate extends Generators {
   @override
   void generate() {
     controller.text = getRandomDateTime().toIso8601String().split('T')[0];
+    dateTime = DateTime.parse(controller.text);
+    print("generated date: ${controller.text}");
   }
 
   @override
@@ -57,5 +59,57 @@ class Generatordate extends Generators {
   @override
   void setLocalization(BuildContext context) {
     localization = AppLocalizations.of(context)!.generator_date_of_birth;
+  }
+
+  @override
+  void checkOptions(Map<dynamic, dynamic> options) {
+    print("checking options for date generator: ${options["generator"]}");
+    switch (options["generator"]) {
+      case "namespace::birth_day_generator":
+        print("checking options for day generator");
+        for (var option in options["options"]) {
+          option["selected"] = false;
+        }
+        for (var option in options["options"]) {
+          print(option);
+          print("checking option: ${option["value"]} == ${dateTime.day}");
+          if (option["value"] != "" &&
+              int.parse(option["value"]) == dateTime.day) {
+            option["selected"] = true;
+            print("selected day: ${option["value"]}");
+          }
+        }
+        break;
+      case "namespace::birth_month_generator":
+        print("checking options for month generator");
+        for (var option in options["options"]) {
+          option["selected"] = false;
+        }
+        for (var option in options["options"]) {
+          print(option);
+          print("checking option: ${option["value"]} == ${dateTime.month}");
+          if (option["value"] != "" &&
+              int.parse(option["value"]) == dateTime.month) {
+            option["selected"] = true;
+            print("selected month: ${option["value"]}");
+          }
+        }
+        break;
+      case "namespace::birth_year_generator":
+        print("checking options for year generator");
+        for (var option in options["options"]) {
+          option["selected"] = false;
+        }
+        for (var option in options["options"]) {
+          print(option);
+          print("checking option: ${option["value"]} == ${dateTime.year}");
+          if (option["value"] != "" &&
+              int.parse(option["value"]) == dateTime.year) {
+            option["selected"] = true;
+            print("selected year: ${option["value"]}");
+          }
+        }
+        break;
+    }
   }
 }
