@@ -1,12 +1,11 @@
-import 'package:browser_extension/generators/GeneratorSex.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/providers/user.dart';
-import 'package:browser_extension/utils/generation.dart';
 import 'package:browser_extension/generators/gens.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
@@ -229,14 +228,16 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
             child: IconButton(
               icon: Icon(Icons.home),
               iconSize: 28,
-              color: currentPage == 'home' 
-                  ? Theme.of(context).colorScheme.primary 
-                  : null,
-              onPressed: currentPage == 'home' 
-                  ? null 
-                  : () {
-                      Navigator.pop(context);
-                    },
+              color:
+                  currentPage == 'home'
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
+              onPressed:
+                  currentPage == 'home'
+                      ? null
+                      : () {
+                        Navigator.pop(context);
+                      },
             ),
           ),
           SizedBox(height: 16),
@@ -246,9 +247,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
             child: IconButton(
               icon: Icon(Icons.person),
               iconSize: 28,
-              color: currentPage == 'profile' 
-                  ? Theme.of(context).colorScheme.primary 
-                  : null,
+              color:
+                  currentPage == 'profile'
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
               onPressed: () async {
                 if (UserProvider.getInstance().isLoggedIn) {
                   await navigateToPageRoute('/profile');
@@ -265,9 +267,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
             child: IconButton(
               icon: Icon(Icons.list_alt),
               iconSize: 28,
-              color: currentPage == 'entries' 
-                  ? Theme.of(context).colorScheme.primary 
-                  : null,
+              color:
+                  currentPage == 'entries'
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -283,9 +286,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
             child: IconButton(
               icon: Icon(Icons.settings),
               iconSize: 28,
-              color: currentPage == 'settings' 
-                  ? Theme.of(context).colorScheme.primary 
-                  : null,
+              color:
+                  currentPage == 'settings'
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
               onPressed: () async {
                 await createSettingsPage();
               },
@@ -296,372 +300,399 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     );
   }
 
-@override
-Widget build(BuildContext context) {
-  List<String> generators = [];
-  for (Generators generator in generatorsList) {
-    generator.setLocalization(context);
-    generators.add(generator.localization);
-  }
+  @override
+  Widget build(BuildContext context) {
+    List<String> generators = [];
+    for (Generators generator in generatorsList) {
+      generator.setLocalization(context);
+      generators.add(generator.localization);
+    }
 
-  final fields =
-      generatorsList.asMap().entries.map((entry) {
-        final generator = entry.value;
-        return {
-          'controller': generator.controller,
-          'label': generator.localization,
-          'isChecked': generator.isChecked,
-          'onChanged':
-              (bool? value) => setState(() {
-                generator.isChecked = value ?? false;
-                _saveCurrentValues();
-              }),
-          'generator': generator,
-        };
-      }).toList();
+    final fields =
+        generatorsList.asMap().entries.map((entry) {
+          final generator = entry.value;
+          return {
+            'controller': generator.controller,
+            'label': generator.localization,
+            'isChecked': generator.isChecked,
+            'onChanged':
+                (bool? value) => setState(() {
+                  generator.isChecked = value ?? false;
+                  _saveCurrentValues();
+                }),
+            'generator': generator,
+          };
+        }).toList();
 
-  return GestureDetector(
-    behavior: HitTestBehavior.translucent,
-    onTap: () {
-      FocusManager.instance.primaryFocus?.unfocus();
-    },
-    child: Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.ext_title)),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Side Navigation Bar with reordered icons
-          buildSidebar(context, 'home'),
-          
-          // Main Content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  // Contained expansion tile with fixed height and ClipRect to prevent overflow
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(4.0),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4.0),
-                      child: ExpansionTile(
-                        title: Text(AppLocalizations.of(context)!.expansion_tile),
-                        initiallyExpanded: false,
-                        children: [
-                          Container(
-                            height: 250,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border(
-                                top: BorderSide(color: Colors.grey.shade300),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.ext_title)),
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Side Navigation Bar with reordered icons
+            buildSidebar(context, 'home'),
+
+            // Main Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Contained expansion tile with fixed height and ClipRect to prevent overflow
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4.0),
+                        child: ExpansionTile(
+                          title: Text(
+                            AppLocalizations.of(context)!.expansion_tile,
+                          ),
+                          initiallyExpanded: false,
+                          children: [
+                            Container(
+                              height: 250,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                  top: BorderSide(color: Colors.grey.shade300),
+                                ),
+                              ),
+                              child: ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: generators.length,
+                                itemBuilder: (context, index) {
+                                  return Material(
+                                    color: Colors.transparent,
+                                    child: ListTile(
+                                      title: Text(generators[index]),
+                                      selected: selectedItems[index],
+                                      selectedTileColor: Colors.green,
+                                      onTap: () {
+                                        setState(() {
+                                          selectedItems[index] =
+                                              !selectedItems[index];
+                                          _saveCurrentValues();
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
                               ),
                             ),
-                            child: ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              itemCount: generators.length,
-                              itemBuilder: (context, index) {
-                                return Material(
-                                  color: Colors.transparent,
-                                  child: ListTile(
-                                    title: Text(generators[index]),
-                                    selected: selectedItems[index],
-                                    selectedTileColor: Colors.green,
-                                    onTap: () {
-                                      setState(() {
-                                        selectedItems[index] = !selectedItems[index];
-                                        _saveCurrentValues();
-                                      });
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  // Fields section
-                  ...fields.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final field = entry.value;
-                    if (!selectedItems[index]) return SizedBox.shrink();
-                    return Row(
-                      children: [
-                        Expanded(
-                          child:
-                              field['generator'] is GeneratorEmail
-                                  ? DropdownButtonFormField<String>(
-                                    value:
-                                        (field['controller']
-                                                as TextEditingController?)
-                                            ?.text,
-                                    decoration: InputDecoration(
-                                      labelText: field['label'] as String?,
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    isExpanded: true,
-                                    items:
-                                        (field['generator'] as GeneratorEmail)
-                                            .getEmails()
-                                            .map(
-                                              (email) => DropdownMenuItem<String>(
-                                                value: email,
-                                                child: Text(
-                                                  email,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        (field['controller']
-                                                as TextEditingController?)
-                                            ?.text = value ?? '';
-                                      });
-                                    },
-                                  )
-                                  : CheckboxListTile(
-                                    title: TextField(
-                                      controller:
-                                          field['controller']
-                                              as TextEditingController?,
+                    SizedBox(height: 16),
+                    // Fields section
+                    ...fields.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final field = entry.value;
+                      if (!selectedItems[index]) return SizedBox.shrink();
+                      return Row(
+                        children: [
+                          Expanded(
+                            child:
+                                field['generator'] is GeneratorEmail
+                                    ? DropdownButtonFormField<String>(
+                                      value:
+                                          (field['controller']
+                                                  as TextEditingController?)
+                                              ?.text,
                                       decoration: InputDecoration(
                                         labelText: field['label'] as String?,
                                         border: OutlineInputBorder(),
                                       ),
+                                      isExpanded: true,
+                                      items:
+                                          (field['generator'] as GeneratorEmail)
+                                              .getEmails()
+                                              .map(
+                                                (email) =>
+                                                    DropdownMenuItem<String>(
+                                                      value: email,
+                                                      child: Text(
+                                                        email,
+                                                        overflow:
+                                                            TextOverflow
+                                                                .ellipsis,
+                                                        maxLines: 1,
+                                                      ),
+                                                    ),
+                                              )
+                                              .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          (field['controller']
+                                                  as TextEditingController?)
+                                              ?.text = value ?? '';
+                                        });
+                                      },
+                                    )
+                                    : CheckboxListTile(
+                                      title: TextField(
+                                        controller:
+                                            field['controller']
+                                                as TextEditingController?,
+                                        decoration: InputDecoration(
+                                          labelText: field['label'] as String?,
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                      value: field['isChecked'] as bool?,
+                                      onChanged:
+                                          field['onChanged']
+                                              as ValueChanged<bool?>?,
+                                      controlAffinity:
+                                          ListTileControlAffinity.leading,
                                     ),
-                                    value: field['isChecked'] as bool?,
-                                    onChanged:
-                                        field['onChanged'] as ValueChanged<bool?>?,
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                  ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            final generator = field['generator'] as Generators;
-                            generator.generate();
-                            if (generator is Generatorcity) {
-                              final city = generator.boundingBox;
-                              (generatorsList[6] as Generatoraddress)
-                                  .setBoundingBox(city);
-                              (generatorsList[7] as Generatorpostal).setBoundingBox(
-                                city,
-                              );
-                            }
-                            if (generator is GeneratorName) {
-                              final name = generator.name.trim();
-                              (generatorsList[8] as GeneratorSex).name = name;
-                            }
-                          },
-                          icon: Icon(Icons.casino, size: 24),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-
-                  // Action Buttons Row
-                  Row(
-                    children: [
-                      // Generate Button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _isButtonDisabled ? null : _generateName,
-                          child: Text(
-                            _isButtonDisabled
-                                ? AppLocalizations.of(context)!.button_wait
-                                : AppLocalizations.of(context)!.button_generate,
                           ),
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      // Clear Button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              // Clear all text fields
-                              for (Generators generator in generatorsList) {
-                                generator.controller.text = '';
+                          IconButton(
+                            onPressed: () {
+                              final generator =
+                                  field['generator'] as Generators;
+                              generator.generate();
+                              if (generator is Generatorcity) {
+                                final city = generator.boundingBox;
+                                (generatorsList[6] as Generatoraddress)
+                                    .setBoundingBox(city);
+                                (generatorsList[7] as Generatorpostal)
+                                    .setBoundingBox(city);
                               }
-                              // Save empty values
-                              _saveCurrentValues();
-                            });
-                            // Show confirmation
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('All fields cleared'),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade100,
-                            foregroundColor: Colors.red.shade900,
+                              if (generator is GeneratorName) {
+                                final name = generator.name.trim();
+                                (generatorsList[8] as GeneratorSex).name = name;
+                              }
+                            },
+                            icon: Icon(Icons.casino, size: 24),
                           ),
-                          child: Text("Clear All"),
+                        ],
+                      );
+                    }).toList(),
+
+                    // Action Buttons Row
+                    Row(
+                      children: [
+                        // Generate Button
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _isButtonDisabled ? null : _generateName,
+                            child: Text(
+                              _isButtonDisabled
+                                  ? AppLocalizations.of(context)!.button_wait
+                                  : AppLocalizations.of(
+                                    context,
+                                  )!.button_generate,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-
-                  ElevatedButton(
-                    onPressed: () async {
-                      int total = 0;
-                      int sum = 0;
-                      List<String> saverFields = [];
-                      for (Generators generator in generatorsList) {
-                        if (generator.isChecked) {
-                          total++;
-                          if (generator.controller.text != '') {
-                            sum++;
-                            saverFields.add(generator.controller.text);
-                          }
-                        }
-                      }
-
-                      if (total == 0) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              AppLocalizations.of(context)!.entry_no_fields,
-                            ),
-                          ),
-                        );
-                      } else if (sum < total) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              AppLocalizations.of(context)!.entry_empty_fields,
-                            ),
-                          ),
-                        );
-                      } else if (sum == total) {
-                        String domain = await getURL();
-                        String favIcon = await getFavIconUrl();
-                        Saver.saveInfo(
-                          saverFields[0],
-                          saverFields[1],
-                          favIcon,
-                          domain,
-                          saverFields[6],
-                          saverFields[5],
-                          saverFields[4],
-                          saverFields[3],
-                          saverFields[7],
-                          saverFields[2],
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              AppLocalizations.of(context)!.entry_saved,
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    child: Text(AppLocalizations.of(context)!.button_save_entry),
-                  ),
-                  SizedBox(height: 16),
-
-                  // Detection and field-filling buttons
-                  Row(
-                    children: [
-                      // Detect fields button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            var result = await queryFields();
-                            if (result["status"] != "FOUND") {
+                        SizedBox(width: 8),
+                        // Clear Button
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                // Clear all text fields
+                                for (Generators generator in generatorsList) {
+                                  generator.controller.text = '';
+                                }
+                                // Save empty values
+                                _saveCurrentValues();
+                              });
+                              // Show confirmation
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(context)!.detect_fail,
-                                  ),
+                                  content: Text('All fields cleared'),
+                                  duration: Duration(seconds: 2),
                                 ),
                               );
-                              return;
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red.shade100,
+                              foregroundColor: Colors.red.shade900,
+                            ),
+                            child: Text("Clear All"),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+
+                    ElevatedButton(
+                      onPressed: () async {
+                        int total = 0;
+                        int sum = 0;
+                        List<String> saverFields = [];
+                        for (Generators generator in generatorsList) {
+                          if (generator.isChecked) {
+                            total++;
+                            if (generator.controller.text != '') {
+                              sum++;
+                              saverFields.add(generator.controller.text);
                             }
+                          }
+                        }
 
-                            _frameId = result["frameId"];
-                            _detectedFields = result["data"];
+                        if (total == 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!.entry_no_fields,
+                              ),
+                            ),
+                          );
+                        } else if (sum < total) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.entry_empty_fields,
+                              ),
+                            ),
+                          );
+                        } else if (sum == total) {
+                          String domain = await getURL();
+                          String favIcon = await getFavIconUrl();
+                          Saver.saveInfo(
+                            saverFields[0],
+                            saverFields[1],
+                            favIcon,
+                            domain,
+                            saverFields[6],
+                            saverFields[5],
+                            saverFields[4],
+                            saverFields[3],
+                            saverFields[7],
+                            saverFields[2],
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!.entry_saved,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text(
+                        AppLocalizations.of(context)!.button_save_entry,
+                      ),
+                    ),
+                    SizedBox(height: 16),
 
-                            print("Detected fields size: ${_detectedFields.length}");
-                            print("Generators size: ${generatorsList.length}");
+                    // Detection and field-filling buttons
+                    Row(
+                      children: [
+                        // Detect fields button
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              var result = await queryFields();
+                              if (result["status"] != "FOUND") {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      AppLocalizations.of(context)!.detect_fail,
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
 
-                            for (int i = 0; i < generatorsList.length; i++) {
-                              for (int j = 0; j < _detectedFields.length; j++) {
-                                if (generatorsList[i].checkNamespaceBool(
-                                  _detectedFields[j]["generator"],
-                                )) {
-                                  setState(() {
-                                    selectedItems[i] = true;
-                                    generatorsList[i].isChecked = true;
-                                  });
+                              _frameId = result["frameId"];
+                              _detectedFields = result["data"];
+
+                              print(
+                                "Detected fields size: ${_detectedFields.length}",
+                              );
+                              print(
+                                "Generators size: ${generatorsList.length}",
+                              );
+
+                              for (int i = 0; i < generatorsList.length; i++) {
+                                for (
+                                  int j = 0;
+                                  j < _detectedFields.length;
+                                  j++
+                                ) {
+                                  if (generatorsList[i].checkNamespaceBool(
+                                    _detectedFields[j]["generator"],
+                                  )) {
+                                    setState(() {
+                                      selectedItems[i] = true;
+                                      generatorsList[i].isChecked = true;
+                                    });
+                                  }
                                 }
                               }
-                            }
 
-                            print("Received fields:");
-                            print(_detectedFields);
-                          },
-                          child: Text("Detect fields from current website"),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  
-                  // Fill detected fields button
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_detectedFields.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              AppLocalizations.of(context)!.detect_fail,
+                              print("Received fields:");
+                              print(_detectedFields);
+                            },
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.detect_fields_button,
                             ),
                           ),
-                        );
-                        return;
-                      }
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
 
-                      List<Map<String, dynamic>> fieldsToFill = [];
-                      for (var i = 0; i < _detectedFields.length; i++) {
-                        fieldsToFill.add({
-                          "ref": _detectedFields[i]["ref"],
-                          "value": generatorsList
-                              .map(
-                                (generator) => generator.checkNamespace(
-                                  _detectedFields[i]["generator"],
-                                ),
-                              )
-                              .firstWhere(
-                                (value) => value.isNotEmpty,
-                                orElse: () => '',
+                    // Fill detected fields button
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_detectedFields.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!.detect_fail,
                               ),
-                        });
-                      }
-                      fillFields(_frameId, fieldsToFill);
-                    },
-                    child: Text("Fill detected fields"),
-                  ),
-                ],
+                            ),
+                          );
+                          return;
+                        }
+
+                        List<Map<String, dynamic>> fieldsToFill = [];
+                        for (var i = 0; i < _detectedFields.length; i++) {
+                          fieldsToFill.add({
+                            "ref": _detectedFields[i]["ref"],
+                            "value": generatorsList
+                                .map(
+                                  (generator) => generator.checkNamespace(
+                                    _detectedFields[i]["generator"],
+                                  ),
+                                )
+                                .firstWhere(
+                                  (value) => value.isNotEmpty,
+                                  orElse: () => '',
+                                ),
+                          });
+                        }
+                        fillFields(_frameId, fieldsToFill);
+                      },
+                      child: Text(
+                        AppLocalizations.of(context)!.fill_fields_button,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
