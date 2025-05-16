@@ -154,9 +154,9 @@ class Drive {
       return "BadAuth";
     }
     var json = jsonDecode(list.body);
-    if (json['files'][0]['id'] != null || json['files'][0]['id'] != "") {
-      return json['files'][0]['id'];
+    if (json['files'].length == 0) {
+      return "NoId";
     }
-    return "NoId";
+    return json['files'][0]['id'];
   }
 }

@@ -99,7 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
         if (res == "BadAuth") {
           await Drive.logout();
           setState(() {});
-        } else if (res == "NoFile") {
+        } else if (res == "NoId") {
           await Drive.sendFile();
         } else {
           bool import = await Drive.importFromDrive(res);
