@@ -96,14 +96,17 @@ class _SettingsPageState extends State<SettingsPage> {
     Widget sync = ElevatedButton(
       onPressed: () async {
         String res = await Drive.needSend();
-        if (res == "Files") {
-          bool import = await Drive.importFromDrive();
+        if (res == "BadAuth") {
+          await Drive.logout();
+          setState(() {});
+        } else if (res == "NoFile") {
+          await Drive.sendFile();
+        } else {
+          bool import = await Drive.importFromDrive(res);
           if (import == false) {
             return;
           }
-          await Drive.updateDrive();
-        } else if (res == "NoFile") {
-          await Drive.sendFile();
+          await Drive.updateDrive(res);
         }
         ScaffoldMessenger.of(
           context,

@@ -92,30 +92,14 @@ class Drive {
     );
   }
 
-  static Future<bool> importFromDrive() async {
+  static Future<bool> importFromDrive(String id) async {
     isAuthorized = _prefs!.getBool('Authorized');
     if (isAuthorized == false || isAuthorized == null) {
       return false;
     }
     String? token = _prefs!.getString('access_token');
-    final list = await http.get(
-      Uri.parse('https://www.googleapis.com/drive/v3/files'),
-      headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
-    );
-    if (list.statusCode != 200) {
-      await _prefs!.remove('access_token');
-
-      isAuthorized = false;
-      return false;
-    }
-    var json = jsonDecode(list.body);
-    if (json['files'].length == 0) {
-      return false;
-    }
     final response = await http.get(
-      Uri.parse(
-        'https://www.googleapis.com/drive/v3/files/${json['files'][0]['id']}?alt=media',
-      ),
+      Uri.parse('https://www.googleapis.com/drive/v3/files/$id?alt=media'),
       headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
     );
     if (response.body.length == 0) {
@@ -128,27 +112,12 @@ class Drive {
     return true;
   }
 
-  static Future<void> updateDrive() async {
+  static Future<void> updateDrive(String id) async {
     isAuthorized = _prefs!.getBool('Authorized');
     if (isAuthorized == false || isAuthorized == null) {
       return;
     }
     String? token = _prefs!.getString('access_token');
-    final list = await http.get(
-      Uri.parse('https://www.googleapis.com/drive/v3/files'),
-      headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
-    );
-    print(list.body);
-    if (list.statusCode != 200) {
-      await _prefs!.remove('access_token');
-
-      isAuthorized = false;
-      return;
-    }
-    var json = jsonDecode(list.body);
-    if (json['files'].length == 0) {
-      return;
-    }
     List<String> entries = Saver.readInfo()!;
     String save = '[';
     for (int i = 0; i < entries.length; i++) {
@@ -158,9 +127,7 @@ class Drive {
     save += ']';
     int bytesCount = utf8.encode(save).length;
     final file = await http.patch(
-      Uri.parse(
-        'https://www.googleapis.com/upload/drive/v3/files/${json['files'][0]['id']}',
-      ),
+      Uri.parse('https://www.googleapis.com/upload/drive/v3/files/$id'),
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer $token',
         HttpHeaders.contentTypeHeader: 'application/json',
@@ -173,7 +140,7 @@ class Drive {
   static Future<String> needSend() async {
     isAuthorized = _prefs!.getBool('Authorized');
     if (isAuthorized == false || isAuthorized == null) {
-      return "UnAuth";
+      return "BadAuth";
     }
     String? token = _prefs!.getString('access_token');
     final list = await http.get(
@@ -187,9 +154,9 @@ class Drive {
       return "BadAuth";
     }
     var json = jsonDecode(list.body);
-    if (json['files'].length == 0) {
-      return "NoFile";
+    if (json['files'][0]['id'] != null || json['files'][0]['id'] != "") {
+      return json['files'][0]['id'];
     }
-    return "Files";
+    return "NoId";
   }
 }

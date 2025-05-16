@@ -124,7 +124,6 @@ class Saver {
     bool encrypted,
     String? input_key,
   ) async {
-    print('Start');
     String dataString;
     if (encrypted == true) {
       String dataCypher = dataInput.substring(4);
@@ -159,7 +158,7 @@ class Saver {
       return "BadFile";
     }
     List<String> entries = [];
-    if (_prefs!.getStringList('entries') != []) {
+    if (_prefs!.getStringList('entries') != null) {
       entries = _prefs!.getStringList('entries')!;
     }
     String save = '[';
@@ -169,8 +168,6 @@ class Saver {
     }
     save += ']';
     var temp = jsonDecode(save);
-    print(temp);
-    print(temp.length);
     for (int i = 0; i < data.length; i++) {
       bool match = false;
       var entry = {
@@ -189,7 +186,6 @@ class Saver {
       for (int j = 0; j < temp.length; j++) {
         if (temp[j]['uid'] == entry['uid']) {
           match = true;
-          print('match');
           break;
         }
       }
