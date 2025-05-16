@@ -269,10 +269,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                   currentPage == 'profile'
                       ? Theme.of(context).colorScheme.primary
                       : null,
-              color:
-                  currentPage == 'profile'
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
               onPressed: () async {
                 if (UserProvider.getInstance().isLoggedIn) {
                   await navigateToPageRoute('/profile');
