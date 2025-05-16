@@ -150,7 +150,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SizedBox(height: 20),
 
-            _encrypt == true ? Text("a") : SizedBox(height: 0),
             // Region
             Text(AppLocalizations.of(context)!.setting_region_title),
             DropdownButton<String>(
