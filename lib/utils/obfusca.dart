@@ -7,7 +7,43 @@ const String apiUrl = "https://obfusca.site";
 typedef LoginData = ({String token, DateTime dateExpire});
 
 typedef Part = ({String mediaType, String content, bool encoded});
-typedef Attachment = ({String filename, int size});
+typedef Attachment = ({String filename, int size, int index});
+
+class PartialAttachment {
+  final String filename;
+  final int size;
+  final int index;
+
+  PartialAttachment({
+    required this.filename,
+    required this.size,
+    required this.index,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {'filename': filename, 'size': size, 'index': index};
+  }
+}
+
+class FullAttachment extends PartialAttachment {
+  final String content;
+
+  FullAttachment({
+    required String filename,
+    required int size,
+    required int index,
+    required this.content,
+  }) : super(filename: filename, size: size, index: index);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'filename': filename,
+      'size': size,
+      'index': index,
+      'content': content,
+    };
+  }
+}
 
 class Addresant {
   final String name;
@@ -18,19 +54,17 @@ class Addresant {
   Map<String, dynamic> toJson() {
     return {'name': name, 'address': address};
   }
-}
 
-abstract class SerializableEmail {
-  Map<String, dynamic> toJson();
-
-  int getUid();
-
-  factory SerializableEmail.fromJson(Map<String, dynamic> json) {
-    throw UnimplementedError("fromJson not implemented");
+  @override
+  String toString() {
+    if (name.isEmpty) {
+      return address;
+    }
+    return "$name\n($address)";
   }
 }
 
-class SlimEmailData implements SerializableEmail {
+class SlimEmailData {
   final int uid;
   final Addresant from;
   final Addresant to;
@@ -75,11 +109,6 @@ class SlimEmailData implements SerializableEmail {
       date: DateTime.parse(json['date'] as String),
       read: json['read'] as bool,
     );
-  }
-
-  @override
-  int getUid() {
-    return uid;
   }
 }
 
@@ -128,6 +157,7 @@ class EmailData extends SlimEmailData {
                 (attachment) => {
                   'filename': attachment.filename,
                   'size': attachment.size,
+                  'index': attachment.index,
                 },
               )
               .toList(),
@@ -161,6 +191,7 @@ class EmailData extends SlimEmailData {
             return (
               filename: attachment['filename'] as String,
               size: attachment['size'] as int,
+              index: attachment['index'] as int,
             );
           }).toList(),
       date: DateTime.parse(json['date'] as String),
@@ -350,10 +381,44 @@ class ObfuscaAPI {
                   return (
                     filename: part["Filename"] as String,
                     size: part["Size"] as int,
+                    index: part["Index"] as int,
                   );
                 }).toList(),
             date: DateTime.parse(email["Date"] as String),
             read: email["Read"] as bool,
+          ),
+          null,
+        );
+      }
+      return (null, data["message"] as String);
+    } catch (e) {
+      return (null, e.toString());
+    }
+  }
+
+  static Future<(FullAttachment?, String?)> getUserEmailAttachment(
+    String token,
+    String address,
+    int uid,
+    int index,
+  ) async {
+    try {
+      var response = await http.get(
+        Uri.parse("$apiUrl/email/$address/$uid/attachment/$index"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        var attachment = data["Attachment"];
+        return (
+          FullAttachment(
+            filename: attachment["Filename"] as String,
+            content: attachment["Content"] as String,
+            size: attachment["Size"] as int,
+            index: attachment["Index"] as int,
           ),
           null,
         );

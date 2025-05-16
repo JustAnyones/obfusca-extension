@@ -10,3 +10,4 @@ export 'GeneratorSex.dart';
 export 'GeneratorPassword.dart';
 export 'GeneratorEmail.dart';
 export 'generators.dart';
+export 'GeneratorCustom.dart';

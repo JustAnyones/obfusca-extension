@@ -49,7 +49,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       return;
     }
 
-    await UserProvider.getInstance().clearUserToken();
+    await UserProvider.getInstance().clearUserState();
     await closeCurrentTab();
   }
 
@@ -90,10 +90,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
             children: [
               Row(
                 children: [
-                  Text("USER EMAIL ADDRESSES", style: TextStyle(fontSize: 18)),
+                  Text(
+                    AppLocalizations.of(context)!.user_profile_email_title,
+                    style: TextStyle(fontSize: 18),
+                  ),
                   ElevatedButton(
                     onPressed: createNewAddress,
-                    child: Text("CREATE NEW"),
+                    child: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.user_profile_email_create_button,
+                    ),
                   ),
                   IconButton(
                     onPressed: fetchAddresses,
@@ -117,17 +124,31 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           arguments: {'address': emailAddress},
                         );
                       },
-                      child: Text("VIEW"),
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.user_profile_email_view_button,
+                      ),
                     ),
                     SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: emailAddress));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("COPIED TO CLIPBOARD")),
+                          SnackBar(
+                            content: Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.user_profile_email_copy_toast,
+                            ),
+                          ),
                         );
                       },
-                      child: Text("COPY"),
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.user_profile_email_copy_button,
+                      ),
                     ),
                   ],
                 ),

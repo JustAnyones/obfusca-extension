@@ -192,7 +192,9 @@ class _SettingsPageState extends State<SettingsPage> {
             SizedBox(height: 16),
 
             CheckboxListTile(
-              title: Text("Encryption"),
+              title: Text(
+                AppLocalizations.of(context)!.settings_encryption_toggle,
+              ),
               value: _encrypt,
               onChanged: (bool? newValue) {
                 setState(() {

@@ -42,4 +42,16 @@ class GeneratorSex extends Generators {
   void setLocalization(BuildContext context) {
     localization = AppLocalizations.of(context)!.generator_sex;
   }
+
+  @override
+  void checkOptions(Map<dynamic, dynamic> options) {
+    for (var option in options["options"]) {
+      option["selected"] = false;
+    }
+    for (var option in options["options"]) {
+      if (option["value"] == sex) {
+        option["selected"] = true;
+      }
+    }
+  }
 }

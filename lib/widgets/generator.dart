@@ -1,12 +1,12 @@
-import 'package:browser_extension/generators/GeneratorSex.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/providers/user.dart';
-import 'package:browser_extension/utils/generation.dart';
 import 'package:browser_extension/generators/gens.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
@@ -30,7 +30,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<double> surNamesFreq;
   late List<String> cities;
   late List<List<double>> boundingBoxes;
-  final List<bool> selectedItems = List.filled(11, false);
+  final List<bool> selectedItems = List.filled(13, false);
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -42,6 +42,20 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     super.initState();
     SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
+    GeneratorCustom custom1 = GeneratorCustom();
+    custom1.setCustom("returnValue", "Glorp", [], "custom::glorp");
+    GeneratorCustom custom2 = GeneratorCustom();
+    List<String> customList = [
+      "Glorp",
+      "Buh",
+      "Guh",
+      "Balls",
+      "uhh",
+      "Balding",
+      "BLOOMING",
+    ];
+    custom2.setCustom("random", "Glorp", customList, "custom::buh");
+
     generatorsList = [
       GeneratorName(),
       GeneratorSurName(),
@@ -54,6 +68,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       GeneratorSex(SettingProvider.getInstance().region),
       GeneratorPassword(),
       GeneratorEmail(),
+      custom1,
+      custom2,
     ];
     _loadSavedValues();
     for (Generators generator in generatorsList) {
@@ -249,6 +265,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
             child: IconButton(
               icon: Icon(Icons.person),
               iconSize: 28,
+              color:
+                  currentPage == 'profile'
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
               color:
                   currentPage == 'profile'
                       ? Theme.of(context).colorScheme.primary
@@ -577,19 +597,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                             saverFields[7],
                             saverFields[2],
                           );
-
-                          String res = await Drive.needSend();
-                          if (res == "BadAuth") {
-                            await Drive.logout();
-                          } else if (res == "NoFile") {
-                            await Drive.sendFile();
-                          } else {
-                            bool import = await Drive.importFromDrive(res);
-                            if (import == false) {
-                              return;
-                            }
-                            await Drive.updateDrive(res);
-                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(

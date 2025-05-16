@@ -33,4 +33,6 @@ class Generators {
   }
 
   void setLocalization(BuildContext context) {}
+
+  void checkOptions(Map<dynamic, dynamic> options) {}
 }
