@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:browser_extension/providers/user.dart';
 import 'package:browser_extension/utils/format.dart';
 import 'package:browser_extension/utils/obfusca.dart';
+import 'package:provider/provider.dart';
 
 class EmailListPage extends StatefulWidget {
   const EmailListPage({super.key});
@@ -84,7 +85,7 @@ class _EmailListPageState extends State<EmailListPage> {
       _generalError = null;
     });
 
-    var (err) = await ObfuscaAPI.changeEmailReadStatus(
+    var err = await ObfuscaAPI.changeEmailReadStatus(
       UserProvider.getInstance().userToken!,
       _emailAddress,
       message.uid,
@@ -96,7 +97,12 @@ class _EmailListPageState extends State<EmailListPage> {
       });
       return;
     }
-    fetchMessages();
+
+    message.read = !message.read;
+    await UserProvider.getInstance().setMessageForEmailAddress(
+      _emailAddress,
+      message,
+    );
   }
 
   Future<void> viewMessage(SlimEmailData message) async {
@@ -131,14 +137,6 @@ class _EmailListPageState extends State<EmailListPage> {
       return;
     }
 
-    // On second thought, horrible idea to cache this
-    // because it will be a lot of data
-    /*UserProvider.getInstance().setMessageForEmailAddress(
-      _emailAddress,
-      fetchedEmail,
-    );
-    print("Caching fetched message");*/
-
     Navigator.pushNamed(
       context,
       '/email/view',
@@ -149,100 +147,113 @@ class _EmailListPageState extends State<EmailListPage> {
   @override
   Widget build(BuildContext context) {
     final errorColor = Colors.red; // TODO: use theme color
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        final List<SlimEmailData?> emails =
+            userProvider
+                .getMessageUidsForAddress(_emailAddress)
+                .map(
+                  (uid) => userProvider.getMessageForEmailAddress(
+                    _emailAddress,
+                    uid,
+                  ),
+                )
+                .toList();
 
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            AppLocalizations.of(
-              context,
-            )!.email_message_list_page_title(_emailAddress),
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.email_message_list_name,
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  IconButton(
-                    onPressed: _isRefreshing ? null : fetchMessages,
-                    icon: Icon(Icons.refresh),
-                  ),
-                ],
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(
+                AppLocalizations.of(
+                  context,
+                )!.email_message_list_page_title(_emailAddress),
               ),
-              Table(
-                border: TableBorder.all(),
-                defaultColumnWidth: IntrinsicColumnWidth(),
-                children: [
-                  for (var email in UserProvider.getInstance()
-                      .getMessagesForEmailAddress(_emailAddress)) ...[
-                    TableRow(
-                      decoration: BoxDecoration(
-                        color: email.read ? Colors.white : Colors.grey[300],
-                      ),
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        SizedBox(child: Icon(Icons.email)),
-                        Container(
-                          padding: EdgeInsets.all(4),
-                          child: Text(formatDate(context, email.date)),
+                        Text(
+                          AppLocalizations.of(context)!.email_message_list_name,
+                          style: TextStyle(fontSize: 18),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(4),
-                          child: Text(
-                            "${email.from.name}\n(${email.from.address})",
-                          ),
+                        IconButton(
+                          onPressed: _isRefreshing ? null : fetchMessages,
+                          icon: Icon(Icons.refresh),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(4),
-                          width: 180,
-                          child: Text(email.subject),
-                        ),
-                        SizedBox(
-                          child: IconButton(
-                            icon: Icon(Icons.visibility),
-                            onPressed: () async {
-                              await viewMessage(email);
-                            },
-                          ),
-                        ),
-                        if (email.read) ...[
-                          SizedBox(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                changeReadStatus(email);
-                              },
-                              child: Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!.email_message_list_mark_as_unread,
-                              ),
+                      ],
+                    ),
+                    Table(
+                      border: TableBorder.all(),
+                      defaultColumnWidth: IntrinsicColumnWidth(),
+                      children: [
+                        for (var email in emails) ...[
+                          TableRow(
+                            decoration: BoxDecoration(
+                              color:
+                                  email!.read ? Colors.white : Colors.grey[300],
                             ),
-                          ),
-                        ] else ...[
-                          SizedBox(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                changeReadStatus(email);
-                              },
-                              child: Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!.email_message_list_mark_as_read,
+                            children: [
+                              SizedBox(child: Icon(Icons.email)),
+                              Container(
+                                padding: EdgeInsets.all(4),
+                                child: SelectableText(
+                                  formatDate(context, email.date),
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
-                        /*
+                              Container(
+                                padding: EdgeInsets.all(4),
+                                child: SelectableText(email.from.toString()),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(4),
+                                width: 180,
+                                child: SelectableText(email.subject),
+                              ),
+                              SizedBox(
+                                child: IconButton(
+                                  icon: Icon(Icons.visibility),
+                                  onPressed: () async {
+                                    await viewMessage(email);
+                                  },
+                                ),
+                              ),
+                              if (email.read) ...[
+                                SizedBox(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      changeReadStatus(email);
+                                    },
+                                    child: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.email_message_list_mark_as_unread,
+                                    ),
+                                  ),
+                                ),
+                              ] else ...[
+                                SizedBox(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      changeReadStatus(email);
+                                    },
+                                    child: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.email_message_list_mark_as_read,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              /*
                         // Not gonna support this yet
                         SizedBox(
                           child: IconButton(
@@ -250,21 +261,27 @@ class _EmailListPageState extends State<EmailListPage> {
                             onPressed: () {},
                           ),
                         ),*/
+                            ],
+                          ),
+                        ],
                       ],
                     ),
-                  ],
-                ],
-              ),
 
-              SizedBox(height: 16),
-              if (_generalError != null) ...[
-                Text(_generalError ?? "", style: TextStyle(color: errorColor)),
-                SizedBox(height: 16),
-              ],
-            ],
+                    SizedBox(height: 16),
+                    if (_generalError != null) ...[
+                      Text(
+                        _generalError ?? "",
+                        style: TextStyle(color: errorColor),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

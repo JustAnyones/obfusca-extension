@@ -54,6 +54,14 @@ class Addresant {
   Map<String, dynamic> toJson() {
     return {'name': name, 'address': address};
   }
+
+  @override
+  String toString() {
+    if (name.isEmpty) {
+      return address;
+    }
+    return "$name\n($address)";
+  }
 }
 
 class SlimEmailData {
