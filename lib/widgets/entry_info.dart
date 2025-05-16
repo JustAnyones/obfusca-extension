@@ -27,7 +27,7 @@ class _EntryPageState extends State<EntryPage> {
     Map<String, String> entry = jsonDecode(_entries![index]);
     List<String> keys = entry.keys.toList();
     for (var key in keys) {
-      if (key == 'favicon') continue;
+      if (key == 'favicon' || key == 'uid') continue;
       if (entry[key] != '' && entry[key] != null) {
         params.add(Text("$key:\t${entry[key]}"));
         params.add(SizedBox(height: 16));

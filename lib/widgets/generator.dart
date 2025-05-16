@@ -12,6 +12,7 @@ import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:browser_extension/widgets/read_entries.dart';
+import 'package:browser_extension/utils/drive.dart';
 
 class NameGeneratorPage extends StatefulWidget {
   const NameGeneratorPage({super.key});
@@ -308,7 +309,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                       ? Theme.of(context).colorScheme.primary
                       : null,
               onPressed: () async {
-                await createSettingsPage();
+                await navigateToPageRoute('/settings');
               },
             ),
           ),

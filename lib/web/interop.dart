@@ -24,6 +24,12 @@ external JSPromise<JSObject> _navigateToPageRoute(JSString route);
 @JS('closeCurrentTab')
 external JSPromise<JSObject> _closeCurrentTab();
 
+@JS('getToken')
+external JSPromise<JSObject> _getToken();
+
+@JS('logout')
+external JSPromise<JSObject> _logout();
+
 Future<Map> queryFields() async {
   var result = await _queryFields().toDart;
   return result.dartify() as Map;
@@ -57,4 +63,10 @@ Future<void> navigateToPageRoute(String route) async {
 
 Future<void> closeCurrentTab() async {
   await _closeCurrentTab().toDart;
+}
+
+Future<String> getToken() async {
+  print("token");
+  var token = await _getToken().toDart;
+  return token.dartify() as String;
 }
