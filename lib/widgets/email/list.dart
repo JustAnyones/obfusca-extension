@@ -142,7 +142,7 @@ class _EmailListPageState extends State<EmailListPage> {
     Navigator.pushNamed(
       context,
       '/email/view',
-      arguments: {'email': fetchedEmail},
+      arguments: {'email': fetchedEmail, 'address': _emailAddress},
     );
   }
 
