@@ -657,7 +657,11 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                               print("Received fields:");
                               print(_detectedFields);
                             },
-                            child: Text("Detect fields from current website"),
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.detect_fields_button,
+                            ),
                           ),
                         ),
                       ],
@@ -680,23 +684,44 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
                         List<Map<String, dynamic>> fieldsToFill = [];
                         for (var i = 0; i < _detectedFields.length; i++) {
-                          fieldsToFill.add({
-                            "ref": _detectedFields[i]["ref"],
-                            "value": generatorsList
-                                .map(
-                                  (generator) => generator.checkNamespace(
-                                    _detectedFields[i]["generator"],
+                          if (int.parse(_detectedFields[i]["options"].length) !=
+                              0) {
+                            for (Generators generator in generatorsList) {
+                              if (generator.checkNamespaceBool(
+                                _detectedFields[i]["generator"],
+                              )) {
+                                generator.checkOptions(_detectedFields[i]);
+                              }
+                            }
+                            for (var option in _detectedFields[i]["options"]) {
+                              if (option["selected"] == true) {
+                                fieldsToFill.add({
+                                  "ref": _detectedFields[i]["ref"],
+                                  "value": option["value"],
+                                });
+                              }
+                            }
+                          } else {
+                            fieldsToFill.add({
+                              "ref": _detectedFields[i]["ref"],
+                              "value": generatorsList
+                                  .map(
+                                    (generator) => generator.checkNamespace(
+                                      _detectedFields[i]["generator"],
+                                    ),
+                                  )
+                                  .firstWhere(
+                                    (value) => value.isNotEmpty,
+                                    orElse: () => '',
                                   ),
-                                )
-                                .firstWhere(
-                                  (value) => value.isNotEmpty,
-                                  orElse: () => '',
-                                ),
-                          });
+                            });
+                          }
                         }
                         fillFields(_frameId, fieldsToFill);
                       },
-                      child: Text("Fill detected fields"),
+                      child: Text(
+                        AppLocalizations.of(context)!.fill_fields_button,
+                      ),
                     ),
                   ],
                 ),
