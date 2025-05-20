@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class Generatorcity extends Generators {
+class GeneratorCity extends Generators {
   String city = '';
   List<String> Cities = [];
   List<List<double>> boundingBoxes = [];
   List<String> boundingBox = [];
 
-  Generatorcity() : super("nera");
+  GeneratorCity() : super("namespace::city_generator");
 
   void setCities(List<String> cities) {
     Cities = cities;

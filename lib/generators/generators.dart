@@ -32,6 +32,11 @@ class Generators {
     return controller.text;
   }
 
+  /// Returns true if the generator has a generated value.
+  bool isPresent() {
+    return controller.text.isNotEmpty;
+  }
+
   void setLocalization(BuildContext context) {}
 
   void checkOptions(Map<dynamic, dynamic> options) {}

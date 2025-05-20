@@ -5,13 +5,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class Generatorpostal extends Generators {
+class GeneratorPostal extends Generators {
   String City = '';
   String postal = '';
   List<String> BoundingBox = [];
   final Random _random = Random();
 
-  Generatorpostal(String short) : super("nera") {
+  GeneratorPostal(String short) : super("namespace::postal_code_generator") {
     setDefault(short);
   }
 
