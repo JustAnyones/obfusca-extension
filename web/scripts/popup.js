@@ -110,6 +110,12 @@ async function closeCurrentTab() {
 	chrome.tabs.remove(tab.id);
 }
 
+async function closeLastFocusedWindow() {
+	chrome.windows.getLastFocused(w => {
+  		chrome.extension.getViews({type: 'popup', windowId: w.id}).forEach(v => v.close());
+	});
+}
+
 async function authorize(){
 	const redirectUrl = chrome.identity.getRedirectURL();
 	console.log(redirectUrl);

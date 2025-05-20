@@ -1,18 +1,15 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 
 import 'package:browser_extension/providers/settings.dart';
-import 'package:browser_extension/providers/user.dart';
 import 'package:browser_extension/generators/gens.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
-import 'package:browser_extension/widgets/read_entries.dart';
-import 'package:browser_extension/utils/drive.dart';
+import 'package:browser_extension/widgets/sidebar.dart';
 
 class NameGeneratorPage extends StatefulWidget {
   const NameGeneratorPage({super.key});
@@ -220,102 +217,6 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
         _isButtonDisabled = false;
       });
     });
-  }
-
-  // Sidebar widget with reordered icons
-  Widget buildSidebar(BuildContext context, String currentPage) {
-    return Container(
-      width: 60,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: Offset(2, 0),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          SizedBox(height: 20),
-          // Home button (highlighted on home page)
-          Tooltip(
-            message: "Home",
-            child: IconButton(
-              icon: Icon(Icons.home),
-              iconSize: 28,
-              color:
-                  currentPage == 'home'
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-              onPressed:
-                  currentPage == 'home'
-                      ? null
-                      : () {
-                        Navigator.pop(context);
-                      },
-            ),
-          ),
-          SizedBox(height: 16),
-          // User Profile Button (second)
-          Tooltip(
-            message: AppLocalizations.of(context)!.user_profile_page_title,
-            child: IconButton(
-              icon: Icon(Icons.person),
-              iconSize: 28,
-              color:
-                  currentPage == 'profile'
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-              onPressed: () async {
-                if (UserProvider.getInstance().isLoggedIn) {
-                  await navigateToPageRoute('/profile');
-                } else {
-                  Navigator.pushNamed(context, '/login');
-                }
-              },
-            ),
-          ),
-          SizedBox(height: 16),
-          // Entries Button (third)
-          Tooltip(
-            message: AppLocalizations.of(context)!.button_view_entries,
-            child: IconButton(
-              icon: Icon(Icons.list_alt),
-              iconSize: 28,
-              color:
-                  currentPage == 'entries'
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EntriesPage()),
-                );
-              },
-            ),
-          ),
-          SizedBox(height: 16),
-          // Settings Button (last)
-          Tooltip(
-            message: AppLocalizations.of(context)!.settings_title,
-            child: IconButton(
-              icon: Icon(Icons.settings),
-              iconSize: 28,
-              color:
-                  currentPage == 'settings'
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-              onPressed: () async {
-                await navigateToPageRoute('/settings');
-              },
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
