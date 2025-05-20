@@ -715,6 +715,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                 "ref": _detectedFields[i]["ref"],
                                 "value": generator.getValue(),
                               });
+                              break;
                             }
                           }
                         }
