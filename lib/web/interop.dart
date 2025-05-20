@@ -24,6 +24,9 @@ external JSPromise<JSObject> _navigateToPageRoute(JSString route);
 @JS('closeCurrentTab')
 external JSPromise<JSObject> _closeCurrentTab();
 
+@JS('closeLastFocusedWindow')
+external JSPromise<JSObject> _closeLastFocusedWindow();
+
 @JS('getToken')
 external JSPromise<JSObject> _getToken();
 
@@ -63,6 +66,10 @@ Future<void> navigateToPageRoute(String route) async {
 
 Future<void> closeCurrentTab() async {
   await _closeCurrentTab().toDart;
+}
+
+Future<void> closeLastFocusedWindow() async {
+  await _closeLastFocusedWindow().toDart;
 }
 
 Future<String> getToken() async {

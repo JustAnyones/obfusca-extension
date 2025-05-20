@@ -20,8 +20,6 @@ class _EmailListPageState extends State<EmailListPage> {
 
   late final String _emailAddress;
 
-  Timer? _timer;
-
   bool _isRefreshing = false;
 
   @override
@@ -30,22 +28,6 @@ class _EmailListPageState extends State<EmailListPage> {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _emailAddress = args['address'] as String;
-
-    // Setup periodic refresh of messages
-    _startTimer();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _startTimer() {
-    fetchMessages();
-    _timer = Timer.periodic(Duration(seconds: 15), (Timer timer) {
-      fetchMessages();
-    });
   }
 
   Future<void> fetchMessages() async {

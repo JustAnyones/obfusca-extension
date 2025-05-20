@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:browser_extension/utils/obfusca.dart';
@@ -13,6 +14,7 @@ const String _keyEmailAddressEmails = 'user.email.address.messages';
 class UserProvider extends ChangeNotifier {
   static final UserProvider _instance = UserProvider._internal();
   static SharedPreferences? _prefs;
+  Timer? _emailFetchTimer;
 
   UserProvider._internal();
 
@@ -50,6 +52,8 @@ class UserProvider extends ChangeNotifier {
     _userTokenExpire = await _getDateTime(_keyUserTokenExpire, null);
     _emailAddresses = await _getEmailAddresses() ?? [];
     _emailAddressEmails = await _getMessagesForAllEmailAddresses();
+
+    startTimer();
   }
 
   Future<void> setUserToken(String token, DateTime expire) async {
@@ -57,10 +61,61 @@ class UserProvider extends ChangeNotifier {
     await _prefs!.setString(_keyUserTokenExpire, expire.toString());
     _userToken = token;
     _userTokenExpire = expire;
+    startTimer();
     notifyListeners();
   }
 
+  /// Fetches the emails for the current user and stores them in the SharedPreferences.
+  Future<void> fetchEmails() async {
+    if (!isLoggedIn) {
+      return;
+    }
+    print("Fetching emails for user: $_userToken");
+
+    // For each email address
+    for (var emailAddress in _emailAddresses) {
+      // Fetch the emails from the server
+      var (emails, err) = await ObfuscaAPI.getUserEmails(
+        _userToken!,
+        emailAddress,
+      );
+      print("Fetched emails for $emailAddress: $emails");
+      if (err != null) {
+        print("Error fetching emails: $err");
+        continue;
+      }
+      for (var email in emails) {
+        await setMessageForEmailAddress(emailAddress, email);
+      }
+    }
+  }
+
+  /// Starts a timer to fetch emails every 15 seconds.
+  /// This is used to keep the email list up to date.
+  /// The timer is started only if it is not already running.
+  /// The timer is stopped when the user logs out.
+  void startTimer() {
+    if (_emailFetchTimer != null) {
+      return;
+    }
+    _emailFetchTimer = Timer.periodic(const Duration(seconds: 15), (timer) {
+      fetchEmails();
+    });
+    fetchEmails();
+  }
+
+  /// Stops the timer that fetches emails.
+  /// This is used to stop the timer when the user logs out.
+  /// The timer is stopped only if it is running.
+  void _stopTimer() {
+    if (_emailFetchTimer != null) {
+      _emailFetchTimer!.cancel();
+      _emailFetchTimer = null;
+    }
+  }
+
   Future<void> clearUserState() async {
+    _stopTimer();
     await _prefs!.remove(_keyUserToken);
     await _prefs!.remove(_keyUserTokenExpire);
     await _prefs!.remove(_keyEmailAddresses);
