@@ -113,5 +113,37 @@
                 }]
             }
         ]
+    },
+
+    "discord.com": {
+        "fields": [
+            {
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "input[aria-label='Day']"
+                }],
+                "generators": [{
+                    "name": "namespace::birth_day_generator"
+                }]
+            },
+            {
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "input[aria-label='Month']"
+                }],
+                "generators": [{
+                    "name": "namespace::birth_month_generator"
+                }]
+            },
+            {
+                "detectors": [{
+                    "type": "querySelector",
+                    "value": "input[aria-label='Year']"
+                }],
+                "generators": [{
+                    "name": "namespace::birth_year_generator"
+                }]
+            }
+        ]
     }
 }
