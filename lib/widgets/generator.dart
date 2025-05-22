@@ -20,7 +20,8 @@ class NameGeneratorPage extends StatefulWidget {
 
 class _NameGeneratorPageState extends State<NameGeneratorPage> {
   bool _isButtonDisabled = false;
-  bool _isPasswordVisible = false;
+  bool _isAddressDiceDisabled = false;
+  bool _isPostalDiceDisabled = false;
 
   late List<String> names;
   late List<double> nameFreq;
@@ -379,27 +380,52 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                             suffixIcon: field['generator'] is GeneratorPassword
                                                 ? IconButton(
                                                     icon: Icon(
-                                                      _isPasswordVisible
+                                                      (field['generator'] as GeneratorPassword).isFieldVisible
                                                           ? Icons.visibility
                                                           : Icons.visibility_off,
                                                     ),
                                                     onPressed: () {
                                                       setState(() {
-                                                        _isPasswordVisible = !_isPasswordVisible;
+                                                        (field['generator'] as GeneratorPassword).toggleVisibility();
                                                       });
                                                     },
                                                   )
                                                 : null,
                                           ),
-                                          obscureText: field['generator'] is GeneratorPassword && !_isPasswordVisible,
+                                          obscureText: field['generator'] is GeneratorPassword && 
+                                              !(field['generator'] as GeneratorPassword).isFieldVisible,
                                         ),
                                       ),
                           ),
                           SizedBox(width: 16),  // Increased spacing before dice button
                           IconButton(
                             onPressed: () {
-                              final generator =
-                                  field['generator'] as Generators;
+                              final generator = field['generator'] as Generators;
+                              final index = generatorsList.indexOf(generator);
+                              
+                              // Check if it's address or postal field
+                              if (index == 6) { // Address field
+                                if (_isAddressDiceDisabled) return;
+                                setState(() {
+                                  _isAddressDiceDisabled = true;
+                                });
+                                Timer(Duration(seconds: 2), () {
+                                  setState(() {
+                                    _isAddressDiceDisabled = false;
+                                  });
+                                });
+                              } else if (index == 7) { // Postal field
+                                if (_isPostalDiceDisabled) return;
+                                setState(() {
+                                  _isPostalDiceDisabled = true;
+                                });
+                                Timer(Duration(seconds: 2), () {
+                                  setState(() {
+                                    _isPostalDiceDisabled = false;
+                                  });
+                                });
+                              }
+
                               generator.generate();
                               if (generator is GeneratorCity) {
                                 final city = generator.boundingBox;
@@ -413,7 +439,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                 (generatorsList[8] as GeneratorSex).name = name;
                               }
                             },
-                            icon: Icon(Icons.casino, size: 24),
+                            icon: Icon(
+                              Icons.casino,
+                              size: 24,
+                              color: (field['generator'] is Generatoraddress && _isAddressDiceDisabled) ||
+                                     (field['generator'] is GeneratorPostal && _isPostalDiceDisabled)
+                                  ? Colors.grey
+                                  : null,
+                            ),
                           ),
                         ],
                       );

@@ -5,8 +5,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GeneratorPassword extends Generators {
   String password = '';
+  bool _isFieldVisible = false;
 
   GeneratorPassword() : super("namespace::password_generator");
+
+  bool get isFieldVisible => _isFieldVisible;
+  void toggleVisibility() {
+    _isFieldVisible = !_isFieldVisible;
+  }
 
   @override
   void generate() {
