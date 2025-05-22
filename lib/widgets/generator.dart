@@ -20,6 +20,7 @@ class NameGeneratorPage extends StatefulWidget {
 
 class _NameGeneratorPageState extends State<NameGeneratorPage> {
   bool _isButtonDisabled = false;
+  bool _isPasswordVisible = false;
 
   late List<String> names;
   late List<double> nameFreq;
@@ -177,7 +178,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     (generatorsList[5] as GeneratorCity).setBoundingBoxes(boundingBoxes);
 
     for (Generators generator in generatorsList) {
-      if (generator.isChecked) {
+      if (selectedItems[generatorsList.indexOf(generator)]) {
         generator.generate();
         if (generator is GeneratorName) {
           final name = generator.name.trim();
@@ -191,7 +192,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       }
     }
 
-    if (generatorsList[0].isChecked && generatorsList[1].isChecked) {
+    if (selectedItems[0] && selectedItems[1]) {
       String name = (generatorsList[0] as GeneratorName).name;
       String surname = (generatorsList[1] as GeneratorSurName).surName;
       surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
@@ -212,11 +213,18 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     }
 
     _saveCurrentValues();
-    Timer(Duration(seconds: 2), () {
+    // Only apply cooldown if address or postal code fields are selected
+    if (selectedItems[6] || selectedItems[7]) {  // 6 is address, 7 is postal code
+      Timer(Duration(seconds: 2), () {
+        setState(() {
+          _isButtonDisabled = false;
+        });
+      });
+    } else {
       setState(() {
         _isButtonDisabled = false;
       });
-    });
+    }
   }
 
   @override
@@ -262,6 +270,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
+                    // Add top padding for menu bar spacing
+                    SizedBox(height: 32),
                     // Contained expansion tile with fixed height and ClipRect to prevent overflow
                     Container(
                       decoration: BoxDecoration(
@@ -357,24 +367,35 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                         });
                                       },
                                     )
-                                    : CheckboxListTile(
-                                      title: TextField(
-                                        controller:
-                                            field['controller']
-                                                as TextEditingController?,
-                                        decoration: InputDecoration(
-                                          labelText: field['label'] as String?,
-                                          border: OutlineInputBorder(),
+                                    : Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: TextField(
+                                          controller:
+                                              field['controller']
+                                                  as TextEditingController?,
+                                          decoration: InputDecoration(
+                                            labelText: field['label'] as String?,
+                                            border: OutlineInputBorder(),
+                                            suffixIcon: field['generator'] is GeneratorPassword
+                                                ? IconButton(
+                                                    icon: Icon(
+                                                      _isPasswordVisible
+                                                          ? Icons.visibility
+                                                          : Icons.visibility_off,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _isPasswordVisible = !_isPasswordVisible;
+                                                      });
+                                                    },
+                                                  )
+                                                : null,
+                                          ),
+                                          obscureText: field['generator'] is GeneratorPassword && !_isPasswordVisible,
                                         ),
                                       ),
-                                      value: field['isChecked'] as bool?,
-                                      onChanged:
-                                          field['onChanged']
-                                              as ValueChanged<bool?>?,
-                                      controlAffinity:
-                                          ListTileControlAffinity.leading,
-                                    ),
                           ),
+                          SizedBox(width: 16),  // Increased spacing before dice button
                           IconButton(
                             onPressed: () {
                               final generator =
@@ -411,6 +432,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                   : AppLocalizations.of(
                                     context,
                                   )!.button_generate,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                height: 1.0,
+                              ),
                             ),
                           ),
                         ),
