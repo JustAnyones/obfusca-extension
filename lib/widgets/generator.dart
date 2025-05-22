@@ -59,9 +59,9 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       Generatorusername(),
       Generatordate(),
       Generatorcountry(SettingProvider.getInstance().region),
-      Generatorcity(),
+      GeneratorCity(),
       Generatoraddress(SettingProvider.getInstance().region),
-      Generatorpostal(SettingProvider.getInstance().region),
+      GeneratorPostal(SettingProvider.getInstance().region),
       GeneratorSex(SettingProvider.getInstance().region),
       GeneratorPassword(),
       GeneratorEmail(),
@@ -173,8 +173,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
     (generatorsList[0] as GeneratorName).setNames(names, nameFreq);
     (generatorsList[1] as GeneratorSurName).setSurnames(surNames, surNamesFreq);
-    (generatorsList[5] as Generatorcity).setCities(cities);
-    (generatorsList[5] as Generatorcity).setBoundingBoxes(boundingBoxes);
+    (generatorsList[5] as GeneratorCity).setCities(cities);
+    (generatorsList[5] as GeneratorCity).setBoundingBoxes(boundingBoxes);
 
     for (Generators generator in generatorsList) {
       if (generator.isChecked) {
@@ -183,10 +183,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
           final name = generator.name.trim();
           (generatorsList[8] as GeneratorSex).name = name;
         }
-        if (generator is Generatorcity) {
+        if (generator is GeneratorCity) {
           final city = generator.boundingBox;
           (generatorsList[6] as Generatoraddress).setBoundingBox(city);
-          (generatorsList[7] as Generatorpostal).setBoundingBox(city);
+          (generatorsList[7] as GeneratorPostal).setBoundingBox(city);
         }
       }
     }
@@ -380,11 +380,11 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                               final generator =
                                   field['generator'] as Generators;
                               generator.generate();
-                              if (generator is Generatorcity) {
+                              if (generator is GeneratorCity) {
                                 final city = generator.boundingBox;
                                 (generatorsList[6] as Generatoraddress)
                                     .setBoundingBox(city);
-                                (generatorsList[7] as Generatorpostal)
+                                (generatorsList[7] as GeneratorPostal)
                                     .setBoundingBox(city);
                               }
                               if (generator is GeneratorName) {
@@ -585,6 +585,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
                         List<Map<String, dynamic>> fieldsToFill = [];
                         for (var i = 0; i < _detectedFields.length; i++) {
+                          // If it's a SELECT type of input
                           if (int.parse(_detectedFields[i]["options"].length) !=
                               0) {
                             for (Generators generator in generatorsList) {
@@ -602,20 +603,23 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                 });
                               }
                             }
-                          } else {
-                            fieldsToFill.add({
-                              "ref": _detectedFields[i]["ref"],
-                              "value": generatorsList
-                                  .map(
-                                    (generator) => generator.checkNamespace(
-                                      _detectedFields[i]["generator"],
-                                    ),
-                                  )
-                                  .firstWhere(
-                                    (value) => value.isNotEmpty,
-                                    orElse: () => '',
-                                  ),
-                            });
+                            continue;
+                          }
+
+                          // Otherwise, it's a TEXT type of input
+                          // Pick the first generator that matches the namespace
+                          // and has a generated value
+                          for (var generator in generatorsList) {
+                            if (generator.checkNamespaceBool(
+                                  _detectedFields[i]["generator"],
+                                ) &&
+                                generator.isPresent()) {
+                              fieldsToFill.add({
+                                "ref": _detectedFields[i]["ref"],
+                                "value": generator.getValue(),
+                              });
+                              break;
+                            }
                           }
                         }
                         fillFields(_frameId, fieldsToFill);
