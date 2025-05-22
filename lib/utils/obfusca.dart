@@ -71,6 +71,7 @@ class SlimEmailData {
   final String subject;
   final DateTime date;
   bool read;
+  bool recentlyShown = false;
 
   SlimEmailData({
     required this.uid,
@@ -79,6 +80,7 @@ class SlimEmailData {
     required this.subject,
     required this.date,
     required this.read,
+    required this.recentlyShown,
   });
 
   /// Converts the SlimEmailData object to a JSON representation.
@@ -90,6 +92,7 @@ class SlimEmailData {
       'subject': subject,
       'date': date.toIso8601String(),
       'read': read,
+      'recentlyShown': recentlyShown,
     };
   }
 
@@ -108,6 +111,7 @@ class SlimEmailData {
       subject: json['subject'] as String,
       date: DateTime.parse(json['date'] as String),
       read: json['read'] as bool,
+      recentlyShown: json['recentlyShown'] as bool,
     );
   }
 }
@@ -132,72 +136,8 @@ class EmailData extends SlimEmailData {
          subject: subject,
          date: date,
          read: read,
+         recentlyShown: false,
        );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'uid': uid,
-      'from': from.toJson(),
-      'to': to.toJson(),
-      'subject': subject,
-      'parts':
-          parts
-              .map(
-                (part) => {
-                  'mediaType': part.mediaType,
-                  'content': part.content,
-                  'encoded': part.encoded,
-                },
-              )
-              .toList(),
-      'attachments':
-          attachments
-              .map(
-                (attachment) => {
-                  'filename': attachment.filename,
-                  'size': attachment.size,
-                  'index': attachment.index,
-                },
-              )
-              .toList(),
-      'date': date.toIso8601String(),
-      'read': read,
-    };
-  }
-
-  factory EmailData.fromJson(Map<String, dynamic> json) {
-    return EmailData(
-      uid: json['uid'] as int,
-      from: Addresant(
-        name: json['from']['name'] as String,
-        address: json['from']['address'] as String,
-      ),
-      to: Addresant(
-        name: json['to']['name'] as String,
-        address: json['to']['address'] as String,
-      ),
-      subject: json['subject'] as String,
-      parts:
-          (json['parts'] as List<dynamic>).map((part) {
-            return (
-              mediaType: part['mediaType'] as String,
-              content: part['content'] as String,
-              encoded: part['encoded'] as bool,
-            );
-          }).toList(),
-      attachments:
-          (json['attachments'] as List<dynamic>).map((attachment) {
-            return (
-              filename: attachment['filename'] as String,
-              size: attachment['size'] as int,
-              index: attachment['index'] as int,
-            );
-          }).toList(),
-      date: DateTime.parse(json['date'] as String),
-      read: json['read'] as bool,
-    );
-  }
 }
 
 class ObfuscaAPI {
@@ -328,6 +268,7 @@ class ObfuscaAPI {
               subject: email["Subject"] as String,
               date: DateTime.parse(email["Date"] as String),
               read: email["Read"] as bool,
+              recentlyShown: false,
             ),
           );
         }
