@@ -43,8 +43,24 @@ class _ExtensionState extends State<Extension> {
             '/register': (context) => const UserRegisterPage(),
             '/profile': (context) => const UserProfilePage(),
             '/email/list': (context) => const EmailListPage(),
-            '/email/view': (context) => const EmailViewPage(),
             '/settings': (context) => const SettingsPage(),
+          },
+          onGenerateRoute: (settings) {
+            final uri = Uri.parse(settings.name ?? '');
+            // /email/view/{address}/{uid}
+            if (uri.pathSegments.length >= 3 &&
+                uri.pathSegments[0] == 'email' &&
+                uri.pathSegments[1] == 'view') {
+              final String address = uri.pathSegments[2];
+              final String uidStr = uri.pathSegments[3];
+              final int uid = int.tryParse(uidStr) ?? -1;
+              return MaterialPageRoute(
+                builder: (context) => EmailViewPage(address: address, uid: uid),
+                settings: settings,
+              );
+            }
+            // Let the framework handle other routes
+            return null;
           },
         );
       },

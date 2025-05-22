@@ -100,30 +100,7 @@ class _EmailListPageState extends State<EmailListPage> {
       );
     }
 
-    var (fetchedEmail, err) = await ObfuscaAPI.getUserEmail(
-      UserProvider.getInstance().userToken!,
-      _emailAddress,
-      message.uid,
-    );
-
-    if (err != null) {
-      setState(() {
-        _generalError = "Could not fetch email: $err";
-      });
-      return;
-    }
-    if (fetchedEmail == null) {
-      setState(() {
-        _generalError = "Could not fetch email: $err";
-      });
-      return;
-    }
-
-    Navigator.pushNamed(
-      context,
-      '/email/view',
-      arguments: {'email': fetchedEmail, 'address': _emailAddress},
-    );
+    Navigator.pushNamed(context, '/email/view/$_emailAddress/${message.uid}');
   }
 
   @override
