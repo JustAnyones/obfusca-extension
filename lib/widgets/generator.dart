@@ -20,6 +20,8 @@ class NameGeneratorPage extends StatefulWidget {
 
 class _NameGeneratorPageState extends State<NameGeneratorPage> {
   bool _isButtonDisabled = false;
+  bool _isAddressDiceDisabled = false;
+  bool _isPostalDiceDisabled = false;
 
   late List<String> names;
   late List<double> nameFreq;
@@ -177,7 +179,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     (generatorsList[5] as GeneratorCity).setBoundingBoxes(boundingBoxes);
 
     for (Generators generator in generatorsList) {
-      if (generator.isChecked) {
+      if (selectedItems[generatorsList.indexOf(generator)]) {
         generator.generate();
         if (generator is GeneratorName) {
           final name = generator.name.trim();
@@ -191,7 +193,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       }
     }
 
-    if (generatorsList[0].isChecked && generatorsList[1].isChecked) {
+    if (selectedItems[0] && selectedItems[1]) {
       String name = (generatorsList[0] as GeneratorName).name;
       String surname = (generatorsList[1] as GeneratorSurName).surName;
       surname = surname[0].toUpperCase() + surname.substring(1).toLowerCase();
@@ -212,11 +214,18 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     }
 
     _saveCurrentValues();
-    Timer(Duration(seconds: 2), () {
+    // Only apply cooldown if address or postal code fields are selected
+    if (selectedItems[6] || selectedItems[7]) {  // 6 is address, 7 is postal code
+      Timer(Duration(seconds: 2), () {
+        setState(() {
+          _isButtonDisabled = false;
+        });
+      });
+    } else {
       setState(() {
         _isButtonDisabled = false;
       });
-    });
+    }
   }
 
   @override
@@ -262,6 +271,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
+                    // Add top padding for menu bar spacing
+                    SizedBox(height: 32),
                     // Contained expansion tile with fixed height and ClipRect to prevent overflow
                     Container(
                       decoration: BoxDecoration(
@@ -357,28 +368,64 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                         });
                                       },
                                     )
-                                    : CheckboxListTile(
-                                      title: TextField(
-                                        controller:
-                                            field['controller']
-                                                as TextEditingController?,
-                                        decoration: InputDecoration(
-                                          labelText: field['label'] as String?,
-                                          border: OutlineInputBorder(),
+                                    : Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: TextField(
+                                          controller:
+                                              field['controller']
+                                                  as TextEditingController?,
+                                          decoration: InputDecoration(
+                                            labelText: field['label'] as String?,
+                                            border: OutlineInputBorder(),
+                                            suffixIcon: field['generator'] is GeneratorPassword
+                                                ? IconButton(
+                                                    icon: Icon(
+                                                      (field['generator'] as GeneratorPassword).isFieldVisible
+                                                          ? Icons.visibility
+                                                          : Icons.visibility_off,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        (field['generator'] as GeneratorPassword).toggleVisibility();
+                                                      });
+                                                    },
+                                                  )
+                                                : null,
+                                          ),
+                                          obscureText: field['generator'] is GeneratorPassword && 
+                                              !(field['generator'] as GeneratorPassword).isFieldVisible,
                                         ),
                                       ),
-                                      value: field['isChecked'] as bool?,
-                                      onChanged:
-                                          field['onChanged']
-                                              as ValueChanged<bool?>?,
-                                      controlAffinity:
-                                          ListTileControlAffinity.leading,
-                                    ),
                           ),
+                          SizedBox(width: 16),  // Increased spacing before dice button
                           IconButton(
                             onPressed: () {
-                              final generator =
-                                  field['generator'] as Generators;
+                              final generator = field['generator'] as Generators;
+                              final index = generatorsList.indexOf(generator);
+                              
+                              // Check if it's address or postal field
+                              if (index == 6) { // Address field
+                                if (_isAddressDiceDisabled) return;
+                                setState(() {
+                                  _isAddressDiceDisabled = true;
+                                });
+                                Timer(Duration(seconds: 2), () {
+                                  setState(() {
+                                    _isAddressDiceDisabled = false;
+                                  });
+                                });
+                              } else if (index == 7) { // Postal field
+                                if (_isPostalDiceDisabled) return;
+                                setState(() {
+                                  _isPostalDiceDisabled = true;
+                                });
+                                Timer(Duration(seconds: 2), () {
+                                  setState(() {
+                                    _isPostalDiceDisabled = false;
+                                  });
+                                });
+                              }
+
                               generator.generate();
                               if (generator is GeneratorCity) {
                                 final city = generator.boundingBox;
@@ -392,7 +439,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                 (generatorsList[8] as GeneratorSex).name = name;
                               }
                             },
-                            icon: Icon(Icons.casino, size: 24),
+                            icon: Icon(
+                              Icons.casino,
+                              size: 24,
+                              color: (field['generator'] is Generatoraddress && _isAddressDiceDisabled) ||
+                                     (field['generator'] is GeneratorPostal && _isPostalDiceDisabled)
+                                  ? Colors.grey
+                                  : null,
+                            ),
                           ),
                         ],
                       );
@@ -411,6 +465,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                   : AppLocalizations.of(
                                     context,
                                   )!.button_generate,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                height: 1.0,
+                              ),
                             ),
                           ),
                         ),
