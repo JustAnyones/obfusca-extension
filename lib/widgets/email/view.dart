@@ -140,6 +140,17 @@ class _EmailViewPageState extends State<EmailViewPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Ugly hack to not show the back button if it's accessed from anywhere
+    // other than the email list page.
+    final args = ModalRoute.of(context)!.settings.arguments;
+    var isFirstRoute = true;
+    if (args != null &&
+        args is Map<String, dynamic> &&
+        args['internal'] != null &&
+        args['internal'] == true) {
+      isFirstRoute = false;
+    }
+
     final errorColor = Colors.red; // TODO: use theme color
 
     // Ugly workaround to get the available height for the WebView
@@ -172,6 +183,7 @@ class _EmailViewPageState extends State<EmailViewPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(AppLocalizations.of(context)!.email_view_page_title),
+          automaticallyImplyLeading: !isFirstRoute,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -189,17 +201,17 @@ class _EmailViewPageState extends State<EmailViewPage> {
                 if (!_htmlLoaded || _message == null) ...[
                   CircularProgressIndicator(),
                 ] else ...[
-                  Text(
+                  SelectableText(
                     AppLocalizations.of(
                       context,
                     )!.email_view_from(_message!.from.toString()),
                   ),
-                  Text(
+                  SelectableText(
                     AppLocalizations.of(
                       context,
                     )!.email_view_subject(_message!.subject),
                   ),
-                  Text(
+                  SelectableText(
                     AppLocalizations.of(
                       context,
                     )!.email_view_date(formatDate(context, _message!.date)),

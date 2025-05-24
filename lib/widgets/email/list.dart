@@ -100,7 +100,11 @@ class _EmailListPageState extends State<EmailListPage> {
       );
     }
 
-    Navigator.pushNamed(context, '/email/view/$_emailAddress/${message.uid}');
+    Navigator.pushNamed(
+      context,
+      '/email/view/$_emailAddress/${message.uid}',
+      arguments: {'internal': true},
+    );
   }
 
   @override

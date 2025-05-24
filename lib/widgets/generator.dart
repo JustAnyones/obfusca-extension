@@ -1,15 +1,19 @@
 import 'dart:async';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:browser_extension/providers/user.dart';
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/generators/gens.dart';
+import 'package:browser_extension/utils/obfusca.dart';
 import 'package:browser_extension/utils/read_csv.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
-import 'package:browser_extension/widgets/sidebar.dart';
+import 'package:browser_extension/widgets/reusable/sidebar.dart';
+import 'package:browser_extension/widgets/reusable/toast.dart';
 
 class NameGeneratorPage extends StatefulWidget {
   const NameGeneratorPage({super.key});
@@ -219,6 +223,32 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     });
   }
 
+  void showEmailDialog(SlimEmailData email) {
+    ToastService.show(
+      context,
+      title: AppLocalizations.of(
+        context,
+      )!.toast_new_email_title(email.from.address),
+      message: email.subject,
+      position: ToastPosition.center,
+      duration: Duration(seconds: 10),
+      actions: [
+        ToastAction(
+          label: AppLocalizations.of(context)!.toast_new_email_view_button,
+          onPressed: () async {
+            ToastService.dismiss();
+            await navigateToPageRoute(
+              '/email/view/${email.to.address}/${email.uid}',
+            );
+            await closeLastFocusedWindow();
+          },
+          textColor: Colors.green,
+          backgroundColor: Colors.white,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String> generators = [];
@@ -255,6 +285,18 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
           children: [
             // Side Navigation Bar with reordered icons
             buildSidebar(context, 'home'),
+
+            Selector<UserProvider, SlimEmailData?>(
+              selector: (context, provider) => provider.recentEmail,
+              builder: (context, recentEmail, child) {
+                if (recentEmail != null) {
+                  showEmailDialog(recentEmail);
+                  UserProvider.getInstance()
+                      .clearRecentEmail(); // Clear recent email after showing
+                }
+                return Container();
+              },
+            ),
 
             // Main Content
             Expanded(
