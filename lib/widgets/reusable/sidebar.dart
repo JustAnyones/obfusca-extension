@@ -12,7 +12,7 @@ Widget buildSidebar(BuildContext context, String currentPage) {
       color: Theme.of(context).colorScheme.surface,
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.1),
+          color: Colors.black.withValues(alpha: 0.1),
           blurRadius: 4,
           offset: Offset(2, 0),
         ),
@@ -23,7 +23,7 @@ Widget buildSidebar(BuildContext context, String currentPage) {
         SizedBox(height: 20),
         // Home button (highlighted on home page)
         Tooltip(
-          message: "Home",
+          message: AppLocalizations.of(context)!.generator_page_title,
           child: IconButton(
             icon: Icon(Icons.home),
             iconSize: 28,

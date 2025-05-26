@@ -18,6 +18,7 @@
     "button_wait": "Prašau palaukit...",
     "button_generate": "Generuoti",
     "expansion_tile": "Generatoriai",
+    "generator_page_title": "Generatorius",
 
     "button_save_entry": "Išsaugoti",
     "entry_saved": "Įrašas išsaugotas!",
@@ -99,5 +100,8 @@
   
     "field_username_title": "Naudotojo vardas",
     "field_password_title": "Slaptažodis",
-    "field_empty": "Laukas negali būti tuščias"
+    "field_empty": "Laukas negali būti tuščias",
+
+    "toast_new_email_title": "Naujas laiškas nuo {address}",
+    "toast_new_email_view_button": "Peržiūrėti"
 }

@@ -16,6 +16,10 @@ class UserProvider extends ChangeNotifier {
   static SharedPreferences? _prefs;
   Timer? _emailFetchTimer;
 
+  SlimEmailData? _recentEmail = null;
+  // The most recent email
+  SlimEmailData? get recentEmail => _recentEmail;
+
   UserProvider._internal();
 
   factory UserProvider() {
@@ -24,6 +28,11 @@ class UserProvider extends ChangeNotifier {
 
   static UserProvider getInstance() {
     return _instance;
+  }
+
+  void clearRecentEmail() {
+    _recentEmail = null;
+    notifyListeners();
   }
 
   String? _userToken;
@@ -45,6 +54,8 @@ class UserProvider extends ChangeNotifier {
       _userTokenExpire != null &&
       _userTokenExpire!.isAfter(DateTime.now());
 
+  /// Initializes the UserProvider and loads the user token and email addresses
+  /// from SharedPreferences.
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
 
@@ -56,6 +67,8 @@ class UserProvider extends ChangeNotifier {
     startTimer();
   }
 
+  /// Sets the user token and expiration date in the SharedPreferences.
+  /// This is called when the user logs in.
   Future<void> setUserToken(String token, DateTime expire) async {
     await _prefs!.setString(_keyUserToken, token);
     await _prefs!.setString(_keyUserTokenExpire, expire.toString());
@@ -85,6 +98,31 @@ class UserProvider extends ChangeNotifier {
         continue;
       }
       for (var email in emails) {
+        // If email arrived in the last 5 minutes
+        // and was not already shown
+        // and there's no recent email
+        if (email.date.isAfter(
+              DateTime.now().subtract(const Duration(minutes: 5)),
+            ) &&
+            _recentEmail == null) {
+          var storedEmail = _emailAddressEmails[emailAddress]?[email.uid];
+          var show = false;
+
+          // If we don't have a stored email, that means we haven't shown it yet
+          // and we can show it now
+          if (storedEmail == null) {
+            show = true;
+            // If we do have it stored, we only show it if it was not shown yet
+          } else if (!storedEmail.recentlyShown) {
+            show = true;
+          }
+
+          if (show) {
+            _recentEmail = email;
+            email.recentlyShown = true;
+          }
+        }
+
         await setMessageForEmailAddress(emailAddress, email);
       }
     }
@@ -188,13 +226,8 @@ class UserProvider extends ChangeNotifier {
       }
 
       var data = jsonDecode(emailData);
-      if (data["parts"] != null) {
-        var message = EmailData.fromJson(data);
-        emailMap[message.uid] = message;
-      } else {
-        var message = SlimEmailData.fromJson(data);
-        emailMap[message.uid] = message;
-      }
+      var message = SlimEmailData.fromJson(data);
+      emailMap[message.uid] = message;
     }
     return emailMap;
   }
@@ -241,12 +274,23 @@ class UserProvider extends ChangeNotifier {
     String emailAddress,
     SlimEmailData message,
   ) async {
+    // If message is already in the list, inherit some state from the list
+    if (_emailAddressEmails[emailAddress]?[message.uid] != null) {
+      var oldMessage = _emailAddressEmails[emailAddress]![message.uid]!;
+      if (oldMessage.recentlyShown) {
+        message.recentlyShown = true;
+      }
+    }
+
+    // Store message in SharedPreferences
     await _prefs!.setString(
       "$_keyEmailAddressEmails.$emailAddress.${message.uid}",
       jsonEncode(message.toJson()),
     );
+    // Update the local map
     _emailAddressEmails[emailAddress] ??= {};
     _emailAddressEmails[emailAddress]![message.uid] = message;
+    // And update the sorted list of UIDs
     await updateSortOrder(emailAddress);
     notifyListeners();
   }

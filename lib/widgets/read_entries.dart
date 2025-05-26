@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:browser_extension/widgets/sidebar.dart';
+import 'package:browser_extension/widgets/reusable/sidebar.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 
 class EntriesPage extends StatefulWidget {

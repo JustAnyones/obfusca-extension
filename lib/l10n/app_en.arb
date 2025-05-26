@@ -18,6 +18,7 @@
   "button_wait": "Please wait...",
   "button_generate": "Generate",
   "expansion_tile": "Generators",
+  "generator_page_title": "Generator",
 
   "button_save_entry": "Save",
   "entry_saved": "Entry saved!",
@@ -135,5 +136,13 @@
 
   "@ext_title": {
     "description": "Name and title of the extension"
-  }
+  },
+
+  "toast_new_email_title": "New email from {address}",
+  "@toast_new_email_title": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "toast_new_email_view_button": "View"
 }
