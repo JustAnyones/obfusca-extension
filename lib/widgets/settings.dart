@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:browser_extension/utils/session_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:file_picker/file_picker.dart';
@@ -115,13 +116,28 @@ class _SettingsPageState extends State<SettingsPage> {
           await Drive.logout();
           setState(() {});
         } else if (res == "NoId") {
-          await Drive.sendFile();
+          _keyController.text = "";
+          _key = "";
+          await _displayTextInputDialog(context);
+          SessionData.session!.set('key', _key!);
+          SessionData.session!.set('sync', true);
+          await Drive.sendFile(await SessionData.session!.get('key'));
         } else {
-          bool import = await Drive.importFromDrive(res);
+          if (await SessionData.session!.get('sync') != true) {
+            _keyController.text = "";
+            _key = "";
+            await _displayTextInputDialog(context);
+            SessionData.session!.set('key', _key!);
+            SessionData.session!.set('sync', true);
+          }
+          bool import = await Drive.importFromDrive(
+            res,
+            await SessionData.session!.get('key'),
+          );
           if (import == false) {
             return;
           }
-          await Drive.updateDrive(res);
+          await Drive.updateDrive(res, await SessionData.session!.get('key'));
         }
         ScaffoldMessenger.of(
           context,

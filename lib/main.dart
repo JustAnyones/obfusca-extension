@@ -8,12 +8,14 @@ import 'package:browser_extension/providers/user.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/widgets/extension.dart';
 import 'package:browser_extension/utils/drive.dart';
+import 'package:browser_extension/utils/session_data.dart';
 
 Future<void> initializeProviders() async {
   await SettingProvider().initialize();
   await UserProvider().initialize();
   await Saver.initialize();
   await Drive.initialize();
+  await SessionData.initialize();
 }
 
 void main() async {

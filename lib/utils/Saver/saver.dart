@@ -4,6 +4,7 @@ import "package:flutter/foundation.dart" hide Key;
 import 'package:file_picker/file_picker.dart';
 import "package:shared_preferences/shared_preferences.dart";
 import 'package:encrypt/encrypt.dart';
+import 'package:crypto/crypto.dart';
 
 class Saver {
   static SharedPreferences? _prefs;
@@ -95,7 +96,9 @@ class Saver {
     final encrypter = Encrypter(AES(key));
     final cypherText = encrypter.encrypt(save, iv: iv);
     String export = 'obfu' + cypherText.base64;
-    Uint8List bytes = new Uint8List.fromList(export.codeUnits);
+    var hash = sha256.convert(utf8.encode(save));
+    export = export + hash.toString();
+    Uint8List bytes = utf8.encode(export);
     FilePicker? platform;
     platform = FilePicker.platform;
     await platform.saveFile(
@@ -127,6 +130,8 @@ class Saver {
     String dataString;
     if (encrypted == true) {
       String dataCypher = dataInput.substring(4);
+      String dataHash = dataCypher.substring(dataCypher.length - 64);
+      dataCypher = dataCypher.substring(0, dataCypher.length - 64);
       String mainKey = "";
       mainKey += input_key!;
       if (mainKey.length < 32) {
@@ -140,6 +145,10 @@ class Saver {
       final encrypter = Encrypter(AES(key));
       Encrypted encrypt = Encrypted.from64(dataCypher);
       dataString = encrypter.decrypt(encrypt, iv: iv);
+      var hash = sha256.convert(utf8.encode(dataString));
+      if (dataHash != hash.toString()) {
+        return "BadFile";
+      }
     } else {
       dataString = dataInput;
     }
