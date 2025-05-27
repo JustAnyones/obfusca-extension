@@ -9,6 +9,7 @@ import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:http/http.dart' as http;
+import 'package:browser_extension/generators/gens.dart';
 import 'package:browser_extension/utils/drive.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -284,6 +285,166 @@ class _SettingsPageState extends State<SettingsPage> {
             Drive.Authorized() ? logout : SizedBox(height: 0),
 
             SizedBox(height: 16),
+
+            // Custom Generator button
+            ElevatedButton.icon(
+              icon: Icon(Icons.add),
+              label: Text('Sukurti Custom Generator'),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    final TextEditingController returnValueController =
+                        TextEditingController();
+                    final TextEditingController namespaceController =
+                        TextEditingController();
+                    String selectedType = 'random'; // default value
+                    List<TextEditingController> randomControllers = [
+                      TextEditingController(),
+                    ];
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return AlertDialog(
+                          title: Text('Sukurti Custom Generator'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                DropdownButton<String>(
+                                  value: selectedType,
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: 'random',
+                                      child: Text('random'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'returnValue',
+                                      child: Text('returnValue'),
+                                    ),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedType = value!;
+                                    });
+                                  },
+                                ),
+                                if (selectedType == 'random') ...[
+                                  Column(
+                                    children: [
+                                      for (
+                                        int i = 0;
+                                        i < randomControllers.length;
+                                        i++
+                                      )
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextField(
+                                                controller:
+                                                    randomControllers[i],
+                                                decoration: InputDecoration(
+                                                  labelText:
+                                                      'Reikšmė #${i + 1}',
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(
+                                                Icons.remove_circle,
+                                                color: Colors.red,
+                                              ),
+                                              onPressed:
+                                                  randomControllers.length > 1
+                                                      ? () {
+                                                        setState(() {
+                                                          randomControllers
+                                                              .removeAt(i);
+                                                        });
+                                                      }
+                                                      : null,
+                                            ),
+                                          ],
+                                        ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: TextButton.icon(
+                                          icon: Icon(Icons.add),
+                                          label: Text('Pridėti reikšmę'),
+                                          onPressed: () {
+                                            setState(() {
+                                              randomControllers.add(
+                                                TextEditingController(),
+                                              );
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                                if (selectedType == 'returnValue')
+                                  TextField(
+                                    controller: returnValueController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Return Value',
+                                    ),
+                                  ),
+                                TextField(
+                                  controller: namespaceController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Namespace',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text('Atšaukti'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                try {
+                                  final generator = GeneratorCustom();
+                                  generator.setCustom(
+                                    selectedType,
+                                    returnValueController.text,
+                                    selectedType == 'random'
+                                        ? randomControllers
+                                            .map((c) => c.text)
+                                            .where((v) => v.isNotEmpty)
+                                            .toList()
+                                        : [],
+                                    namespaceController.text,
+                                  );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Custom generator sukurtas!',
+                                      ),
+                                    ),
+                                  );
+                                  Navigator.of(context).pop();
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Klaida: ${e.toString()}'),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text('Sukurti'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
           ],
         ),
       ),
