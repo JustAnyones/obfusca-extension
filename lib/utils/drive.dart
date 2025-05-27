@@ -11,8 +11,6 @@ class Drive {
   static bool? isAuthorized;
   static SharedPreferences? _prefs;
   static String _keyExtension = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-  static bool _passwordSet = false;
-  static String _password = "";
   static Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
   }
@@ -49,8 +47,6 @@ class Drive {
   }
 
   static Future<void> sendFile(String inputKey) async {
-    _passwordSet = true;
-    _password = inputKey;
     isAuthorized = _prefs!.getBool('Authorized');
     if (isAuthorized == false || isAuthorized == null) {
       return;
