@@ -100,14 +100,14 @@ class _SettingsPageState extends State<SettingsPage> {
         await Drive.Login();
         setState(() {});
       },
-      child: Text("Google login"),
+      child: Text(AppLocalizations.of(context)!.google_sign_in),
     );
     Widget logout = ElevatedButton(
       onPressed: () async {
         await Drive.logout();
         setState(() {});
       },
-      child: Text("Google logout"),
+      child: Text(AppLocalizations.of(context)!.google_logout),
     );
     Widget sync = ElevatedButton(
       onPressed: () async {
@@ -139,11 +139,11 @@ class _SettingsPageState extends State<SettingsPage> {
           }
           await Drive.updateDrive(res, await SessionData.session!.get('key'));
         }
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Drive synced")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.google_synced)),
+        );
       },
-      child: Text("Google sync"),
+      child: Text(AppLocalizations.of(context)!.google_sync),
     );
 
     return Scaffold(

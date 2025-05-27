@@ -27,8 +27,8 @@
   "missing_name_surname": "Enter name and surname",
   "button_view_entries": "Entries",
   "entries_title": "Saved entries",
-  "button_export_entries": "Export",
-  "button_import_entries": "Import",
+  "button_export_entries": "Export to file",
+  "button_import_entries": "Import from file",
   "import_no_file": "Choose a file",
   "import_bad_file": "Cannot import from this file",
   "import_success": "Entries imported",
@@ -38,6 +38,10 @@
   "input_password": "Input encryption password",
   "hint_password": "Password",
   "button_submit_password": "Ok",
+  "google_sign_in": "Google Sign in",
+  "google_logout": "Logout from Google",
+  "google_sync": "Sync to Google Drive",
+  "google_synced": "Drive synced",
 
   "settings_title": "Settings",
   "@settings_title": {
