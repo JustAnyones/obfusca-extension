@@ -34,7 +34,7 @@
     "import_success": "Įrašai importuoti",
     "entry_details": "Įrašo detalės",
     "button_entry_details": "Detaliau",
-    "button_clear_entries": "Ištrinti įrašus",
+    "button_clear_entries": "Ištrinti išsaugotus įrašus",
     "input_password": "Įveskite sugeneruotą slaptažodį",
     "hint_password": "Slaptažodis",
     "button_submit_password": "Ok",
