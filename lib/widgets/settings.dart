@@ -24,14 +24,12 @@ class _SettingsPageState extends State<SettingsPage> {
   bool? _encrypt = false;
   final TextEditingController _keyController = TextEditingController();
   String? _key;
-  String? _access_token;
-  bool? _authorized;
+  bool? _password = false;
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
-    _authorized = false;
   }
 
   // Loads current settings from the settings provider.
@@ -69,6 +67,16 @@ class _SettingsPageState extends State<SettingsPage> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
+                    _password = false;
+                    Navigator.pop(context);
+                  });
+                },
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _password = true;
                     _key = _keyController.text;
                     Navigator.pop(context);
                   });
@@ -95,7 +103,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
     Widget logout = ElevatedButton(
       onPressed: () async {
-        _access_token = null;
         await Drive.logout();
         setState(() {});
       },
@@ -216,7 +223,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ElevatedButton(
               onPressed: () async {
                 if (_encrypt == true) {
+                  _keyController.text = "";
                   await _displayTextInputDialog(context);
+                  if (_password == false) {
+                    return;
+                  }
                   await Saver.exportEncrypted(_key!);
                 } else {
                   await Saver.writeEntries();
