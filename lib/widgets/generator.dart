@@ -572,6 +572,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                         int total = 0;
                         int sum = 0;
                         List<String> saverFields = [];
+                        List<String> saverNamespace = [];
                         for (int i = 0; i < selectedItems.length; i++) {
                           if (selectedItems[i]) {
                             total++;
@@ -580,6 +581,13 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                               saverFields.add(
                                 generatorsList[i].controller.text,
                               );
+                              String namespace = generatorsList[i].namespace
+                                  .substring(11);
+                              namespace = namespace.replaceAll(
+                                "_generator",
+                                "",
+                              );
+                              saverNamespace.add(namespace);
                             }
                           }
                         }
@@ -606,16 +614,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           String domain = await getURL();
                           String favIcon = await getFavIconUrl();
                           Saver.saveInfo(
-                            saverFields[0],
-                            saverFields[1],
+                            saverFields,
+                            saverNamespace,
                             favIcon,
                             domain,
-                            saverFields[6],
-                            saverFields[5],
-                            saverFields[4],
-                            saverFields[3],
-                            saverFields[7],
-                            saverFields[2],
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

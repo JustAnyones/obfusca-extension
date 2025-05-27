@@ -11,7 +11,7 @@ class Generatoraddress extends Generators {
   List<String> BoundingBox = [];
   final Random _random = Random();
 
-  Generatoraddress(String short) : super("nera") {
+  Generatoraddress(String short) : super("namespace::address_generator") {
     setDefault(short);
   }
 

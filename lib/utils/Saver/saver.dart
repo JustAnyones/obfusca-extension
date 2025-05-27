@@ -15,32 +15,21 @@ class Saver {
   }
 
   static Future<void> saveInfo(
-    String name,
-    String surname,
-    String favIcon,
+    List<String> items,
+    List<String> namespaces,
+    String favicon,
     String domain,
-    String address,
-    String city,
-    String country,
-    String date,
-    String postal,
-    String username,
   ) async {
     var intRandom = Random().nextInt(1000000000);
-    var newSave = {
-      'name': name,
-      'surname': surname,
-      'favicon': favIcon,
-      'domain': domain,
-      'address': address,
-      'city': city,
-      'country': country,
-      'date': date,
-      'postal': postal,
-      'username': username,
-      'uid': intRandom,
-    };
+    Map<String, String> newSave = {};
+    for (int i = 0; i < items.length; i++) {
+      newSave[namespaces[i]] = items[i];
+    }
+    newSave['favicon'] = favicon;
+    newSave['domain'] = domain;
     final String json = jsonEncode(newSave);
+    print(newSave);
+    print(json);
     var entries = _prefs!.getStringList('entries') ?? [];
     entries.add(json);
     await _prefs!.setStringList('entries', entries);
