@@ -29,7 +29,13 @@ class _EntryPageState extends State<EntryPage> {
     for (var key in keys) {
       if (key == 'favicon' || key == 'uid') continue;
       if (entry[key] != '' && entry[key] != null) {
-        params.add(Text("$key:\t${entry[key]}"));
+        print(key);
+        String namespace = key;
+        if (key != "domain") {
+          namespace = namespace.substring(11);
+          namespace = namespace.replaceAll("_generator", "");
+        }
+        params.add(Text("$namespace:\t${entry[key]}"));
         params.add(SizedBox(height: 16));
       }
     }

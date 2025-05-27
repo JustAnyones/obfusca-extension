@@ -581,13 +581,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                               saverFields.add(
                                 generatorsList[i].controller.text,
                               );
-                              String namespace = generatorsList[i].namespace
-                                  .substring(11);
-                              namespace = namespace.replaceAll(
-                                "_generator",
-                                "",
-                              );
-                              saverNamespace.add(namespace);
+                              saverNamespace.add(generatorsList[i].namespace);
                             }
                           }
                         }

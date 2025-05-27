@@ -22,11 +22,12 @@ class Saver {
   ) async {
     var intRandom = Random().nextInt(1000000000);
     Map<String, String> newSave = {};
+    newSave['domain'] = domain;
     for (int i = 0; i < items.length; i++) {
       newSave[namespaces[i]] = items[i];
     }
     newSave['favicon'] = favicon;
-    newSave['domain'] = domain;
+    newSave['uid'] = intRandom.toString();
     final String json = jsonEncode(newSave);
     print(newSave);
     print(json);
