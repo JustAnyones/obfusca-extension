@@ -305,7 +305,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SizedBox(height: 16),
 
             Text(
-              "Sync saved entries with Google drive",
+              AppLocalizations.of(context)!.google_explain,
               style: const TextStyle(fontSize: 24),
             ),
 

@@ -42,6 +42,7 @@
     "google_logout": "Atsijungti nuo Google",
     "google_sync": "Sinchronizuoti į Google Drive",
     "google_synced": "Sinchronizuota į Drive",
+    "google_explain": "Sinchronizuoti išsaugotus įrašus su Google Drive",
 
     "settings_title": "Nustatymai",
     "setting_locale_title": "Nustatymų kalba",
