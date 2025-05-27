@@ -80,26 +80,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
         );
-        /*return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.input_password),
-          content: TextField(
-            controller: _keyController,
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)!.hint_password,
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _key = _keyController.text;
-                  Navigator.pop(context);
-                });
-              },
-              child: Text(AppLocalizations.of(context)!.button_submit_password),
-            ),
-          ],
-        );*/
       },
     );
   }
