@@ -304,6 +304,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
             SizedBox(height: 16),
 
+            Text(
+              "Sync saved entries with Google drive",
+              style: const TextStyle(fontSize: 24),
+            ),
+
+            SizedBox(height: 16),
+
             Drive.Authorized() ? SizedBox(height: 0) : login,
 
             Drive.Authorized() ? sync : SizedBox(height: 0),
