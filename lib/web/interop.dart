@@ -30,9 +30,6 @@ external JSPromise<JSObject> _closeLastFocusedWindow();
 @JS('getToken')
 external JSPromise<JSObject> _getToken();
 
-@JS('logout')
-external JSPromise<JSObject> _logout();
-
 Future<Map> queryFields() async {
   var result = await _queryFields().toDart;
   return result.dartify() as Map;

@@ -219,7 +219,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
     _saveCurrentValues();
     // Only apply cooldown if address or postal code fields are selected
-    if (selectedItems[6] || selectedItems[7]) {  // 6 is address, 7 is postal code
+    if (selectedItems[6] || selectedItems[7]) {
+      // 6 is address, 7 is postal code
       Timer(Duration(seconds: 2), () {
         setState(() {
           _isButtonDisabled = false;
@@ -411,42 +412,59 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                       },
                                     )
                                     : Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                        child: TextField(
-                                          controller:
-                                              field['controller']
-                                                  as TextEditingController?,
-                                          decoration: InputDecoration(
-                                            labelText: field['label'] as String?,
-                                            border: OutlineInputBorder(),
-                                            suffixIcon: field['generator'] is GeneratorPassword
-                                                ? IconButton(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0,
+                                      ),
+                                      child: TextField(
+                                        controller:
+                                            field['controller']
+                                                as TextEditingController?,
+                                        decoration: InputDecoration(
+                                          labelText: field['label'] as String?,
+                                          border: OutlineInputBorder(),
+                                          suffixIcon:
+                                              field['generator']
+                                                      is GeneratorPassword
+                                                  ? IconButton(
                                                     icon: Icon(
-                                                      (field['generator'] as GeneratorPassword).isFieldVisible
+                                                      (field['generator']
+                                                                  as GeneratorPassword)
+                                                              .isFieldVisible
                                                           ? Icons.visibility
-                                                          : Icons.visibility_off,
+                                                          : Icons
+                                                              .visibility_off,
                                                     ),
                                                     onPressed: () {
                                                       setState(() {
-                                                        (field['generator'] as GeneratorPassword).toggleVisibility();
+                                                        (field['generator']
+                                                                as GeneratorPassword)
+                                                            .toggleVisibility();
                                                       });
                                                     },
                                                   )
-                                                : null,
-                                          ),
-                                          obscureText: field['generator'] is GeneratorPassword && 
-                                              !(field['generator'] as GeneratorPassword).isFieldVisible,
+                                                  : null,
                                         ),
+                                        obscureText:
+                                            field['generator']
+                                                is GeneratorPassword &&
+                                            !(field['generator']
+                                                    as GeneratorPassword)
+                                                .isFieldVisible,
                                       ),
+                                    ),
                           ),
-                          SizedBox(width: 16),  // Increased spacing before dice button
+                          SizedBox(
+                            width: 16,
+                          ), // Increased spacing before dice button
                           IconButton(
                             onPressed: () {
-                              final generator = field['generator'] as Generators;
+                              final generator =
+                                  field['generator'] as Generators;
                               final index = generatorsList.indexOf(generator);
-                              
+
                               // Check if it's address or postal field
-                              if (index == 6) { // Address field
+                              if (index == 6) {
+                                // Address field
                                 if (_isAddressDiceDisabled) return;
                                 setState(() {
                                   _isAddressDiceDisabled = true;
@@ -456,7 +474,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                     _isAddressDiceDisabled = false;
                                   });
                                 });
-                              } else if (index == 7) { // Postal field
+                              } else if (index == 7) {
+                                // Postal field
                                 if (_isPostalDiceDisabled) return;
                                 setState(() {
                                   _isPostalDiceDisabled = true;
@@ -484,10 +503,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                             icon: Icon(
                               Icons.casino,
                               size: 24,
-                              color: (field['generator'] is Generatoraddress && _isAddressDiceDisabled) ||
-                                     (field['generator'] is GeneratorPostal && _isPostalDiceDisabled)
-                                  ? Colors.grey
-                                  : null,
+                              color:
+                                  (field['generator'] is Generatoraddress &&
+                                              _isAddressDiceDisabled) ||
+                                          (field['generator']
+                                                  is GeneratorPostal &&
+                                              _isPostalDiceDisabled)
+                                      ? Colors.grey
+                                      : null,
                             ),
                           ),
                         ],
@@ -508,9 +531,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                     context,
                                   )!.button_generate,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                height: 1.0,
-                              ),
+                              style: TextStyle(height: 1.0),
                             ),
                           ),
                         ),
@@ -551,12 +572,16 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                         int total = 0;
                         int sum = 0;
                         List<String> saverFields = [];
-                        for (Generators generator in generatorsList) {
-                          if (generator.isChecked) {
+                        List<String> saverNamespace = [];
+                        for (int i = 0; i < selectedItems.length; i++) {
+                          if (selectedItems[i]) {
                             total++;
-                            if (generator.controller.text != '') {
+                            if (generatorsList[i].controller.text != '') {
                               sum++;
-                              saverFields.add(generator.controller.text);
+                              saverFields.add(
+                                generatorsList[i].controller.text,
+                              );
+                              saverNamespace.add(generatorsList[i].namespace);
                             }
                           }
                         }
@@ -583,16 +608,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           String domain = await getURL();
                           String favIcon = await getFavIconUrl();
                           Saver.saveInfo(
-                            saverFields[0],
-                            saverFields[1],
+                            saverFields,
+                            saverNamespace,
                             favIcon,
                             domain,
-                            saverFields[6],
-                            saverFields[5],
-                            saverFields[4],
-                            saverFields[3],
-                            saverFields[7],
-                            saverFields[2],
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

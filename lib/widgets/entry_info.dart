@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class EntryPage extends StatefulWidget {
   const EntryPage({super.key});
@@ -12,6 +13,9 @@ class EntryPage extends StatefulWidget {
 
 class _EntryPageState extends State<EntryPage> {
   List<String>? _entries;
+  final String _pass = "***********";
+  bool _isPass = false;
+  bool _show = false;
   @override
   void initState() {
     super.initState();
@@ -22,28 +26,90 @@ class _EntryPageState extends State<EntryPage> {
     _entries = Saver.readInfo();
   }
 
-  List<Widget> _getEntryValues(int index) {
+  @override
+  Widget build(BuildContext context) {
+    int index = ModalRoute.of(context)!.settings.arguments as int;
+
     List<Widget> params = [];
     Map<String, String> entry = jsonDecode(_entries![index]);
     List<String> keys = entry.keys.toList();
     for (var key in keys) {
+      _isPass = false;
+      Widget row;
       if (key == 'favicon' || key == 'uid') continue;
       if (entry[key] != '' && entry[key] != null) {
-        params.add(Text("$key:\t${entry[key]}"));
+        String namespace = key;
+        String data;
+        if (namespace == "namespace::email_generator") {
+          int atIndex = entry[key]!.indexOf("@");
+          data =
+              entry[key]!.substring(0, 12) +
+              "..." +
+              entry[key]!.substring(atIndex - 4);
+        } else {
+          data = entry[key]!;
+        }
+        if (key != "domain") {
+          if (namespace.contains("namespace")) {
+            namespace = namespace.substring(11);
+            namespace = namespace.replaceAll("_generator", "");
+          } else if (namespace.contains("custom")) {
+            namespace = namespace.substring(8);
+            namespace = namespace.replaceAll("_generator", "");
+          }
+        }
+        if (key == "namespace::password_generator") {
+          _isPass = true;
+        }
+        namespace = namespace[0].toUpperCase() + namespace.substring(1);
+        row = Row(
+          children: [
+            Text(
+              "$namespace:",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(width: 2),
+            _isPass
+                ? SelectableText(_show ? data : _pass)
+                : SelectableText(data),
+            SizedBox(width: 12),
+            _isPass
+                ? IconButton(
+                  onPressed: () {
+                    setState(() {
+                      print(_show);
+                      _show = !_show;
+                      print(_show);
+                    });
+                  },
+                  icon: Icon(_show ? Icons.visibility : Icons.visibility_off),
+                )
+                : SizedBox(width: 0),
+            _isPass ? SizedBox(width: 2) : SizedBox(width: 0),
+            IconButton(
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: entry[key]!));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.clipboard),
+                  ),
+                );
+              },
+              icon: Icon(Icons.content_copy),
+              alignment: Alignment.centerRight,
+            ),
+          ],
+        );
+        params.add(row);
         params.add(SizedBox(height: 16));
       }
     }
-    return params;
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    int index = ModalRoute.of(context)!.settings.arguments as int;
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.entry_details)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(children: _getEntryValues(index)),
+        child: Column(children: params),
       ),
     );
   }
