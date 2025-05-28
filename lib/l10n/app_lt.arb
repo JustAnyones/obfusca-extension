@@ -43,6 +43,7 @@
     "google_sync": "Sinchronizuoti su Google Drive",
     "google_synced": "Sinchronizuota į Drive",
     "google_explain": "Sinchronizuoti išsaugotus įrašus su Google Drive",
+    "clipboard": "Nukopijuota į iškarpinę",
 
     "settings_title": "Nustatymai",
     "setting_locale_title": "Nustatymų kalba",

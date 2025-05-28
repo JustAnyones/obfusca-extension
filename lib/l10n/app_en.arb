@@ -43,6 +43,7 @@
   "google_sync": "Sync with Google Drive",
   "google_synced": "Drive synced",
   "google_explain": "Sync saved entries with Google drive",
+  "clipboard": "Copied to clipboard",
 
   "settings_title": "Settings",
   "@settings_title": {
