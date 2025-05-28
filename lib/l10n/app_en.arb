@@ -79,6 +79,8 @@
   "settings_custom_generator_create_button": "Create",
   "settings_custom_generator_creation_success": "Custom generator created!",
   "settings_custom_generator_creation_error": "Error creating custom generator: ",
+  "settings_custom_generator_delete_all": "Delete all custom generators",
+  "settings_custom_generator_delete_all_success": "All custom generators deleted!",
 
   "home_title": "Home",
   "detect_fields_button": "Detect fields from current page",

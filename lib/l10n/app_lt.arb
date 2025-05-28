@@ -72,6 +72,8 @@
     "settings_custom_generator_create_button": "Sukurti",
     "settings_custom_generator_creation_success": "Custom generatorius sukurtas!",
     "settings_custom_generator_creation_error": "Nepavyko sukurti custom generatoriaus: ",
+    "settings_custom_generator_delete_all": "Ištrinti visus custom generatorius",
+    "settings_custom_generator_delete_all_success": "Visi custom generatoriai ištrinti!",
 
     "home_title": "Pagrindinis",
     "detect_fields_button": "Aptikti laukus iš svetainės",

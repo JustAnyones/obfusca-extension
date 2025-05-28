@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:browser_extension/widgets/reusable/sidebar.dart';
 import 'package:browser_extension/widgets/reusable/toast.dart';
+import 'package:browser_extension/widgets/settings.dart';
 
 class NameGeneratorPage extends StatefulWidget {
   const NameGeneratorPage({super.key});
@@ -33,7 +35,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<double> surNamesFreq;
   late List<String> cities;
   late List<List<double>> boundingBoxes;
-  final List<bool> selectedItems = List.filled(13, false);
+  List<bool> selectedItems = List.filled(13, false);
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -45,20 +47,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     super.initState();
     SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
-    GeneratorCustom custom1 = GeneratorCustom();
-    custom1.setCustom("returnValue", "Glorp", [], "custom::glorp");
-    GeneratorCustom custom2 = GeneratorCustom();
-    List<String> customList = [
-      "Glorp",
-      "Buh",
-      "Guh",
-      "Balls",
-      "uhh",
-      "Balding",
-      "BLOOMING",
-    ];
-    custom2.setCustom("random", "Glorp", customList, "custom::buh");
+    _loadCustomGeneratorsAndInit();
+  }
 
+  Future<void> _loadCustomGeneratorsAndInit() async {
     generatorsList = [
       GeneratorName(),
       GeneratorSurName(),
@@ -71,13 +63,34 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       GeneratorSex(SettingProvider.getInstance().region),
       GeneratorPassword(),
       GeneratorEmail(),
-      custom1,
-      custom2,
     ];
+
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? saved = prefs.getStringList('custom_generators');
+    if (saved != null) {
+      for (final jsonStr in saved) {
+        final model = GeneratorCustom.fromJson(jsonDecode(jsonStr));
+        final customGen = GeneratorCustom();
+        print(model.custom);
+        print(model.returnValue);
+        print(model.customList);
+        print(model.namespace);
+        customGen.setCustom(
+          model.custom,
+          model.returnValue,
+          model.customList,
+          model.namespace,
+        );
+        generatorsList.add(customGen);
+      }
+    }
+
     _loadSavedValues();
     for (Generators generator in generatorsList) {
       generator.controller.addListener(_saveCurrentValues);
     }
+    selectedItems = List.filled(generatorsList.length, false);
+    setState(() {});
   }
 
   Future<void> _loadCSVData() async {
@@ -219,7 +232,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
 
     _saveCurrentValues();
     // Only apply cooldown if address or postal code fields are selected
-    if (selectedItems[6] || selectedItems[7]) {  // 6 is address, 7 is postal code
+    if (selectedItems[6] || selectedItems[7]) {
+      // 6 is address, 7 is postal code
       Timer(Duration(seconds: 2), () {
         setState(() {
           _isButtonDisabled = false;
@@ -411,42 +425,59 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                       },
                                     )
                                     : Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                        child: TextField(
-                                          controller:
-                                              field['controller']
-                                                  as TextEditingController?,
-                                          decoration: InputDecoration(
-                                            labelText: field['label'] as String?,
-                                            border: OutlineInputBorder(),
-                                            suffixIcon: field['generator'] is GeneratorPassword
-                                                ? IconButton(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0,
+                                      ),
+                                      child: TextField(
+                                        controller:
+                                            field['controller']
+                                                as TextEditingController?,
+                                        decoration: InputDecoration(
+                                          labelText: field['label'] as String?,
+                                          border: OutlineInputBorder(),
+                                          suffixIcon:
+                                              field['generator']
+                                                      is GeneratorPassword
+                                                  ? IconButton(
                                                     icon: Icon(
-                                                      (field['generator'] as GeneratorPassword).isFieldVisible
+                                                      (field['generator']
+                                                                  as GeneratorPassword)
+                                                              .isFieldVisible
                                                           ? Icons.visibility
-                                                          : Icons.visibility_off,
+                                                          : Icons
+                                                              .visibility_off,
                                                     ),
                                                     onPressed: () {
                                                       setState(() {
-                                                        (field['generator'] as GeneratorPassword).toggleVisibility();
+                                                        (field['generator']
+                                                                as GeneratorPassword)
+                                                            .toggleVisibility();
                                                       });
                                                     },
                                                   )
-                                                : null,
-                                          ),
-                                          obscureText: field['generator'] is GeneratorPassword && 
-                                              !(field['generator'] as GeneratorPassword).isFieldVisible,
+                                                  : null,
                                         ),
+                                        obscureText:
+                                            field['generator']
+                                                is GeneratorPassword &&
+                                            !(field['generator']
+                                                    as GeneratorPassword)
+                                                .isFieldVisible,
                                       ),
+                                    ),
                           ),
-                          SizedBox(width: 16),  // Increased spacing before dice button
+                          SizedBox(
+                            width: 16,
+                          ), // Increased spacing before dice button
                           IconButton(
                             onPressed: () {
-                              final generator = field['generator'] as Generators;
+                              final generator =
+                                  field['generator'] as Generators;
                               final index = generatorsList.indexOf(generator);
-                              
+
                               // Check if it's address or postal field
-                              if (index == 6) { // Address field
+                              if (index == 6) {
+                                // Address field
                                 if (_isAddressDiceDisabled) return;
                                 setState(() {
                                   _isAddressDiceDisabled = true;
@@ -456,7 +487,8 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                     _isAddressDiceDisabled = false;
                                   });
                                 });
-                              } else if (index == 7) { // Postal field
+                              } else if (index == 7) {
+                                // Postal field
                                 if (_isPostalDiceDisabled) return;
                                 setState(() {
                                   _isPostalDiceDisabled = true;
@@ -484,10 +516,14 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                             icon: Icon(
                               Icons.casino,
                               size: 24,
-                              color: (field['generator'] is Generatoraddress && _isAddressDiceDisabled) ||
-                                     (field['generator'] is GeneratorPostal && _isPostalDiceDisabled)
-                                  ? Colors.grey
-                                  : null,
+                              color:
+                                  (field['generator'] is Generatoraddress &&
+                                              _isAddressDiceDisabled) ||
+                                          (field['generator']
+                                                  is GeneratorPostal &&
+                                              _isPostalDiceDisabled)
+                                      ? Colors.grey
+                                      : null,
                             ),
                           ),
                         ],
@@ -508,9 +544,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                                     context,
                                   )!.button_generate,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                height: 1.0,
-                              ),
+                              style: TextStyle(height: 1.0),
                             ),
                           ),
                         ),

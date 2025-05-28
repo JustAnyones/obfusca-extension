@@ -61,7 +61,7 @@ class GeneratorCustom extends Generators {
   }
 
   void setLocalization(BuildContext context) {
-    localization = AppLocalizations.of(context)!.generator_custom;
+    localization = namespace;
   }
 
   Map<String, dynamic> toJson() => {
