@@ -40,8 +40,13 @@ class _EntryPageState extends State<EntryPage> {
       if (entry[key] != '' && entry[key] != null) {
         String namespace = key;
         if (key != "domain") {
-          namespace = namespace.substring(11);
-          namespace = namespace.replaceAll("_generator", "");
+          if (namespace.contains("namespace")) {
+            namespace = namespace.substring(11);
+            namespace = namespace.replaceAll("_generator", "");
+          } else if (namespace.contains("custom")) {
+            namespace = namespace.substring(8);
+            namespace = namespace.replaceAll("_generator", "");
+          }
         }
         if (key == "namespace::password_generator") {
           _isPass = true;
