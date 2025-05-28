@@ -39,6 +39,16 @@ class _EntryPageState extends State<EntryPage> {
       if (key == 'favicon' || key == 'uid') continue;
       if (entry[key] != '' && entry[key] != null) {
         String namespace = key;
+        String data;
+        if (namespace == "namespace::email_generator") {
+          int atIndex = entry[key]!.indexOf("@");
+          data =
+              entry[key]!.substring(0, 12) +
+              "..." +
+              entry[key]!.substring(atIndex - 4);
+        } else {
+          data = entry[key]!;
+        }
         if (key != "domain") {
           if (namespace.contains("namespace")) {
             namespace = namespace.substring(11);
@@ -60,8 +70,8 @@ class _EntryPageState extends State<EntryPage> {
             ),
             SizedBox(width: 2),
             _isPass
-                ? SelectableText(_show ? entry[key]! : _pass)
-                : SelectableText(entry[key]!),
+                ? SelectableText(_show ? data : _pass)
+                : SelectableText(data),
             SizedBox(width: 12),
             _isPass
                 ? IconButton(
