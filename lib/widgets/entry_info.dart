@@ -13,6 +13,9 @@ class EntryPage extends StatefulWidget {
 
 class _EntryPageState extends State<EntryPage> {
   List<String>? _entries;
+  final String _pass = "***********";
+  bool _isPass = false;
+  bool _show = false;
   @override
   void initState() {
     super.initState();
@@ -31,14 +34,17 @@ class _EntryPageState extends State<EntryPage> {
     Map<String, String> entry = jsonDecode(_entries![index]);
     List<String> keys = entry.keys.toList();
     for (var key in keys) {
+      _isPass = false;
       Widget row;
       if (key == 'favicon' || key == 'uid') continue;
       if (entry[key] != '' && entry[key] != null) {
-        print(key);
         String namespace = key;
         if (key != "domain") {
           namespace = namespace.substring(11);
           namespace = namespace.replaceAll("_generator", "");
+        }
+        if (key == "namespace::password_generator") {
+          _isPass = true;
         }
         namespace = namespace[0].toUpperCase() + namespace.substring(1);
         row = Row(
@@ -48,8 +54,23 @@ class _EntryPageState extends State<EntryPage> {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(width: 2),
-            SelectableText(entry[key]!),
+            _isPass
+                ? SelectableText(_show ? entry[key]! : _pass)
+                : SelectableText(entry[key]!),
             SizedBox(width: 12),
+            _isPass
+                ? IconButton(
+                  onPressed: () {
+                    setState(() {
+                      print(_show);
+                      _show = !_show;
+                      print(_show);
+                    });
+                  },
+                  icon: Icon(_show ? Icons.visibility : Icons.visibility_off),
+                )
+                : SizedBox(width: 0),
+            _isPass ? SizedBox(width: 2) : SizedBox(width: 0),
             IconButton(
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: entry[key]!));
