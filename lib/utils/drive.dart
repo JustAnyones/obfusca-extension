@@ -159,7 +159,7 @@ class Drive {
       Uri.parse('https://www.googleapis.com/upload/drive/v3/files/$id'),
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer $token',
-        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.contentTypeHeader: 'plain/text',
         HttpHeaders.contentLengthHeader: '$bytesCount',
       },
       body: export,

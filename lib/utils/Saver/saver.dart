@@ -142,59 +142,39 @@ class Saver {
     } else {
       dataString = dataInput;
     }
-    var data = jsonDecode(dataString);
-    if (data[0]['name'] == null &&
-        data[0]['surname'] == null &&
-        data[0]['favicon'] == null &&
-        data[0]['domain'] == null &&
-        data[0]['address'] == null &&
-        data[0]['city'] == null &&
-        data[0]['country'] == null &&
-        data[0]['date'] == null &&
-        data[0]['postal'] == null &&
-        data[0]['username'] == null &&
-        data[0]['uid'] == null) {
+    try {
+      var data = jsonDecode(dataString);
+      List<String> entries = [];
+      if (_prefs!.getStringList('entries') != null) {
+        entries = _prefs!.getStringList('entries')!;
+      }
+      String save = '[';
+      for (int i = 0; i < entries.length; i++) {
+        save += entries[i];
+        if (i != entries.length - 1) save += ',';
+      }
+      save += ']';
+      var temp = jsonDecode(save);
+      for (int i = 0; i < data.length; i++) {
+        Map<String, String> entry = data[i];
+        bool match = false;
+        for (int j = 0; j < temp.length; j++) {
+          if (temp[j]['uid'] == entry['uid']) {
+            match = true;
+            break;
+          }
+        }
+        if (match == true) {
+          continue;
+        }
+        final String json = jsonEncode(entry);
+        entries.add(json);
+      }
+      await _prefs!.setStringList('entries', entries);
+    } catch (exeption) {
+      print(exeption);
       return "BadFile";
     }
-    List<String> entries = [];
-    if (_prefs!.getStringList('entries') != null) {
-      entries = _prefs!.getStringList('entries')!;
-    }
-    String save = '[';
-    for (int i = 0; i < entries.length; i++) {
-      save += entries[i];
-      if (i != entries.length - 1) save += ',';
-    }
-    save += ']';
-    var temp = jsonDecode(save);
-    for (int i = 0; i < data.length; i++) {
-      bool match = false;
-      var entry = {
-        'name': data[i]['name'],
-        'surname': data[i]['surname'],
-        'favicon': data[i]['favicon'],
-        'domain': data[i]['domain'],
-        'address': data[i]['address'],
-        'city': data[i]['city'],
-        'country': data[i]['country'],
-        'date': data[i]['date'],
-        'postal': data[i]['postal'],
-        'username': data[i]['username'],
-        'uid': data[i]['uid'],
-      };
-      for (int j = 0; j < temp.length; j++) {
-        if (temp[j]['uid'] == entry['uid']) {
-          match = true;
-          break;
-        }
-      }
-      if (match == true) {
-        continue;
-      }
-      final String json = jsonEncode(entry);
-      entries.add(json);
-    }
-    await _prefs!.setStringList('entries', entries);
     return "Saved";
   }
 }
