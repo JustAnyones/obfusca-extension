@@ -289,7 +289,9 @@ class _SettingsPageState extends State<SettingsPage> {
             // Custom Generator button
             ElevatedButton.icon(
               icon: Icon(Icons.add),
-              label: Text('Sukurti Custom Generator'),
+              label: Text(
+                AppLocalizations.of(context)!.settings_custom_generator_create,
+              ),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -298,7 +300,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         TextEditingController();
                     final TextEditingController namespaceController =
                         TextEditingController();
-                    String selectedType = 'random'; // default value
+                    String selectedType = 'random';
                     List<TextEditingController> randomControllers = [
                       TextEditingController(),
                     ];
@@ -306,7 +308,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     return StatefulBuilder(
                       builder: (context, setState) {
                         return AlertDialog(
-                          title: Text('Sukurti Custom Generator'),
+                          title: Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.settings_custom_generator_create,
+                          ),
                           content: SingleChildScrollView(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -316,11 +322,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                   items: [
                                     DropdownMenuItem(
                                       value: 'random',
-                                      child: Text('random'),
+                                      child: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.settings_custom_generator_random,
+                                      ),
                                     ),
                                     DropdownMenuItem(
                                       value: 'returnValue',
-                                      child: Text('returnValue'),
+                                      child: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.settings_custom_generator_return_value,
+                                      ),
                                     ),
                                   ],
                                   onChanged: (value) {
@@ -345,7 +359,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                                     randomControllers[i],
                                                 decoration: InputDecoration(
                                                   labelText:
-                                                      'Reikšmė #${i + 1}',
+                                                      AppLocalizations.of(
+                                                        context,
+                                                      )!.settings_custom_generator_value +
+                                                      (i + 1).toString(),
                                                 ),
                                               ),
                                             ),
@@ -370,7 +387,11 @@ class _SettingsPageState extends State<SettingsPage> {
                                         alignment: Alignment.centerLeft,
                                         child: TextButton.icon(
                                           icon: Icon(Icons.add),
-                                          label: Text('Pridėti reikšmę'),
+                                          label: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.settings_custom_generator_add_value,
+                                          ),
                                           onPressed: () {
                                             setState(() {
                                               randomControllers.add(
@@ -387,13 +408,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                   TextField(
                                     controller: returnValueController,
                                     decoration: InputDecoration(
-                                      labelText: 'Return Value',
+                                      labelText:
+                                          AppLocalizations.of(
+                                            context,
+                                          )!.settings_custom_generator_return_value,
                                     ),
                                   ),
                                 TextField(
                                   controller: namespaceController,
                                   decoration: InputDecoration(
-                                    labelText: 'Namespace',
+                                    labelText:
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.settings_custom_generator_namespace,
                                   ),
                                 ),
                               ],
@@ -402,7 +429,11 @@ class _SettingsPageState extends State<SettingsPage> {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              child: Text('Atšaukti'),
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.settings_custom_generator_cancel,
+                              ),
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -422,7 +453,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'Custom generator sukurtas!',
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.settings_custom_generator_creation_success,
                                       ),
                                     ),
                                   );
@@ -430,12 +463,21 @@ class _SettingsPageState extends State<SettingsPage> {
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Klaida: ${e.toString()}'),
+                                      content: Text(
+                                        AppLocalizations.of(
+                                              context,
+                                            )!.settings_custom_generator_creation_error +
+                                            e.toString(),
+                                      ),
                                     ),
                                   );
                                 }
                               },
-                              child: Text('Sukurti'),
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.settings_custom_generator_create_button,
+                              ),
                             ),
                           ],
                         );
