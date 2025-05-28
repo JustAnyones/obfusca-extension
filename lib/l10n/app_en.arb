@@ -40,7 +40,7 @@
   "button_submit_password": "Ok",
   "google_sign_in": "Google Sign in",
   "google_logout": "Logout from Google",
-  "google_sync": "Sync to Google Drive",
+  "google_sync": "Sync with Google Drive",
   "google_synced": "Drive synced",
   "google_explain": "Sync saved entries with Google drive",
 
