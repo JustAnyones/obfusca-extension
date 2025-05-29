@@ -10,6 +10,13 @@ class GeneratorCustom extends Generators {
 
   GeneratorCustom() : super("");
 
+  GeneratorCustom.withParams({
+    required this.custom,
+    required this.returnValue,
+    required this.customList,
+    required String namespace,
+  }) : super(namespace);
+
   void setCustom(
     String custom,
     String returnValue,
@@ -54,6 +61,21 @@ class GeneratorCustom extends Generators {
   }
 
   void setLocalization(BuildContext context) {
-    localization = AppLocalizations.of(context)!.generator_custom;
+    localization = namespace;
   }
+
+  Map<String, dynamic> toJson() => {
+    'type': custom,
+    'returnValue': returnValue,
+    'randomValues': customList,
+    'namespace': namespace,
+  };
+
+  factory GeneratorCustom.fromJson(Map<String, dynamic> json) =>
+      GeneratorCustom.withParams(
+        custom: json['type'],
+        returnValue: json['returnValue'],
+        customList: List<String>.from(json['randomValues']),
+        namespace: json['namespace'],
+      );
 }

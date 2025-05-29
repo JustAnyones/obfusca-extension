@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:browser_extension/widgets/reusable/sidebar.dart';
 import 'package:browser_extension/widgets/reusable/toast.dart';
+import 'package:browser_extension/widgets/settings.dart';
 
 class NameGeneratorPage extends StatefulWidget {
   const NameGeneratorPage({super.key});
@@ -33,7 +35,7 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
   late List<double> surNamesFreq;
   late List<String> cities;
   late List<List<double>> boundingBoxes;
-  final List<bool> selectedItems = List.filled(13, false);
+  List<bool> selectedItems = List.filled(13, false);
 
   int _frameId = -1;
   List<Map> _detectedFields = [];
@@ -45,20 +47,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
     super.initState();
     SettingProvider.getInstance().addListener(_loadCSVData);
     _loadCSVData();
-    GeneratorCustom custom1 = GeneratorCustom();
-    custom1.setCustom("returnValue", "Glorp", [], "custom::glorp");
-    GeneratorCustom custom2 = GeneratorCustom();
-    List<String> customList = [
-      "Glorp",
-      "Buh",
-      "Guh",
-      "Balls",
-      "uhh",
-      "Balding",
-      "BLOOMING",
-    ];
-    custom2.setCustom("random", "Glorp", customList, "custom::buh");
+    _loadCustomGeneratorsAndInit();
+  }
 
+  Future<void> _loadCustomGeneratorsAndInit() async {
     generatorsList = [
       GeneratorName(),
       GeneratorSurName(),
@@ -71,13 +63,34 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
       GeneratorSex(SettingProvider.getInstance().region),
       GeneratorPassword(),
       GeneratorEmail(),
-      custom1,
-      custom2,
     ];
+
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? saved = prefs.getStringList('custom_generators');
+    if (saved != null) {
+      for (final jsonStr in saved) {
+        final model = GeneratorCustom.fromJson(jsonDecode(jsonStr));
+        final customGen = GeneratorCustom();
+        print(model.custom);
+        print(model.returnValue);
+        print(model.customList);
+        print(model.namespace);
+        customGen.setCustom(
+          model.custom,
+          model.returnValue,
+          model.customList,
+          model.namespace,
+        );
+        generatorsList.add(customGen);
+      }
+    }
+
     _loadSavedValues();
     for (Generators generator in generatorsList) {
       generator.controller.addListener(_saveCurrentValues);
     }
+    selectedItems = List.filled(generatorsList.length, false);
+    setState(() {});
   }
 
   Future<void> _loadCSVData() async {
