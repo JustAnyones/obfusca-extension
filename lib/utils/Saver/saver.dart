@@ -4,6 +4,7 @@ import "package:flutter/foundation.dart" hide Key;
 import 'package:file_picker/file_picker.dart';
 import "package:shared_preferences/shared_preferences.dart";
 import 'package:encrypt/encrypt.dart';
+import 'package:crypto/crypto.dart';
 
 class Saver {
   static SharedPreferences? _prefs;
@@ -14,32 +15,22 @@ class Saver {
   }
 
   static Future<void> saveInfo(
-    String name,
-    String surname,
-    String favIcon,
+    List<String> items,
+    List<String> namespaces,
+    String favicon,
     String domain,
-    String address,
-    String city,
-    String country,
-    String date,
-    String postal,
-    String username,
   ) async {
     var intRandom = Random().nextInt(1000000000);
-    var newSave = {
-      'name': name,
-      'surname': surname,
-      'favicon': favIcon,
-      'domain': domain,
-      'address': address,
-      'city': city,
-      'country': country,
-      'date': date,
-      'postal': postal,
-      'username': username,
-      'uid': intRandom,
-    };
+    Map<String, String> newSave = {};
+    newSave['domain'] = domain;
+    for (int i = 0; i < items.length; i++) {
+      newSave[namespaces[i]] = items[i];
+    }
+    newSave['favicon'] = favicon;
+    newSave['uid'] = intRandom.toString();
     final String json = jsonEncode(newSave);
+    print(newSave);
+    print(json);
     var entries = _prefs!.getStringList('entries') ?? [];
     entries.add(json);
     await _prefs!.setStringList('entries', entries);
@@ -95,7 +86,9 @@ class Saver {
     final encrypter = Encrypter(AES(key));
     final cypherText = encrypter.encrypt(save, iv: iv);
     String export = 'obfu' + cypherText.base64;
-    Uint8List bytes = new Uint8List.fromList(export.codeUnits);
+    var hash = sha256.convert(utf8.encode(save));
+    export = export + hash.toString();
+    Uint8List bytes = utf8.encode(export);
     FilePicker? platform;
     platform = FilePicker.platform;
     await platform.saveFile(
@@ -127,6 +120,8 @@ class Saver {
     String dataString;
     if (encrypted == true) {
       String dataCypher = dataInput.substring(4);
+      String dataHash = dataCypher.substring(dataCypher.length - 64);
+      dataCypher = dataCypher.substring(0, dataCypher.length - 64);
       String mainKey = "";
       mainKey += input_key!;
       if (mainKey.length < 32) {
@@ -140,62 +135,46 @@ class Saver {
       final encrypter = Encrypter(AES(key));
       Encrypted encrypt = Encrypted.from64(dataCypher);
       dataString = encrypter.decrypt(encrypt, iv: iv);
+      var hash = sha256.convert(utf8.encode(dataString));
+      if (dataHash != hash.toString()) {
+        return "BadFile";
+      }
     } else {
       dataString = dataInput;
     }
-    var data = jsonDecode(dataString);
-    if (data[0]['name'] == null &&
-        data[0]['surname'] == null &&
-        data[0]['favicon'] == null &&
-        data[0]['domain'] == null &&
-        data[0]['address'] == null &&
-        data[0]['city'] == null &&
-        data[0]['country'] == null &&
-        data[0]['date'] == null &&
-        data[0]['postal'] == null &&
-        data[0]['username'] == null &&
-        data[0]['uid'] == null) {
+    try {
+      var data = jsonDecode(dataString);
+      List<String> entries = [];
+      if (_prefs!.getStringList('entries') != null) {
+        entries = _prefs!.getStringList('entries')!;
+      }
+      String save = '[';
+      for (int i = 0; i < entries.length; i++) {
+        save += entries[i];
+        if (i != entries.length - 1) save += ',';
+      }
+      save += ']';
+      var temp = jsonDecode(save);
+      for (int i = 0; i < data.length; i++) {
+        Map<String, String> entry = data[i];
+        bool match = false;
+        for (int j = 0; j < temp.length; j++) {
+          if (temp[j]['uid'] == entry['uid']) {
+            match = true;
+            break;
+          }
+        }
+        if (match == true) {
+          continue;
+        }
+        final String json = jsonEncode(entry);
+        entries.add(json);
+      }
+      await _prefs!.setStringList('entries', entries);
+    } catch (exeption) {
+      print(exeption);
       return "BadFile";
     }
-    List<String> entries = [];
-    if (_prefs!.getStringList('entries') != null) {
-      entries = _prefs!.getStringList('entries')!;
-    }
-    String save = '[';
-    for (int i = 0; i < entries.length; i++) {
-      save += entries[i];
-      if (i != entries.length - 1) save += ',';
-    }
-    save += ']';
-    var temp = jsonDecode(save);
-    for (int i = 0; i < data.length; i++) {
-      bool match = false;
-      var entry = {
-        'name': data[i]['name'],
-        'surname': data[i]['surname'],
-        'favicon': data[i]['favicon'],
-        'domain': data[i]['domain'],
-        'address': data[i]['address'],
-        'city': data[i]['city'],
-        'country': data[i]['country'],
-        'date': data[i]['date'],
-        'postal': data[i]['postal'],
-        'username': data[i]['username'],
-        'uid': data[i]['uid'],
-      };
-      for (int j = 0; j < temp.length; j++) {
-        if (temp[j]['uid'] == entry['uid']) {
-          match = true;
-          break;
-        }
-      }
-      if (match == true) {
-        continue;
-      }
-      final String json = jsonEncode(entry);
-      entries.add(json);
-    }
-    await _prefs!.setStringList('entries', entries);
     return "Saved";
   }
 }

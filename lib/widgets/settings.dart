@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
-
+import 'package:browser_extension/utils/session_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:file_picker/file_picker.dart';
@@ -29,6 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String? _access_token;
   bool? _authorized;
   List<GeneratorCustom> _customGenerators = [];
+  bool? _password = false;
 
   @override
   void initState() {
@@ -56,25 +54,43 @@ class _SettingsPageState extends State<SettingsPage> {
     return showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.input_password),
-          content: TextField(
-            controller: _keyController,
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)!.hint_password,
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: AlertDialog(
+            title: Text(AppLocalizations.of(context)!.input_password),
+            content: TextField(
+              controller: _keyController,
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.hint_password,
+              ),
             ),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _password = false;
+                    Navigator.pop(context);
+                  });
+                },
+                child: Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _password = true;
+                    _key = _keyController.text;
+                    Navigator.pop(context);
+                  });
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.button_submit_password,
+                ),
+              ),
+            ],
           ),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _key = _keyController.text;
-                  Navigator.pop(context);
-                });
-              },
-              child: Text(AppLocalizations.of(context)!.button_submit_password),
-            ),
-          ],
         );
       },
     );
@@ -105,15 +121,14 @@ class _SettingsPageState extends State<SettingsPage> {
         await Drive.Login();
         setState(() {});
       },
-      child: Text("Google login"),
+      child: Text(AppLocalizations.of(context)!.google_sign_in),
     );
     Widget logout = ElevatedButton(
       onPressed: () async {
-        _access_token = null;
         await Drive.logout();
         setState(() {});
       },
-      child: Text("Google logout"),
+      child: Text(AppLocalizations.of(context)!.google_logout),
     );
     Widget sync = ElevatedButton(
       onPressed: () async {
@@ -122,19 +137,34 @@ class _SettingsPageState extends State<SettingsPage> {
           await Drive.logout();
           setState(() {});
         } else if (res == "NoId") {
-          await Drive.sendFile();
+          _keyController.text = "";
+          _key = "";
+          await _displayTextInputDialog(context);
+          SessionData.session!.set('key', _key!);
+          SessionData.session!.set('sync', true);
+          await Drive.sendFile(await SessionData.session!.get('key'));
         } else {
-          bool import = await Drive.importFromDrive(res);
+          if (await SessionData.session!.get('sync') != true) {
+            _keyController.text = "";
+            _key = "";
+            await _displayTextInputDialog(context);
+            SessionData.session!.set('key', _key!);
+            SessionData.session!.set('sync', true);
+          }
+          bool import = await Drive.importFromDrive(
+            res,
+            await SessionData.session!.get('key'),
+          );
           if (import == false) {
             return;
           }
-          await Drive.updateDrive(res);
+          await Drive.updateDrive(res, await SessionData.session!.get('key'));
         }
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Drive synced")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.google_synced)),
+        );
       },
-      child: Text("Google sync"),
+      child: Text(AppLocalizations.of(context)!.google_sync),
     );
 
     return Scaffold(
@@ -230,7 +260,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ElevatedButton(
               onPressed: () async {
                 if (_encrypt == true) {
+                  _keyController.text = "";
                   await _displayTextInputDialog(context);
+                  if (_password == false) {
+                    return;
+                  }
                   await Saver.exportEncrypted(_key!);
                 } else {
                   await Saver.writeEntries();
@@ -246,16 +280,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 bool encrypted = false;
                 PlatformFile file = await Saver.encryptedImportCheck();
                 String dataString = String.fromCharCodes(file.bytes!);
-                if (file == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        AppLocalizations.of(context)!.import_no_file,
-                      ),
-                    ),
-                  );
-                  return;
-                }
                 if (dataString.substring(0, 4) == 'obfu') {
                   encrypted = true;
                   await _displayTextInputDialog(context);
@@ -293,6 +317,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 Saver.clear();
               },
               child: Text(AppLocalizations.of(context)!.button_clear_entries),
+            ),
+
+            SizedBox(height: 16),
+
+            Text(
+              AppLocalizations.of(context)!.google_explain,
+              style: const TextStyle(fontSize: 24),
             ),
 
             SizedBox(height: 16),

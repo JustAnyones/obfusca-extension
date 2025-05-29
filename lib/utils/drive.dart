@@ -4,10 +4,13 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:browser_extension/web/interop.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
+import 'package:encrypt/encrypt.dart';
+import 'package:crypto/crypto.dart';
 
 class Drive {
   static bool? isAuthorized;
   static SharedPreferences? _prefs;
+  static String _keyExtension = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
   static Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
   }
@@ -43,14 +46,14 @@ class Drive {
     print(response.body);
   }
 
-  static Future<void> sendFile() async {
+  static Future<void> sendFile(String inputKey) async {
     isAuthorized = _prefs!.getBool('Authorized');
     if (isAuthorized == false || isAuthorized == null) {
       return;
     }
     String? token = _prefs!.getString('access_token');
 
-    var meta = {"name": "entries.json"};
+    var meta = {"name": "entries.obfu"};
     String metaString = jsonEncode(meta);
     int count = utf8.encode(metaString).length;
     final metadata = await http.post(
@@ -77,22 +80,35 @@ class Drive {
       if (i != entries.length - 1) save += ',';
     }
     save += ']';
-    int bytesCount = utf8.encode(save).length;
+    var hash = sha256.convert(utf8.encode(save));
+    String mainKey = "";
+    mainKey += inputKey;
+    if (mainKey.length < 32) {
+      mainKey = mainKey + _keyExtension;
+    }
+    final key = Key.fromUtf8(mainKey.substring(0, 32));
+    final iv = IV.fromBase64(
+      key.base64.substring(0, 8) + _keyExtension.substring(8, 16),
+    );
+    final encrypter = Encrypter(AES(key));
+    final cypherText = encrypter.encrypt(save, iv: iv);
+    String export = 'obfu' + cypherText.base64 + hash.toString();
+    int bytesCount = utf8.encode(export).length;
     var json = jsonDecode(metadata.body);
-    final response = await http.patch(
+    await http.patch(
       Uri.parse(
         'https://www.googleapis.com/upload/drive/v3/files/${json['id']}',
       ),
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer $token',
-        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.contentTypeHeader: 'plain/text',
         HttpHeaders.contentLengthHeader: '$bytesCount',
       },
-      body: save,
+      body: export,
     );
   }
 
-  static Future<bool> importFromDrive(String id) async {
+  static Future<bool> importFromDrive(String id, String inputKey) async {
     isAuthorized = _prefs!.getBool('Authorized');
     if (isAuthorized == false || isAuthorized == null) {
       return false;
@@ -105,14 +121,14 @@ class Drive {
     if (response.body.length == 0) {
       return true;
     }
-    String res = await Saver.importEntries(response.body, false, null);
+    String res = await Saver.importEntries(response.body, true, inputKey);
     if (res != "Saved") {
       return false;
     }
     return true;
   }
 
-  static Future<void> updateDrive(String id) async {
+  static Future<void> updateDrive(String id, String inputKey) async {
     isAuthorized = _prefs!.getBool('Authorized');
     if (isAuthorized == false || isAuthorized == null) {
       return;
@@ -125,15 +141,28 @@ class Drive {
       if (i != entries.length - 1) save += ',';
     }
     save += ']';
-    int bytesCount = utf8.encode(save).length;
-    final file = await http.patch(
+    var hash = sha256.convert(utf8.encode(save));
+    String mainKey = "";
+    mainKey += inputKey;
+    if (mainKey.length < 32) {
+      mainKey = mainKey + _keyExtension;
+    }
+    final key = Key.fromUtf8(mainKey.substring(0, 32));
+    final iv = IV.fromBase64(
+      key.base64.substring(0, 8) + _keyExtension.substring(8, 16),
+    );
+    final encrypter = Encrypter(AES(key));
+    final cypherText = encrypter.encrypt(save, iv: iv);
+    String export = 'obfu' + cypherText.base64 + hash.toString();
+    int bytesCount = utf8.encode(export).length;
+    await http.patch(
       Uri.parse('https://www.googleapis.com/upload/drive/v3/files/$id'),
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer $token',
-        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.contentTypeHeader: 'plain/text',
         HttpHeaders.contentLengthHeader: '$bytesCount',
       },
-      body: save,
+      body: export,
     );
   }
 

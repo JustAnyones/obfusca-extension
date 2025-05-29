@@ -64,8 +64,8 @@ class _EntriesPageState extends State<EntriesPage> {
                 },
               ),
             ),
-            Container(child: Text(entry['name'])),
-            Container(child: Text(entry['surname'])),
+            Container(child: Text(entry['namespace::firstname_generator'])),
+            Container(child: Text(entry['namespace::lastname_generator'])),
             Container(
               child: ElevatedButton(
                 onPressed: () {

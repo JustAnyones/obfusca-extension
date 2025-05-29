@@ -585,12 +585,16 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                         int total = 0;
                         int sum = 0;
                         List<String> saverFields = [];
-                        for (Generators generator in generatorsList) {
-                          if (generator.isChecked) {
+                        List<String> saverNamespace = [];
+                        for (int i = 0; i < selectedItems.length; i++) {
+                          if (selectedItems[i]) {
                             total++;
-                            if (generator.controller.text != '') {
+                            if (generatorsList[i].controller.text != '') {
                               sum++;
-                              saverFields.add(generator.controller.text);
+                              saverFields.add(
+                                generatorsList[i].controller.text,
+                              );
+                              saverNamespace.add(generatorsList[i].namespace);
                             }
                           }
                         }
@@ -617,16 +621,10 @@ class _NameGeneratorPageState extends State<NameGeneratorPage> {
                           String domain = await getURL();
                           String favIcon = await getFavIconUrl();
                           Saver.saveInfo(
-                            saverFields[0],
-                            saverFields[1],
+                            saverFields,
+                            saverNamespace,
                             favIcon,
                             domain,
-                            saverFields[6],
-                            saverFields[5],
-                            saverFields[4],
-                            saverFields[3],
-                            saverFields[7],
-                            saverFields[2],
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
