@@ -1,11 +1,11 @@
+import 'dart:convert';
+
 import 'package:browser_extension/utils/session_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:browser_extension/providers/settings.dart';
 import 'package:browser_extension/utils/Saver/saver.dart';
-import 'package:browser_extension/web/interop.dart';
-import 'package:http/http.dart' as http;
 import 'package:browser_extension/generators/gens.dart';
 import 'package:browser_extension/utils/drive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
