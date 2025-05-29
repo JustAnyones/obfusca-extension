@@ -81,6 +81,7 @@
   "settings_custom_generator_creation_error": "Error creating custom generator: ",
   "settings_custom_generator_delete_all": "Delete all custom generators",
   "settings_custom_generator_delete_all_success": "All custom generators deleted!",
+  "settings_custom_generator_required": "Required field",
 
   "home_title": "Home",
   "detect_fields_button": "Detect fields from current page",

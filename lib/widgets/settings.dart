@@ -463,6 +463,35 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                               ElevatedButton(
                                 onPressed: () async {
+                                  bool valid = true;
+                                  String errorMsg = '';
+                                  if (namespaceController.text.trim().isEmpty) {
+                                    valid = false;
+                                    errorMsg =
+                                        '${AppLocalizations.of(context)!.settings_custom_generator_namespace} ${AppLocalizations.of(context)!.settings_custom_generator_required}';
+                                  } else if (selectedType == 'random' &&
+                                      randomControllers.any(
+                                        (c) => c.text.trim().isEmpty,
+                                      )) {
+                                    valid = false;
+                                    errorMsg =
+                                        '${AppLocalizations.of(context)!.settings_custom_generator_value} ${AppLocalizations.of(context)!.settings_custom_generator_required}';
+                                  } else if (selectedType == 'returnValue' &&
+                                      returnValueController.text
+                                          .trim()
+                                          .isEmpty) {
+                                    valid = false;
+                                    errorMsg =
+                                        '${AppLocalizations.of(context)!.settings_custom_generator_return_value} ${AppLocalizations.of(context)!.settings_custom_generator_required}';
+                                  }
+
+                                  if (!valid) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(errorMsg)),
+                                    );
+                                    return;
+                                  }
+
                                   try {
                                     final model = GeneratorCustom.withParams(
                                       custom: selectedType,
