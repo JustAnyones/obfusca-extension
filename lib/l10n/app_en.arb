@@ -1,5 +1,5 @@
 {
-  "ext_title": "Data Generation Extension",
+  "ext_title": "Obfusca",
 
   "detect_fail": "Failed to detect fields",
 
@@ -11,15 +11,39 @@
   "generator_street": "Street",
   "generator_postal_code": "Postal code",
   "generator_date_of_birth": "Date of birth",
+  "generator_sex": "Sex",
+  "generator_password": "Password",
+  "generator_email": "Email",
+  "generator_custom": "Custom generator",
   "button_wait": "Please wait...",
   "button_generate": "Generate",
   "expansion_tile": "Generators",
+  "generator_page_title": "Generator",
 
   "button_save_entry": "Save",
   "entry_saved": "Entry saved!",
+  "entry_no_fields": "Please select fields to generate and save",
+  "entry_empty_fields": "Fill all selected fields",
   "missing_name_surname": "Enter name and surname",
   "button_view_entries": "Entries",
   "entries_title": "Saved entries",
+  "button_export_entries": "Export to file",
+  "button_import_entries": "Import from file",
+  "import_no_file": "Choose a file",
+  "import_bad_file": "Cannot import from this file",
+  "import_success": "Entries imported",
+  "entry_details": "Entry details",
+  "button_entry_details": "Details",
+  "button_clear_entries": "Clear saved entries",
+  "input_password": "Input encryption password",
+  "hint_password": "Password",
+  "button_submit_password": "Ok",
+  "google_sign_in": "Google Sign in",
+  "google_logout": "Logout from Google",
+  "google_sync": "Sync with Google Drive",
+  "google_synced": "Drive synced",
+  "google_explain": "Sync saved entries with Google drive",
+  "clipboard": "Copied to clipboard",
 
   "settings_title": "Settings",
   "@settings_title": {
@@ -47,10 +71,97 @@
     }
   },
 
+  "settings_encryption_toggle": "Encrypt entries on export",
+
   "settings_save_button": "Save Settings",
   "settings_saved_popup": "Settings Saved!",
+  "settings_custom_generator_create": "Create custom generator",
+  "settings_custom_generator_random": "Random",
+  "settings_custom_generator_return_value": "Return value",
+  "settings_custom_generator_value": "Value",
+  "settings_custom_generator_add_value": "Add value",
+  "settings_custom_generator_namespace": "Namespace",
+  "settings_custom_generator_cancel": "Cancel",
+  "settings_custom_generator_create_button": "Create",
+  "settings_custom_generator_creation_success": "Custom generator created!",
+  "settings_custom_generator_creation_error": "Error creating custom generator: ",
+  "settings_custom_generator_delete_all": "Delete all custom generators",
+  "settings_custom_generator_delete_all_success": "All custom generators deleted!",
+  "settings_custom_generator_required": "Required field",
+
+  "home_title": "Home",
+  "detect_fields_button": "Detect fields from current page",
+  "fill_fields_button": "Fill detected fields",
+
+  "user_profile_title": "User account",
+  "user_profile_page_title": "User account",
+  "user_profile_page_logout_button": "Logout",
+  "user_profile_email_title": "Your email addresses",
+  "user_profile_email_create_button": "Create new email",
+  "user_profile_email_view_button": "View",
+  "user_profile_email_copy_button": "Copy",
+  "user_profile_email_copy_toast": "Address copied to clipboard",
+
+  "email_message_list_page_title": "Email list for {email}",
+    "@email_message_list_page_title": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "email_message_list_name": "Emails",
+  "email_message_list_mark_as_read": "Mark as read",
+  "email_message_list_mark_as_unread": "Mark as unread",
+
+  "email_view_page_title": "Viewing email",
+  "email_view_from": "From: {address}",
+  "@email_view_from": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "email_view_subject": "Subject: {subject}",
+  "@email_view_subject": {
+    "placeholders": {
+      "subject": {"type": "String"}
+    }
+  },
+  "email_view_date": "Date: {date}",
+  "@email_view_date": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "email_view_attachments": "Attachments",
+  "email_view_attachment_bytes": "{size} bytes",
+    "@email_view_attachment_bytes": {
+        "placeholders": {
+        "size": {"type": "int"}
+        }
+    },
+
+  "user_register_page_title": "Register",
+  "user_register_page_hint": "Create an account",
+  "user_register_page_button": "Register",
+
+  "user_login_page_title": "Login",
+  "user_login_page_hint": "Login to your account",
+  "user_login_page_button": "Login",
+  "user_login_page_register_upsell_1": "Don't have an account? Create one",
+  "user_login_page_register_upsell_2": "here",
+
+  "field_username_title": "Username",
+  "field_password_title": "Password",
+  "field_empty": "Field cannot be empty",
 
   "@ext_title": {
     "description": "Name and title of the extension"
-  }
+  },
+
+  "toast_new_email_title": "New email from {address}",
+  "@toast_new_email_title": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "toast_new_email_view_button": "View"
 }

@@ -1,28 +1,25 @@
 import 'dart:convert';
-import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import 'package:browser_extension/utils/Saver/saver.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as img;
+import 'package:browser_extension/widgets/reusable/sidebar.dart';
+import 'package:browser_extension/utils/Saver/saver.dart';
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({super.key});
-
   @override
   State<EntriesPage> createState() => _EntriesPageState();
 }
 
 class _EntriesPageState extends State<EntriesPage> {
   List<String>? _entries;
-
   @override
   void initState() {
     super.initState();
     _loadEntries();
   }
 
-  Future<void> _loadEntries() async {
+  void _loadEntries() {
     _entries = Saver.readInfo();
   }
 
@@ -38,6 +35,7 @@ class _EntriesPageState extends State<EntriesPage> {
           Container(
             child: Text(AppLocalizations.of(context)!.generator_surname_name),
           ),
+          Container(),
         ],
       ),
     );
@@ -45,8 +43,7 @@ class _EntriesPageState extends State<EntriesPage> {
       return Future.value(rows);
     }
     for (int i = 0; i < _entries!.length; i++) {
-      final _entry = jsonDecode(_entries![i]);
-      var res = await http.get(Uri.parse(_entry['favicon']));
+      final entry = jsonDecode(_entries![i]);
       rows.add(
         TableRow(
           children: <Widget>[
@@ -54,37 +51,29 @@ class _EntriesPageState extends State<EntriesPage> {
               height: 32,
               child: Builder(
                 builder: (context) {
-                  if (_entry['favicon'] == null || _entry['favicon'] == "") {
+                  if (entry['favicon'] == null || entry['favicon'] == "") {
                     return Text("??");
                   }
-                  /*var bytes = Uint8List.fromList(res.body.codeUnits);
-                  var vaizdas = img.Image.fromBytes(
-                    width: 16,
-                    height: 16,
-                    bytes: bytes,
-                  );
-                  var test = img.IcoDecoder().decode(bytes);
-                  var image2 = img.JpegEncoder().encode(test!);*/
-
                   var image = Image.network(
-                    _entry['favicon'],
-                    width: 16,
-                    height: 16,
+                    entry['favicon'],
                     errorBuilder: (ctx, ex, trace) {
-                      print(ex);
-                      print(trace);
-                      var bytes = Uint8List.fromList(res.body.codeUnits);
-                      var test = img.IcoDecoder().decode(bytes);
-                      var image2 = img.JpegEncoder().encode(test!);
-                      return Image.memory(image2);
+                      return Text("??");
                     },
                   );
                   return image;
                 },
               ),
             ),
-            Container(child: Text(_entry['name'])),
-            Container(child: Text(_entry['surname'])),
+            Container(child: Text(entry['namespace::firstname_generator'])),
+            Container(child: Text(entry['namespace::lastname_generator'])),
+            Container(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/entry', arguments: i);
+                },
+                child: Text(AppLocalizations.of(context)!.button_entry_details),
+              ),
+            ),
           ],
         ),
       );
@@ -95,28 +84,50 @@ class _EntriesPageState extends State<EntriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.entries_title)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<TableRow>>(
-          future: _getRows(),
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<List<TableRow>> snapshot,
-          ) {
-            var child = Table(
-              border: TableBorder.all(),
-              columnWidths: const <int, TableColumnWidth>{
-                0: FlexColumnWidth(),
-                1: FlexColumnWidth(),
-                2: FlexColumnWidth(),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: snapshot.data!,
-            );
-            return child;
-          },
-        ),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.entries_title),
+        automaticallyImplyLeading: false, // Remove back button
+      ),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Side Navigation Bar
+          buildSidebar(context, "entries"),
+
+          // Main Content - Entries table
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  FutureBuilder<List<TableRow>>(
+                    future: _getRows(),
+                    builder: (
+                      BuildContext context,
+                      AsyncSnapshot<List<TableRow>> snapshot,
+                    ) {
+                      if (!snapshot.hasData) {
+                        return CircularProgressIndicator();
+                      }
+                      return Table(
+                        border: TableBorder.all(),
+                        columnWidths: const <int, TableColumnWidth>{
+                          0: FlexColumnWidth(),
+                          1: FlexColumnWidth(),
+                          2: FlexColumnWidth(),
+                          3: FlexColumnWidth(),
+                        },
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
+                        children: snapshot.data!,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

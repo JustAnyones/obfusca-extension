@@ -20,22 +20,32 @@ Future<(List<String>, List<double>)> readCSV(String filePath) async {
   }
 }
 
-Future<List<String>> readCities(String filePath, String countryCode) async {
-  List<String> data = [];
+Future<(List<String>, List<List<double>>)> readCities(
+  String filePath,
+  String countryCode,
+) async {
+  List<String> cities = [];
+  List<List<double>> boundingBoxes = [];
 
   try {
     final csvString = await rootBundle.loadString(filePath);
     var lines = csvString.split("\n");
     for (var i = 0; i < lines.length; i++) {
-      if (lines[i] == "") break;
+      if (lines[i].trim().isEmpty) break;
       var fields = lines[i].split(",");
       if (fields[1].trim() == countryCode) {
-        data.add(fields[0].toString().trim());
+        cities.add(fields[0].trim());
+        boundingBoxes.add([
+          double.parse(fields[2].trim()),
+          double.parse(fields[3].trim()),
+          double.parse(fields[4].trim()),
+          double.parse(fields[5].trim()),
+        ]);
       }
     }
-    return data;
+    return (cities, boundingBoxes);
   } catch (e) {
     print('Error reading file: $e');
-    return data;
+    return (cities, boundingBoxes);
   }
 }

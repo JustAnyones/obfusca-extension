@@ -63,13 +63,9 @@ function fillFields(fields) {
 
 // Called when site finishes loading, not all iframes
 (async () => {
-    const dataUrl = chrome.runtime.getURL("predefined.json");
-    const response = await fetch(dataUrl)
-    const data = await response.json()
-
     // Load site specific overrides
     const overrideResponse = await fetch(chrome.runtime.getURL("data/overrides.json"))
-    const overrides = await overrideResponse.json()["overrides"]
+    const overrides = await overrideResponse.json()
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Called when the popup requests fields
@@ -77,7 +73,7 @@ function fillFields(fields) {
             console.log("Received request for fields from popup");
 
             resetStore()
-            let fieldData = detectFields(data)
+            let fieldData = detectFields(overrides)
             // Remove fields with duplicate ref number, leaving only the last one
             fieldData = Object.values(
                 fieldData.reduce((acc, obj) => {

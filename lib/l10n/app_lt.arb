@@ -1,5 +1,5 @@
 {
-    "ext_title": "Duomenų generavimo įskiepis",
+    "ext_title": "Obfusca",
 
     "detect_fail": "Nepavyko aptikti laukų",
 
@@ -11,16 +11,42 @@
     "generator_street": "Gatvė",
     "generator_postal_code": "Pašto kodas",
     "generator_date_of_birth": "Gimimo metai",
+    "generator_sex": "Lytis",
+    "generator_password": "Slaptažodis",
+    "generator_custom": "Pasirinktinis generatorius",
+    "generator_email": "El. paštas",
     "button_wait": "Prašau palaukit...",
     "button_generate": "Generuoti",
     "expansion_tile": "Generatoriai",
+    "generator_page_title": "Generatorius",
 
     "button_save_entry": "Išsaugoti",
     "entry_saved": "Įrašas išsaugotas!",
+    "entry_no_fields": "Pasirinkite kuriuos laukus generuosite ir saugosite",
+    "entry_empty_fields": "Užpildykite visus pasirinktus laukus",
     "missing_name_surname": "Įveskite vardą ir pavardę",
+    "button_view_entries": "Įrašai",
+    "entries_title": "Išsaugoti įrašai",
+    "button_export_entries": "Eksportuoti į failą",
+    "button_import_entries": "Importuoti iš failo",
+    "import_no_file": "Pasirinkite failą",
+    "import_bad_file": "Negalima importuoti iš šio failo",
+    "import_success": "Įrašai importuoti",
+    "entry_details": "Įrašo detalės",
+    "button_entry_details": "Detaliau",
+    "button_clear_entries": "Ištrinti išsaugotus įrašus",
+    "input_password": "Įveskite sugeneruotą slaptažodį",
+    "hint_password": "Slaptažodis",
+    "button_submit_password": "Ok",
+    "google_sign_in": "Prisijungimas per Google",
+    "google_logout": "Atsijungti nuo Google",
+    "google_sync": "Sinchronizuoti su Google Drive",
+    "google_synced": "Sinchronizuota į Drive",
+    "google_explain": "Sinchronizuoti išsaugotus įrašus su Google Drive",
+    "clipboard": "Nukopijuota į iškarpinę",
 
     "settings_title": "Nustatymai",
-    "setting_locale_title": "Kalba",
+    "setting_locale_title": "Nustatymų kalba",
     "setting_locale_hint": "Pasirinkite kalbą",
     "setting_locale_option": "{code, select, en{Anglų} lt{Lietuvių} other{{code}}}",
     "@setting_locale_option": {
@@ -38,6 +64,63 @@
         }
     },
 
+    "settings_encryption_toggle": "Šifruoti įrašus eksportuojant",
+
     "settings_save_button": "Išsaugoti nustatymus",
-    "settings_saved_popup": "Nustatymai išsaugoti!"
+    "settings_saved_popup": "Nustatymai išsaugoti!",
+    "settings_custom_generator_create": "Sukurti custom generatorių",
+    "settings_custom_generator_random": "Atsitiktinis",
+    "settings_custom_generator_return_value": "Grąžinti reikšmę",
+    "settings_custom_generator_value": "Reikšmė",
+    "settings_custom_generator_add_value": "Pridėti reikšmę",
+    "settings_custom_generator_namespace": "Vardų sritis",
+    "settings_custom_generator_cancel": "Atšaukti",
+    "settings_custom_generator_create_button": "Sukurti",
+    "settings_custom_generator_creation_success": "Jusų generatorius sukurtas!",
+    "settings_custom_generator_creation_error": "Nepavyko sukurti custom generatoriaus: ",
+    "settings_custom_generator_delete_all": "Ištrinti visus jusų generatorius",
+    "settings_custom_generator_delete_all_success": "Visi jusų generatoriai ištrinti!",
+    "settings_custom_generator_required": "Privalomas laukelis",
+
+    "home_title": "Pagrindinis",
+    "detect_fields_button": "Aptikti laukus iš svetainės",
+    "fill_fields_button": "Užpildyti aptiktus laukus",
+
+    "user_profile_title": "Naudotojo paskyra",
+    "user_profile_page_title": "Naudotojo paskyra",
+    "user_profile_page_logout_button": "Atsijungti",
+    "user_profile_email_title": "Jūsų el. pašto adresai",
+    "user_profile_email_create_button": "Sukurti naują",
+    "user_profile_email_view_button": "Peržiūrėti",
+    "user_profile_email_copy_button": "Kopijuoti",
+    "user_profile_email_copy_toast": "Adresas nukopijuotas į iškarpinę",
+
+    "email_message_list_page_title": "Laiškai {email} el. pašto adresui",
+    "email_message_list_name": "Laiškai",
+    "email_message_list_mark_as_read": "Pažymėti kaip perskaitytą",
+    "email_message_list_mark_as_unread": "Pažymėti kaip neperskaitytą",
+
+    "email_view_page_title": "Laiško peržiūra",
+    "email_view_from": "Nuo: {address}",
+    "email_view_subject": "Tema: {subject}",
+    "email_view_date": "Data: {date}",
+    "email_view_attachments": "Prisegti failai",
+    "email_view_attachment_bytes": "{size} baitai",
+
+    "user_register_page_title": "Registracija",
+    "user_register_page_hint": "Sukurti naują paskyrą",
+    "user_register_page_button": "Registruotis",
+  
+    "user_login_page_title": "Prisijungimas",
+    "user_login_page_hint": "Prisijungti prie savo paskyros",
+    "user_login_page_button": "Prisijungti",
+    "user_login_page_register_upsell_1": "Neturite paskyros? Sukurkite savo paskyrą",
+    "user_login_page_register_upsell_2": "čia",
+  
+    "field_username_title": "Naudotojo vardas",
+    "field_password_title": "Slaptažodis",
+    "field_empty": "Laukas negali būti tuščias",
+
+    "toast_new_email_title": "Naujas laiškas nuo {address}",
+    "toast_new_email_view_button": "Peržiūrėti"
 }
